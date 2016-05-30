@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainApp.ui'
 #
-# Created: Thu May 26 15:12:55 2016
+# Created: Mon May 30 15:43:55 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -342,13 +342,14 @@ class Ui_MainApp(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_11)
         self.horizontalLayout_12 = QtGui.QHBoxLayout()
         self.horizontalLayout_12.setObjectName("horizontalLayout_12")
-        self.allowedDepthVarianceBox = QtGui.QSpinBox(self.settingsPage)
+        self.pressureCutOffBox = QtGui.QSpinBox(self.settingsPage)
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.allowedDepthVarianceBox.setFont(font)
-        self.allowedDepthVarianceBox.setMaximum(9999)
-        self.allowedDepthVarianceBox.setObjectName("allowedDepthVarianceBox")
-        self.horizontalLayout_12.addWidget(self.allowedDepthVarianceBox)
+        self.pressureCutOffBox.setFont(font)
+        self.pressureCutOffBox.setMaximum(99999)
+        self.pressureCutOffBox.setProperty("value", 2010)
+        self.pressureCutOffBox.setObjectName("pressureCutOffBox")
+        self.horizontalLayout_12.addWidget(self.pressureCutOffBox)
         self.label_10 = QtGui.QLabel(self.settingsPage)
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -381,6 +382,7 @@ class Ui_MainApp(object):
         font.setPointSize(10)
         self.stepSizeBox.setFont(font)
         self.stepSizeBox.setMaximum(9999)
+        self.stepSizeBox.setProperty("value", 1)
         self.stepSizeBox.setObjectName("stepSizeBox")
         self.horizontalLayout_13.addWidget(self.stepSizeBox)
         self.label_12 = QtGui.QLabel(self.settingsPage)
@@ -621,7 +623,7 @@ class Ui_MainApp(object):
         self.label_16.setText(QtGui.QApplication.translate("MainApp", "Second Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
         self.label_9.setText(QtGui.QApplication.translate("MainApp", "First Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
         self.label_17.setText(QtGui.QApplication.translate("MainApp", "Second Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_10.setText(QtGui.QApplication.translate("MainApp", "Allowed depth variance (m)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_10.setText(QtGui.QApplication.translate("MainApp", "Pressure Cut-Off (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_11.setText(QtGui.QApplication.translate("MainApp", "Maximum depth for interpolation (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_12.setText(QtGui.QApplication.translate("MainApp", "Step size for depth/pressure (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_13.setText(QtGui.QApplication.translate("MainApp", "Desired outputs:", None, QtGui.QApplication.UnicodeUTF8))

@@ -431,18 +431,21 @@ class MainApp(QMainWindow, Ui_MainApp):
             Qsa=Swgtsum/Wgtsums
             
             Qst = self.getSigmaT(Qsa,Qte)
-            self.Spiciness(Qsp,Qte,Qsa)
-            CALL Svanom(Qsa,Qte,0.,Sigma,Svan)
+            self.spiciness(Qsp,Qte,Qsa)
+            # self.Svanom(Qsa,Qte,0.,Sigma,Svan)
             
-            P(Ipr)=Deltap*(Ipr-1.)
-            T(Ipr)=Qte
-            S(Ipr)=Qsa
-            St(Ipr)=Qst
-            Sp(Ipr)=Qsp
-            Kdel=Kdel+1
-            Pdel(Kdel)=Pc
-            Sva(Kdel)=Svan
+            # P(Ipr)=Deltap*(Ipr-1.)
+            # T(Ipr)=Qte
+            # S(Ipr)=Qsa
+            # St(Ipr)=Qst
+            # Sp(Ipr)=Qsp
+            # Kdel=Kdel+1
+            # Pdel(Kdel)=Pc
+            # Sva(Kdel)=Svan
             
+        return
+
+    def svanom(self):
         return
 
     def spiciness(self, spice, temp, salt):
@@ -457,15 +460,12 @@ class MainApp(QMainWindow, Ui_MainApp):
         Sp=Salt-35.
         Theta=Temp
         # Reversed I and J here, are arrays backwards in HP Basic?
-        for I=1 in range(0, 5)
+        for I in range(0, 5):
             Ii=I-1
-            for J=1 in range(0, 4)
+            for J in range(0, 4):
                 Jj=J-1
-                Spice = Spice + B(I, J)*(Theta^Ii)*(Sp^Jj)
-                NEXT J
-        NEXT I
-        
-        SUBEND
+                # In Python, ^ is XOR 8 ^ 3 => 1000 ^ 0011 => 1011 = 11
+                Spice = Spice + B(I, J) * (Theta^I) * (Sp^J)
         return
 
     def sanityCheck(self):
@@ -494,8 +494,8 @@ class MainApp(QMainWindow, Ui_MainApp):
                     and float(row[3]) < self.pressureCutOff):
                         self.numFloats += 1
                         buoysToUse.append(row[0])
-                        self.Lat[numFloats] = float(row[1])
-                        self.Lon[numFloats] = float(row[2])
+                        self.Lat[self.numFloats] = float(row[1])
+                        self.Lon[self.numFloats] = float(row[2])
                     # Save it
                 # print row[0]
         print "Bouys to use is ", buoysToUse
@@ -541,9 +541,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         # Should I do the NumPy NULL or just stick with 999.9?
         self.Te[:] = 999.9
         self.Sa[:] = 999.9    
-        Lat[:] = 999.9
-        Lon[:] = 999.9
-        Accpt[:] = (-1)
+        self.Lat[:] = 999.9
+        self.Lon[:] = 999.9
+        self.Accpt[:] = (-1)
         Sa_av[:] = 0
         Sa_knt[:] = 0
         # Dout backslash because in Python you need to escape special chearacters
