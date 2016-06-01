@@ -284,6 +284,9 @@
                 <property name="maximum">
                  <number>9999</number>
                 </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
                </widget>
               </item>
               <item>
@@ -294,7 +297,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Radius of Float Cachment region (Km)</string>
+                 <string>List floats within radius (Km)</string>
                 </property>
                </widget>
               </item>
@@ -586,6 +589,9 @@
                 <property name="maximum">
                  <number>9999</number>
                 </property>
+                <property name="value">
+                 <number>20</number>
+                </property>
                </widget>
               </item>
               <item>
@@ -626,6 +632,9 @@
                 </property>
                 <property name="maximum">
                  <number>9999</number>
+                </property>
+                <property name="value">
+                 <number>20</number>
                 </property>
                </widget>
               </item>
@@ -1247,144 +1256,271 @@
           <widget class="QWidget" name="calculationsPage">
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QLabel" name="outputFilesLabel">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Output Files:</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <item>
+               <widget class="QLabel" name="outputFilesLabel">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Output Files:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_28">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_19">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Output files location</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLabel" name="label_19">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Output files location</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QLabel" name="label_21">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Write to file as settings for next time</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_27">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_20">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Station to Interpolate location</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLabel" name="label_20">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Station to Interpolate location</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <item>
+               <widget class="QTableWidget" name="tableWidget">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="rowCount">
+                 <number>30</number>
+                </property>
+                <property name="columnCount">
+                 <number>7</number>
+                </property>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <row/>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+                <item row="0" column="0">
+                 <property name="text">
+                  <string>Day Number</string>
+                 </property>
+                </item>
+                <item row="0" column="1">
+                 <property name="text">
+                  <string>Date</string>
+                 </property>
+                </item>
+                <item row="0" column="2">
+                 <property name="text">
+                  <string>Weight</string>
+                 </property>
+                </item>
+                <item row="0" column="3">
+                 <property name="text">
+                  <string>Delta Sigma T</string>
+                 </property>
+                </item>
+                <item row="0" column="4">
+                 <property name="text">
+                  <string>Surface Sigma T</string>
+                 </property>
+                </item>
+                <item row="0" column="5">
+                 <property name="text">
+                  <string>Closest Float (Km)</string>
+                 </property>
+                </item>
+                <item row="0" column="6">
+                 <property name="text">
+                  <string>Closest Float Filename</string>
+                 </property>
+                </item>
+                <item row="1" column="0">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="1" column="1">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="1" column="2">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="1" column="3">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="1" column="4">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+                <item row="1" column="5">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_30">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>583</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QLabel" name="label_21">
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Write to file as settings for next time</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTableWidget" name="tableWidget">
-              <property name="rowCount">
-               <number>10</number>
-              </property>
-              <property name="columnCount">
-               <number>7</number>
-              </property>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <row/>
-              <column/>
-              <column/>
-              <column/>
-              <column/>
-              <column/>
-              <column/>
-              <column/>
-              <item row="0" column="0">
-               <property name="text">
-                <string>Day Number</string>
-               </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <spacer name="horizontalSpacer_29">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
-              <item row="0" column="1">
-               <property name="text">
-                <string>Date</string>
-               </property>
+              <item>
+               <widget class="QPushButton" name="backToSettingsButton">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Back</string>
+                </property>
+               </widget>
               </item>
-              <item row="0" column="2">
-               <property name="text">
-                <string>Weight</string>
-               </property>
+              <item>
+               <widget class="QPushButton" name="nextButton_2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Next</string>
+                </property>
+               </widget>
               </item>
-              <item row="0" column="3">
-               <property name="text">
-                <string>Delta Sigma T</string>
-               </property>
-              </item>
-              <item row="0" column="4">
-               <property name="text">
-                <string>Surface Sigma T</string>
-               </property>
-              </item>
-              <item row="0" column="5">
-               <property name="text">
-                <string>Closest Float (Km)</string>
-               </property>
-              </item>
-              <item row="0" column="6">
-               <property name="text">
-                <string>Closest Float Filename</string>
-               </property>
-              </item>
-              <item row="1" column="0">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-              <item row="1" column="1">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-              <item row="1" column="2">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-              <item row="1" column="3">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-              <item row="1" column="4">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-              <item row="1" column="5">
-               <property name="text">
-                <string/>
-               </property>
-              </item>
-             </widget>
+             </layout>
             </item>
            </layout>
           </widget>

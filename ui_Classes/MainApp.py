@@ -114,6 +114,8 @@ class MainApp(QMainWindow, Ui_MainApp):
                 self.appendCheckBoxStateChanged)
         self.verboseCheckBox.stateChanged.connect(
                 self.verboseCheckBoxStateChanged)
+        self.backToSettingsButton.clicked.connect(
+                self.backToSettingsButtonClicked)
         return
 
     # Start of parameter boxes
@@ -204,6 +206,10 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.verbose = self.verboseCheckBox.isChecked()
         return
     # End of parameter boxes
+
+    def backToSettingsButtonClicked(self):
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        return
 
     def backToProgramListButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.programListPage)
@@ -380,6 +386,8 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.sanityCheck()
             sigT = self.getSigmaT(self.S, self.T)
             self.randomCalcs(sigT)
+        self.secondRun()
+        self.thirdRun()
         return
 
     def randomCalcs(self, sigT):
@@ -395,7 +403,40 @@ class MainApp(QMainWindow, Ui_MainApp):
             p[1] = 0
         # Re-intitializes Te[x][y] and Sa to 999.9
         print "nPress is ", self.nPress
-        for iterPress in xrange(1, self.nPress):
+        for Ipr in range(1, self.Press):
+            Pc=Deltap*(Ipr-1.) # Interpolate to Pc
+            if Pc<self.P[1]:
+                break
+            if Pc>self.P(self.numRecords):
+                break
+            # ! Somewhere in P(Ipr) there is data at pressure Pc
+            Eps=1.0E-6
+            for K in range(2, self.numRecords):
+                if Pc>=self.P[K-1] and Pc<=self.P[K]:
+                    Del_p=self.P[K]-self.P[K-1]
+                    if Del_p<100.:
+                        Rho=(Pc-self.P[K-1])/(self.P[K]-self.P[K-1]+Eps)
+                        self.Te[Iflt,Ipr]=self.T[K-1]+Rho*(self.T[K]-self.T[K-1]+Eps)
+                        self.Sa[Iflt,Ipr]=self.S[K-1]+Rho*(self.S[K]-self.S[K-1]+Eps)
+                    break
+            # ! Finished interpolation to standard pressures for Float Iflt
+        # Finished interpolation to standard pressures for all floats
+        return
+
+    def secondRun(self):
+        Stav=Stav/Stknt
+        Stav2=Stav2/Stknt
+        Stsd=SQR(Stav2-Stav*Stav)
+        if Verb_opt>.5:
+            print "Mean & std dev of St = ", Stav, Stsd
+        # ! Interpolate to station
+        # MAT Pdel=(-9999.9)
+        # MAT Sva=(-9999.9)
+        # MAT Dh=(-9999.9)
+        Kdel=0
+        Ipr75=INT(1.1+75./Deltap)
+        Wgtsumt_max=0.
+        for iterPress in range(1, self.nPress):
             pc = self.stepSize * (iterPress - 1) # What does this line do
             # 8330 REM IF Pc>Wdep THEN GOTO 5000
             Wgtsums=0.
@@ -424,29 +465,114 @@ class MainApp(QMainWindow, Ui_MainApp):
                 if Sa(iterFloat,iterPress)>20. and Sa(iterFloat,iterPress)<40.:
                     Wgtsums=Wgtsums+Wgt
                     Swgtsum=Swgtsum+Wgt*Sa(iterFloat,iterPress)
-
             if Wgtsumt>Wgtsumt_max: 
                 Wgtsumt_max=Wgtsumt
             Qte=Twgtsum/Wgtsumt
             Qsa=Swgtsum/Wgtsums
             
             Qst = self.getSigmaT(Qsa,Qte)
-            self.spiciness(Qsp,Qte,Qsa)
-            # self.Svanom(Qsa,Qte,0.,Sigma,Svan)
+            Spiciness = self.spiciness(Qsp,Qte,Qsa)
+            Sigma, Svan = self.svanom(Qsa,Qte,0)
             
-            # P(Ipr)=Deltap*(Ipr-1.)
-            # T(Ipr)=Qte
-            # S(Ipr)=Qsa
-            # St(Ipr)=Qst
-            # Sp(Ipr)=Qsp
-            # Kdel=Kdel+1
-            # Pdel(Kdel)=Pc
-            # Sva(Kdel)=Svan
-            
+            self.P[iterPress]=Deltap*(Ipr-1.)
+            self.T[iterPress]=Qte
+            self.S[iterPress]=Qsa
+            self.St[iterPress]=Qst
+            self.Sp[iterPress]=Qsp
+            Kdel=Kdel+1
+            self.Pdel[Kdel]=Pc
+            self.Sva[Kdel]=Svan
         return
 
-    def svanom(self):
+    def thirdRun(self):
+        # c means "calculated" ? Don't worry about this for now
+        # CALL Julday(1,Dc,Dayc,Monc,Yearc)
+        # Dayc$=TRIM$(VAL$(Dayc))
+        # IF Dayc<9.9 THEN Dayc$=" "&Dayc$
+        # Monc$=TRIM$(VAL$(Monc))
+        # IF Monc<9.9 THEN Monc$=" "&Monc$
+
+        # Some kind of formatting?
+        # Wgt = .001*int(Wgtsumt_max*1000.+.5)
+        # if POS(Wgt$,".")<.1 :
+        #     Wgt=Wgt$&"."
+        # if Wgtsumt_max<.9999999:
+        #     Wgt="0"&Wgt$
+        # L=LEN(Wgt$)
+        # if ABS(L-4.)<.1:
+        #     Wgt=Wgt$&"0"
+        # if ABS(L-3.)<.1 :
+        #     Wgt=Wgt$&"00"
+        # if ABS(L-2.)<.1:
+        #     Wgt=Wgt$&"000"
+        # if Wgtsumt_max>1.000 AND Wgtsumt_max<9.999999 :
+        #     Wgt=" "&Wgt$
+
+        # Lw=LEN(Wgt$)
+
+        # if St(1)>St(2) and np.abs(St(1)-St(2))>.05:
+        #     St(1)=St(2)
+        #     T(1)=T(2)
+        #     S(1)=S(2)
+        #     Sp(1)=Sp(2)
+
+        # # ! Now compute DHgt relative to Pmax
+        # Dh(Npress)=0.
+        # Q=5.6E-6 ! Q=0.5f/g at station Papa
         return
+
+    def svanom(self, S, T, P0):
+        #! Compute the density anomaly, sigma, in kg/m^3
+        #! Density anomaly is identical with sigma-t without pressure terms
+        #!
+        #! P0 = Pressure in decibars
+        #! T  = Temperature in deg C
+        #! S  = salinity in pss-78
+        #!
+        R3500=1028.106331
+        R4=4.8314E-4
+        Dr350=28.106331
+        P=P0/10
+        Sr=np.sqrt(S)
+        R1=((((6.536332E-9*T-1.120083E-6)*T+1.001685E-4)*T-9.09529E-3)*T+6.793952E-2)*T-28.263737
+        R2=(((5.3875E-9*T-8.2467E-7)*T+7.6438E-5)*T-4.0899E-3)*T+8.24493E-1
+        R3=(-1.6546E-6*T+1.0227E-4)*T-5.72466E-3
+        Sig=(R4*S+R3*Sr+R2)*S+R1
+        V350p=1/R3500
+        Sva=-Sig*V350p/(R3500+Sig)
+        Sigma=Sig+Dr350
+        #! Scale specific volume anomaly to normally reported units
+        Svan=Sva*1.0E+8
+        if P ==     0:
+                    # THEN GOTO 13710
+            return  # ToDo: Might not be correct
+        E=(9.1697E-10*T+2.0816E-8)*T-9.9348E-7
+        Bw=(5.2787E-8*T-6.12293E-6)*T+3.47718E-5
+        B=Bw+E*S
+        D=1.91075E-4
+        C=(-1.6078E-6*T-1.0981E-5)*T+2.2838E-3
+        Aw=((-5.77905E-7*T+1.16092E-4)*T+1.43713E-3)*T-.1194975
+        A=(D*Sr+C)*S+Aw
+        B1=(-5.3009E-4*T+1.6483E-2)*T+7.944E-2
+        A1=((-6.167E-5*T+1.09987E-2)*T-.603459)*T+54.6746
+        Kw=(((-5.155288E-5*T+1.360477E-2)*T-2.327105)*T+148.4206)*T-1930.06
+        K0=(B1*Sr+A1)*S+Kw
+        Dk=(B*P+A)*P+K0
+        K35=(5.03217E-5*P+3.359406)*P+21582.27
+        Gam=P/K35
+        Pk=1.0-Gam
+        Sva=Sva*Pk+(V350p+Sva)*P*Dk/(K35*(K35+Dk))
+        Svan=Sva*1.0E+8
+        V350p=V350p*Pk
+        # Density anomaly computed relative to 1000 kg/m^3
+        # DR350 = density anomaly at 35 pss, 0 deg C and 0 decibars
+        # dr35p = density anomaly at 35 pss, 0 deg C and pressure = p0 decibars
+        # Dvan  = Density anomaly variations involving spec vol anom
+        Dr35p=Gam/V350p
+        Dvan=Sva/(V350p*(V350p+Sva))
+        Sigma=Dr350+Dr35p-Dvan
+        # SUBEND
+        return Sigma, Dvan
 
     def spiciness(self, spice, temp, salt):
         # Hardcoded by Howard
@@ -466,7 +592,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                 Jj=J-1
                 # In Python, ^ is XOR 8 ^ 3 => 1000 ^ 0011 => 1011 = 11
                 Spice = Spice + B(I, J) * (Theta^I) * (Sp^J)
-        return
+        return Spice
 
     def sanityCheck(self):
         # ToDo
@@ -512,8 +638,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Accpt = np.empty((500))
         self.Fltnm = np.empty((500))
 
-        Pdel = np.empty((1000))
-        Sva = np.empty((1000))
+        self.Pdel = np.empty((1000))
+        self.Sva = np.empty((1000))
         Dh = np.empty((1000))
         # 40 DIM S$[100],T$[100],U$[500],Path0$[80],self.outPath$[80],Path$[80],R$[600],Closest_fltnm$[100]
         # Ignore all these declarations if they're strings, since I can do them at use-time
@@ -529,8 +655,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.P = np.empty((2000))
         self.T = np.empty((2000))
         self.S = np.empty((2000))
-        St = np.empty((2000))
-        Sp = np.empty((2000))
+        self.St = np.empty((2000))
+        self.Sp = np.empty((2000))
         # 140 ! ALPHA PEN 1
         # 150 Tabrow=11
         Scy = 111.2     # Scy = km/degree of latitude
