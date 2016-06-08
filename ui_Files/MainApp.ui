@@ -353,6 +353,13 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="date">
+                 <date>
+                  <year>2001</year>
+                  <month>1</month>
+                  <day>1</day>
+                 </date>
+                </property>
                 <property name="displayFormat">
                  <string>d/M/yyyy</string>
                 </property>
@@ -379,6 +386,13 @@
                  <font>
                   <pointsize>10</pointsize>
                  </font>
+                </property>
+                <property name="date">
+                 <date>
+                  <year>2016</year>
+                  <month>6</month>
+                  <day>6</day>
+                 </date>
                 </property>
                 <property name="displayFormat">
                  <string>d/M/yyyy</string>
@@ -634,7 +648,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>20</number>
+                 <number>100</number>
                 </property>
                </widget>
               </item>
@@ -678,7 +692,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>200</number>
+                 <number>20</number>
                 </property>
                </widget>
               </item>
@@ -721,7 +735,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>10</number>
+                 <number>90</number>
                 </property>
                </widget>
               </item>
@@ -765,7 +779,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>200</number>
+                 <number>100</number>
                 </property>
                </widget>
               </item>
@@ -808,7 +822,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>10</number>
+                 <number>200</number>
                 </property>
                </widget>
               </item>
@@ -896,7 +910,7 @@
                  <number>99999</number>
                 </property>
                 <property name="value">
-                 <number>2010</number>
+                 <number>20</number>
                 </property>
                </widget>
               </item>
@@ -908,7 +922,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Maximum depth for interpolation (m)</string>
+                 <string>Interpolate Vertically to P-max  (m)</string>
                 </property>
                </widget>
               </item>
@@ -936,7 +950,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>1</number>
+                 <number>2</number>
                 </property>
                </widget>
               </item>
@@ -1099,6 +1113,9 @@
                       <pointsize>10</pointsize>
                      </font>
                     </property>
+                    <property name="value">
+                     <number>50</number>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1107,6 +1124,12 @@
                      <font>
                       <pointsize>10</pointsize>
                      </font>
+                    </property>
+                    <property name="maximum">
+                     <number>300</number>
+                    </property>
+                    <property name="value">
+                     <number>144</number>
                     </property>
                    </widget>
                   </item>
@@ -1506,7 +1529,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="nextButton_2">
+               <widget class="QPushButton" name="finishedButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1516,7 +1539,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Next</string>
+                 <string>Finished</string>
                 </property>
                </widget>
               </item>

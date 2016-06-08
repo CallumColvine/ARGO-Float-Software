@@ -10,11 +10,13 @@ from ui_Files.ui_MainApp import Ui_MainApp
 # Calculations imports
 import numpy as np
 import os
-from datetime import datetime
+import datetime
 import time
 import csv
 
+
 class MainApp(QMainWindow, Ui_MainApp):
+
     def __init__(self):
         super(MainApp, self).__init__()
         # self.ui = Ui_MainWindow()
@@ -22,9 +24,17 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.setupSignals()
         # Declare input parameter variables
         self.defaultSettings = False
+        self.xCoord = 0
         self.floatRadius = 0
-        self.dayRange = 0
-        self.dayStepSize = 0
+        self.startDate = self.startRangeDateEdit.date().getDate()
+        self.endDate = self.endRangeDateEdit.date().getDate()
+        self.firstDayTuple = self.formatToDateTime(self.startDate[0],
+                                                   self.startDate[1],
+                                                   self.startDate[2])
+        self.lastDayTuple = self.formatToDateTime(self.endDate[0],
+                                                  self.endDate[1], 
+                                                  self.endDate[2])
+        self.dayStepSize = self.dayStepSizeBox.value()
         self.sampleWindow = 0
         self.firstLatitude = self.firstLatitudeBox.value()
         self.secondLatitude = self.secondLatitudeBox.value()
@@ -34,19 +44,39 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.maxInterpDepth = self.maxInterpDepthBox.value()
         self.stepSize = self.stepSizeBox.value()
         self.nPress = 1 + int(0.001 + self.maxInterpDepth / self.stepSize)
-        self.temp = False
-        self.salinity = False
-        self.sigmaT = False
-        self.spiciness = False
-        self.dynamicHeight = False
-        self.latitudeDesired = 0
-        self.longitudeDesired = 0
+        if self.nPress > 300:
+            self.nPress = 300
+
+        self.temp = self.tempCheckBox.isChecked()
+        self.salinity = self.salinityCheckBox.isChecked()
+        self.sigmaT = self.sigmaTCheckBox.isChecked()
+        self.spiciness = self.spicinessCheckBox.isChecked()
+        self.dynamicHeight = self.dynamicHeightCheckBox.isChecked()
+
+        self.latitudeDesired = self.latitudeDesiredBox.value()
+        self.longitudeDesired = self.longitudeDesiredBox.value()
         self.append = True
         self.verbose = False
         self.outPath = None
         self.drive = ''
         self.path0 = ''
+        self.pathTemp = ''
+        self.sigPath = "projects\\Sigma_Climate"
+        
+        self.weight = 0
+        self.tempCSV = None
+        self.salinityCSV = None
+        self.sigmaTCSV = None
+        self.spicinessCSV = None
+        self.dynamicHeightCSV = None
+        self.hgtCSV = None
+        self.cLimCSV = None
+
         self.yearMonthDayPath0 = ''
+        self.Scy=111.2  # ! Scy = km/degree of latitude
+        self.Scx0 = self.Scy*np.cos(self.latitudeDesired)
+        self.Rho0=300  # ! Decay scale of weighting function
+        self.Pref=1000. # ! Reference level for dynamic height calculations
         # Actual code, for testing easier though
         # self.curDay = int(time.strftime("%d"))
         # self.curMonth = int(time.strftime("%m"))
@@ -67,65 +97,91 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.setupInputParameterSignals()
         # GUI related to TimeSeries
         self.backToProgramListButton.clicked.connect(
-                self.backToProgramListButtonClicked)
+            self.backToProgramListButtonClicked)
         self.nextButton.clicked.connect(self.nextButtonClicked)
         return
 
     def setupInputParameterSignals(self):
         self.defaultSettingsCheckBox.stateChanged.connect(
-                self.defaultSettingsCheckBoxStateChanged)
+            self.defaultSettingsCheckBoxStateChanged)
         self.floatRadiusBox.editingFinished.connect(
-                self.floatRadiusBoxEditingFinished)
+            self.floatRadiusBoxEditingFinished)
         # self.dayRangeBox.editingFinished.connect(
         #         self.dayRangeBoxEditingFinished)
         self.dayStepSizeBox.editingFinished.connect(
-                self.dayStepSizeBoxEditingFinished)
+            self.dayStepSizeBoxEditingFinished)
         self.sampleWindowBox.editingFinished.connect(
-                self.sampleWindowBoxEditingFinished)
+            self.sampleWindowBoxEditingFinished)
         self.firstLatitudeBox.editingFinished.connect(
-                self.firstLatitudeBoxEditingFinished)
+            self.firstLatitudeBoxEditingFinished)
         self.secondLatitudeBox.editingFinished.connect(
-                self.secondLatitudeBoxEditingFinished)
+            self.secondLatitudeBoxEditingFinished)
         self.firstLongitudeBox.editingFinished.connect(
-                self.firstLongitudeBoxEditingFinished)
+            self.firstLongitudeBoxEditingFinished)
         self.secondLongitudeBox.editingFinished.connect(
-                self.secondLongitudeBoxEditingFinished)
+            self.secondLongitudeBoxEditingFinished)
         self.pressureCutOffBox.editingFinished.connect(
-                self.pressureCutOffBoxEditingFinished)
+            self.pressureCutOffBoxEditingFinished)
         self.maxInterpDepthBox.editingFinished.connect(
-                self.maxInterpDepthBoxEditingFinished)
+            self.maxInterpDepthBoxEditingFinished)
         self.stepSizeBox.editingFinished.connect(
-                self.stepSizeBoxEditingFinished)
+            self.stepSizeBoxEditingFinished)
         self.tempCheckBox.stateChanged.connect(
-                self.tempCheckBoxStateChanged)
+            self.tempCheckBoxStateChanged)
         self.salinityCheckBox.stateChanged.connect(
-                self.salinityCheckBoxStateChanged)
+            self.salinityCheckBoxStateChanged)
         self.sigmaTCheckBox.stateChanged.connect(
-                self.sigmaTCheckBoxStateChanged)
+            self.sigmaTCheckBoxStateChanged)
         self.spicinessCheckBox.stateChanged.connect(
-                self.spicinessCheckBoxStateChanged)
+            self.spicinessCheckBoxStateChanged)
         self.dynamicHeightCheckBox.stateChanged.connect(
-                self.dynamicHeightCheckBoxStateChanged)
+            self.dynamicHeightCheckBoxStateChanged)
         self.latitudeDesiredBox.editingFinished.connect(
-                self.latitudeDesiredBoxEditingFinished)
+            self.latitudeDesiredBoxEditingFinished)
         self.longitudeDesiredBox.editingFinished.connect(
-                self.longitudeDesiredBoxEditingFinished)
+            self.longitudeDesiredBoxEditingFinished)
         self.appendCheckBox.stateChanged.connect(
-                self.appendCheckBoxStateChanged)
+            self.appendCheckBoxStateChanged)
         self.verboseCheckBox.stateChanged.connect(
-                self.verboseCheckBoxStateChanged)
+            self.verboseCheckBoxStateChanged)
         self.backToSettingsButton.clicked.connect(
-                self.backToSettingsButtonClicked)
+            self.backToSettingsButtonClicked)
+        self.startRangeDateEdit.dateChanged.connect(
+            self.startDateChanged)
+        self.endRangeDateEdit.dateChanged.connect(
+            self.endDateChanged)
         return
 
+
+    def formatToDateTime(self, year, month, day):
+        stringVersion = str(day) + '.' + str(month) + '.' + str(year)
+        stringFormat = '%d.%m.%Y'
+        dateTuple = datetime.datetime.strptime(stringVersion,
+                                               stringFormat)
+        return dateTuple
+
     # Start of parameter boxes
+    def startDateChanged(self, date):
+        self.startDate = date.getDate()
+        self.firstDayTuple = self.formatToDateTime(self.startDate[0],
+                                                   self.startDate[1],
+                                                   self.startDate[2])
+        return
+
+    def endDateChanged(self, date):
+        self.endDate = date.getDate()
+        self.lastDayTuple = self.formatToDateTime(self.endDate[0],
+                                                  self.endDate[1], 
+                                                  self.endDate[2])
+        return
+
     def defaultSettingsCheckBoxStateChanged(self, boxInput):
         if boxInput == 2:
             self.defaultOptions()
         else:
             self.userDefinedSettings()
         return
-        
+
     def floatRadiusBoxEditingFinished(self):
         self.floatRadius = self.floatRadiusBox.value()
         return
@@ -222,16 +278,16 @@ class MainApp(QMainWindow, Ui_MainApp):
     def nextButtonClicked(self):
         # Check to make sure all params have been filled
         self.yearMonthDayPath0 = self.path0 \
-                + str(self.curYear) + '\\' \
-                + str(self.curMonth).zfill(2) + '\\' \
-                + str(self.curDay).zfill(2) + '\\' 
+            + str(self.curYear) + '\\' \
+            + str(self.curMonth).zfill(2) + '\\' \
+            + str(self.curDay).zfill(2) + '\\'
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         self.prepareOutputFiles()
         self.commenceInterpolation()
         return
 
     def sanityCheck(self):
-        
+
         return
 
     def getSigmaT(self, S, T):
@@ -240,11 +296,13 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 12640! T  = Temperature in C
         # 12650! S  = salinity in pss-78
         # 12660!
-        R4 =4.8314E-4
+        R4 = 4.8314E-4
         Dr350 = 28.106331
         Sr = np.sqrt(S)
-        R1 = ((((6.536332E-9 * T - 1.120083E-6) * T + 1.001685E-4) * T - 9.09529E-3) * T + 6.793952E-2) * T - 28.263737
-        R2 = (((5.3875E-9 * T - 8.2467E-7) * T + 7.6438E-5) * T - 4.0899E-3) * T + 8.24493E-1
+        R1 = ((((6.536332E-9 * T - 1.120083E-6) * T + 1.001685E-4)
+               * T - 9.09529E-3) * T + 6.793952E-2) * T - 28.263737
+        R2 = (((5.3875E-9 * T - 8.2467E-7) * T + 7.6438E-5)
+              * T - 4.0899E-3) * T + 8.24493E-1
         R3 = (-1.6546E-6 * T + 1.0227E-4) * T - 5.72466E-3
         Sig = (R4 * S + R3 * Sr + R2) * S + R1
         Sigma = Sig + Dr350
@@ -252,28 +310,28 @@ class MainApp(QMainWindow, Ui_MainApp):
         return Sigma_t
 
     # Line 1402-1623
-    def getProfile(self, 
-                   floatNum, 
-                   pressureMatrix, 
-                   tempMatrix, 
-                   salinityMatrix, 
+    def getProfile(self,
+                   floatNum,
+                   pressureMatrix,
+                   tempMatrix,
+                   salinityMatrix,
                    rFlag):
         # Setup path (skip)
         rFlag = -1
         order = []
         path = self.yearMonthDayPath0 + floatNum
-        self.extractDataFromFloatFile(path, order)          
-        # He opens this path?
         numChannels = 0
         numRecords = 0
         fileTempQc = 0
         filePSalQc = 0
+        numRecs = self.extractDataFromFloatFile(path, order)
+        # He opens this path?
         # Line1 -> 16210 close file, stop logging, lastRun
-        if not self.checkIfReturn(numRecords, fileTempQc, filePSalQc):
+        if not self.checkIfReturn(numRecs, fileTempQc, filePSalQc):
             print "in getProfile, returning prematurely due to bad values"
             return
-        self.channelOrder()
-        return
+        # self.channelOrder()
+        return numRecs
 
     def extractDataFromFloatFile(self, path, order):
         print "Opening path ", path
@@ -282,11 +340,14 @@ class MainApp(QMainWindow, Ui_MainApp):
         pFound = False
         tFound = False
         sFound = False
+        numRecs = 0
         i = 0
         for line in floatFile:
             if not passedEndOfHeader:
+                if line.find("NUMBER OF RECORDS") != -1:
+                    numRecs = self.getNumRecs(line)
                 order, pFound, tFound, sFound = \
-                        self.findOrder(line, order, pFound, tFound, sFound)
+                    self.findOrder(line, order, pFound, tFound, sFound)
                 if not (self.verifyUsability(line)):
                     return
             else:
@@ -294,30 +355,40 @@ class MainApp(QMainWindow, Ui_MainApp):
                 self.appendInfo(line, order, i)
             if line.find("END OF HEADER") != -1:
                 passedEndOfHeader = True
-        print "Order is ", order  
-        return 
+        print "Order is ", order
+        return numRecs 
+
+    def getNumRecs(self, line):
+        split = line.split()
+        # print "numRecs is ", int(split[4]) 
+        return int(split[4])         
 
     def appendInfo(self, line, order, i):
         split = line.split()
-        print "Split is ", split
+        # print "Split is ", split
         offset = 5
         position = 0
         for data in order:
+            twoPos = float(split[2 + (position * 5)])
+            zeroPos = float(split[0 + (position * 5)])
             if data == 'P':
-                if abs(float(split[2 + (position * 5)])) < 9000:
-                    self.P[i] = float(split[2 + (position * 5)])
+                if np.abs(twoPos) < 9000:
+                    # print "twoPos is ", twoPos
+                    # print "i is ", i
+                    self.P[i] = twoPos
                 else:
-                    self.P[i] = float(split[0 + (position * 5)])
+                    # print "zero pso is ", zeroPos
+                    self.P[i] = zeroPos
             elif data == 'T':
-                if abs(float(split[2 + (position * 5)])) < 9000:
-                    self.T[i] = float(split[2 + (position * 5)])
+                if np.abs(twoPos) < 9000:
+                    self.T[i] = twoPos
                 else:
-                    self.T[i] = float(split[0 + (position * 5)])
+                    self.T[i] = zeroPos
             elif data == 'S':
-                if abs(float(split[2 + (position * 5)])) < 9000:                
-                    self.S[i] = float(split[2 + (position * 5)])
+                if np.abs(twoPos) < 9000:
+                    self.S[i] = twoPos
                 else:
-                    self.S[i] = float(split[0 + (position * 5)])
+                    self.S[i] = zeroPos
             position += 1
 
         return
@@ -334,7 +405,7 @@ class MainApp(QMainWindow, Ui_MainApp):
     # TODO: Improve runtime, reduce calls to this function
     def findOrder(self, line, order, pFound, tFound, sFound):
         resP = -1
-        resT = -1 
+        resT = -1
         resS = -1
         print line
         if not pFound:
@@ -348,180 +419,354 @@ class MainApp(QMainWindow, Ui_MainApp):
             order.append('P')
         elif resT != -1:
             tFound = True
-            order.append('T')                
+            order.append('T')
         elif resS != -1:
             sFound = True
             order.append('S')
         return order, pFound, tFound, sFound
-
 
     def checkIfReturn(self, numRecords, fileTempQc, filePSalQc):
         if numRecords < 15:
             return False
         if fileTempQc == 'C':
             return False
-        if fileTempQc == 'D': 
+        if fileTempQc == 'D':
             return False
-        if fileTempQc == 'E': 
+        if fileTempQc == 'E':
             return False
-        if fileTempQc == 'F': 
+        if fileTempQc == 'F':
             return False
-        if filePSalQc == 'C': 
+        if filePSalQc == 'C':
             return False
-        if filePSalQc == 'D': 
+        if filePSalQc == 'D':
             return False
-        if filePSalQc == 'E': 
+        if filePSalQc == 'E':
             return False
-        if filePSalQc == 'F': 
+        if filePSalQc == 'F':
             return False
         return True
 
-    def commenceInterpolation(self,):
-        # print some stuff for user
-        sTav = 0
-        floats = self.checkFloatsFromIndex(self.yearMonthDayPath0)
-        rFlag = -1
-        for singleFloat in floats:
-            self.getProfile(singleFloat, self.P, self.T, self.S, rFlag)
-            self.sanityCheck()
-            sigT = self.getSigmaT(self.S, self.T)
-            self.randomCalcs(sigT)
-        self.secondRun()
-        self.thirdRun()
+    def commenceInterpolation(self):
+        yearDayStart = self.firstDayTuple.timetuple().tm_yday
+        yearDayEnd = self.lastDayTuple.timetuple().tm_yday
+        julStart = self.dateToJulian(self.startDate[2],
+                                     self.startDate[1],
+                                     self.startDate[0],
+                                     yearDayStart)
+        julEnd = self.dateToJulian(self.endDate[2],
+                                   self.endDate[1],
+                                   self.endDate[0],
+                                   yearDayEnd)
+        # print "Starting date ", self.startDate[2], " Ending date ", self.endDate[2]
+        # print "start Date is ", julStart, " end Date is ", julEnd
+        for Dc in xrange(julStart, julEnd, self.dayStepSize):
+            # print some stuff for user
+            # print "INSIDE LOOP"
+            self.xCoord = Dc
+            sTav = 0
+            sTavSq = 0
+            sTKnt = 0
+            floats = self.checkFloatsFromIndex(self.yearMonthDayPath0)
+            # print "floats are ", floats
+            rFlag = -1
+            i = 0
+            for singleFloat in floats:
+                # print "there's a float for all the floats!"
+                numRecs = self.getProfile(singleFloat, self.P, self.T, self.S, rFlag)
+                self.sanityCheck()
+                sigT = self.getSigmaT(self.S[1], self.T[1])
+                sTav, sTavSq, sTKnt = self.randomCalcs(sigT, sTav, sTavSq, sTKnt, numRecs, i)
+                i += 1
+                break               # ToDo: This is for testing
+            # secondRun has double for loop
+            Ipr75 = self.secondRun(sTav, sTavSq, sTKnt)
+            self.thirdRun()
+            self.computeDHgt()
+            self.finishUp(Ipr75)
+        self.cleanUp()
         return
 
-    def randomCalcs(self, sigT):
+    def cleanUp(self):
+        # IF Te_opt>.5 THEN ASSIGN @Pte TO *
+        # IF Sa_opt>.5 THEN ASSIGN @Psa TO *
+        # IF St_opt>.5 THEN ASSIGN @Pst TO *
+        # IF Sp_opt>.5 THEN ASSIGN @Psp TO *
+        # IF Dh_opt>.5 THEN ASSIGN @Pdh TO *
+        # IF Dh_opt>.5 THEN ASSIGN @Psu TO *
+        # ASSIGN @Pstrat TO *
+        self.tempCSV.close()
+        self.salinityCSV.close()
+        self.sigmaTCSV.close()
+        self.spicinessCSV.close()
+        self.dynamicHeightCSV.close()
+        self.hgtCSV.close()
+        self.cLimCSV.close()
+        self.stratCSV.close()
+
+        print "-----------------------------------------------------------------------"
+        # 
+        # DISP
+        print "Interpolations are completed and stored."
+        # !
+        # CALL Logit(2,"TimeSeries.prg",Drive$)
+        # 
+        # ON KEY 5 LABEL "Select  Programs" GOTO 10320
+        # ON KEY 6 LABEL "Quit" GOTO 10370
+        # 
+        # GOTO 10300
+        # 
+        # GCLEAR
+        # CLEAR SCREEN
+        # 
+        # LOAD "d:\projects\Argo\Selector.prg",1
+        # 
+        # PRINT "Normal End"
+        self.Lastrun(self.drive,-1)
+        # 
+        return
+
+    def finishUp(self, Ipr75):
+
+        # S$=Xcoord$&","&VAL$(Dh(1))&","&Wgt$
+        # IF Dh_opt>.5 THEN OUTPUT @Psu;S$
+        if self.dynamicHeight:
+            self.dynamicHeightCSV.write(str(self.xCoord) + ',' + 
+                str(self.Dh[1]) + ',' + str(self.weight))
+        # !
+        Stdiff=self.St[Ipr75]-self.St[1]
+        if Stdiff<-.002:
+            Stdiff=0.
+        self.stratCSV.write(str(self.xCoord) + ',' + str(self.St[1]) + ',' 
+            + str(self.St[Ipr75]) + ',' + str(self.weight))
+        # !
+        Stdiff=.001*int(1000.*Stdiff+.5)
+        # IF Stdiff<.9999999 THEN Stdiff$="0"&Stdiff$
+        if Stdiff<.001:
+            Stdiff=0.000
+        St1 = .001*int(.5+1000.*self.St[1])
+        Dayc, Monc, Yearc = self.julianToDate(self.xCoord)
+        R = "| " + str(self.xCoord) + " " + str(Dayc) + "/" + str(Monc) + "/" + \
+            str(Yearc) + " | " + str(self.weight) + "  " + str(Stdiff) + "    " + \
+            str(St1)
+        self.Closest=.1*int(10.*self.Closest+.5)
+        # Pp=POS(Closest_fltnm$,".")
+        R += R + " | " + str(self.Closest) + "  " + \
+            self.Closest_fltnm + " |"
+        print R
+
+        # ToDo: Optimize, open outside of loop
+        lstMsge = open((self.outPath + "lstmsge.csv"), 'w+')
+        lstMsge.truncate()
+        lstMsge.write(R)
+        lstMsge.close()        
+        # IF Verb_opt>.5 THEN PRINT "Done ";Dc1;Dc;Dc2
+        # NEXT Dc
+        return
+
+    def randomCalcs(self, sigT, sTav, sTavSq, sTKnt, numRecs, Iflt):
         # Copied, not sure why Howard does this
-        sigT = .001 * int(.5 + 1000. * sigT)
-        print "sigT is ", sigT
+        sigT = ((.5 + 1000. * sigT)) / 1000
+        # print "sigT is ", sigT
         if sigT > 5 and sigT < 30:
             sTav += sigT
             sTavSq += np.power(sigT, 2)
             sTKnt += 1
-        print "P[1] is ", p[1]
-        if P[1] < 20:
-            p[1] = 0
+        # print "P[1] is ", self.P[1]
+        if self.P[1] < 20:
+            self.P[1] = 0
         # Re-intitializes Te[x][y] and Sa to 999.9
-        print "nPress is ", self.nPress
-        for Ipr in range(1, self.Press):
-            Pc=Deltap*(Ipr-1.) # Interpolate to Pc
-            if Pc<self.P[1]:
+        # print "nPress is ", self.nPress
+        for Ipr in range(1, self.nPress):
+            pressureCalc = self.stepSize * (Ipr - 1.)  # Interpolate to pressureCalc
+            # print "pressureCalc is ", pressureCalc, " P[1] is ", self.P[1]
+            if (pressureCalc < self.P[1]):
                 break
-            if Pc>self.P(self.numRecords):
+            # print "numRecs is ", numRecs
+            # print "self.P[numRecs] is ", self.P[numRecs]
+            # print "P is ", self.P
+            if (pressureCalc > self.P[numRecs]):
                 break
-            # ! Somewhere in P(Ipr) there is data at pressure Pc
-            Eps=1.0E-6
-            for K in range(2, self.numRecords):
-                if Pc>=self.P[K-1] and Pc<=self.P[K]:
-                    Del_p=self.P[K]-self.P[K-1]
-                    if Del_p<100.:
-                        Rho=(Pc-self.P[K-1])/(self.P[K]-self.P[K-1]+Eps)
-                        self.Te[Iflt,Ipr]=self.T[K-1]+Rho*(self.T[K]-self.T[K-1]+Eps)
-                        self.Sa[Iflt,Ipr]=self.S[K-1]+Rho*(self.S[K]-self.S[K-1]+Eps)
+            # ! Somewhere in P(Ipr) there is data at pressure pressureCalc
+            Eps = 1.0E-6
+            # print "numRecs is ", numRecs
+            # print "nPress is ", self.nPress
+            for K in range(2, numRecs):
+                if pressureCalc >= self.P[K - 1] and pressureCalc <= self.P[K]:
+                    Del_p = self.P[K] - self.P[K - 1]
+                    # print "----- Del_p is ", Del_p 
+                    if Del_p < 100:
+                        Rho = (pressureCalc - self.P[K - 1]) / \
+                            (self.P[K] - self.P[K - 1] + Eps)
+                        self.Te[Iflt, Ipr] = self.T[K - 1] + \
+                            Rho * (self.T[K] - self.T[K - 1] + Eps)
+                        # print "Setting Te to ", self.T[K - 1] + \
+                        #     Rho * (self.T[K] - self.T[K - 1] + Eps), " at ", Iflt, Ipr 
+                        self.Sa[Iflt, Ipr] = self.S[K - 1] + \
+                            Rho * (self.S[K] - self.S[K - 1] + Eps)
                     break
             # ! Finished interpolation to standard pressures for Float Iflt
         # Finished interpolation to standard pressures for all floats
-        return
+        return sTav, sTavSq, sTKnt
 
-    def secondRun(self):
-        Stav=Stav/Stknt
-        Stav2=Stav2/Stknt
-        Stsd=SQR(Stav2-Stav*Stav)
-        if Verb_opt>.5:
-            print "Mean & std dev of St = ", Stav, Stsd
+    def secondRun(self, sTav, sTavSq, sTKnt):
+        sTav = sTav / sTKnt
+        sTavSq = sTavSq / sTKnt
+        stdDev = np.power((sTavSq - sTav * sTav), 2)
+        # if Verb_opt > .5:
+            # print "Mean & std dev of St = ", sTav, stdDev
         # ! Interpolate to station
         # MAT Pdel=(-9999.9)
         # MAT Sva=(-9999.9)
         # MAT Dh=(-9999.9)
-        Kdel=0
-        Ipr75=INT(1.1+75./Deltap)
-        Wgtsumt_max=0.
+        Kdel = 0
+        Qsa = 0
+        Qte = 0
+        Qsp = 0
+        Ipr75 = int(1.1 + 75. / self.stepSize)
+        weightSumTMax = 0.
         for iterPress in range(1, self.nPress):
-            pc = self.stepSize * (iterPress - 1) # What does this line do
+            pressureCal = self.stepSize * (iterPress - 1)  # What does this line do
             # 8330 REM IF Pc>Wdep THEN GOTO 5000
-            Wgtsums=0.
-            Wgtsumt=0.
-            Swgtsum=0.
-            Twgtsum=0.
-            for iterFloat in range(1, numFloats):
+            weightSumS = 0.
+            weightSumT = 0.
+            salWeightSumT = 0.
+            tempWeightSumT = 0.
+            # print "numFloats is ", self.numFloats
+            for iterFloat in range(1, self.numFloats):
                 # IF Accpt(Iflt)<0. THEN GOTO 8610
                 # Latav = latitude average?
-                Latav = .5 * (Lat(iterFloat) + Latc)
-                Scx=Scy*COS(Latav)
-                Dx=Scx*(Lonc-Lon(iterFloat))
-                Dy=Scy*(Latc-Lat(iterFloat))
-                Rho=SQR(Dx*Dx+Dy*Dy)
-                Z=Rho/Rho0
-                print "Z is ", Z
+                Latav = (self.Lat[iterFloat] + self.latitudeDesired) / 2
+                Scx = self.Scy * np.cos(Latav)
+                Dx = Scx * (self.longitudeDesired - self.Lon[iterFloat])
+                # print "Dx is ", Dx
+                Dy = self.Scy * (self.latitudeDesired - self.Lat[iterFloat])
+                # print "Dy is ", Dy
+                Rho = np.sqrt(Dx * Dx + Dy * Dy)
+                # print "Rho is ", Rho
+                Z = Rho / self.Rho0
+                # print "Z is ", Z
                 # IF Z>5. THEN GOTO 8610
-                if Z > 5:
-                    break
-                Wgt=np.exp(-Z*Z)
-                # !
-                if Te(iterFloat,iterPress)>-1.5 and Te(iterFloat,iterPress)<40.:
-                    Wgtsumt=Wgtsumt+Wgt
-                    Twgtsum=Twgtsum+Wgt*Te(iterFloat,iterPress)
+                if not (Z > 5):
+                    # print "THERE IS AN OCCURANCE OF Z NOT > 5"
+                    self.weight = np.exp(-Z * Z)
+                    # !
+                    # print "Te's are ", self.Te[iterFloat, iterPress], self.Te[iterFloat, iterPress]
+                    # print "inside if at ", iterFloat, iterPress
+                    if (self.Te[iterFloat, iterPress] > -1.5 and \
+                            self.Te[iterFloat, iterPress] < 40.):
+                        weightSumT = weightSumT + weight
+                        tempWeightSumT = tempWeightSumT + \
+                            weight * self.Te[iterFloat, iterPress]
 
-                if Sa(iterFloat,iterPress)>20. and Sa(iterFloat,iterPress)<40.:
-                    Wgtsums=Wgtsums+Wgt
-                    Swgtsum=Swgtsum+Wgt*Sa(iterFloat,iterPress)
-            if Wgtsumt>Wgtsumt_max: 
-                Wgtsumt_max=Wgtsumt
-            Qte=Twgtsum/Wgtsumt
-            Qsa=Swgtsum/Wgtsums
-            
-            Qst = self.getSigmaT(Qsa,Qte)
-            Spiciness = self.spiciness(Qsp,Qte,Qsa)
-            Sigma, Svan = self.svanom(Qsa,Qte,0)
-            
-            self.P[iterPress]=Deltap*(Ipr-1.)
-            self.T[iterPress]=Qte
-            self.S[iterPress]=Qsa
-            self.St[iterPress]=Qst
-            self.Sp[iterPress]=Qsp
-            Kdel=Kdel+1
-            self.Pdel[Kdel]=Pc
-            self.Sva[Kdel]=Svan
-        return
+                    if self.Sa[iterFloat, iterPress] > 20. and \
+                            self.Sa[iterFloat, iterPress] < 40.:
+                        weightSumS = weightSumS + weight
+                        salWeightSumT = salWeightSumT + \
+                            weight * self.Sa[iterFloat, iterPress]
+            if weightSumT > weightSumTMax:
+                weightSumTMax = weightSumT
+            if weightSumT > 0:
+                Qte = tempWeightSumT / weightSumT
+            else:
+                print "no floats usable to calculate Qte"
+            if weightSumS > 0:
+                Qsa = salWeightSumT / weightSumS
+            else:
+                print "no floats usable to calculate Qsa"
+
+            Qst = self.getSigmaT(Qsa, Qte)
+            Spiciness = self.getSpiciness(Qsp, Qte, Qsa)
+            Sigma, Svan = self.getSvanom(Qsa, Qte, 0)
+            self.P[iterPress] = self.stepSize * (iterPress - 1.)
+            # print "things are ", self.stepSize * (iterPress - 1.)
+            self.T[iterPress] = Qte
+            self.S[iterPress] = Qsa
+            self.St[iterPress] = Qst
+            self.Sp[iterPress] = Qsp
+            Kdel = Kdel + 1
+            self.Pdel[Kdel] = pressureCal
+            self.Sva[Kdel] = Svan
+        return Ipr75
 
     def thirdRun(self):
-        # c means "calculated" ? Don't worry about this for now
-        # CALL Julday(1,Dc,Dayc,Monc,Yearc)
-        # Dayc$=TRIM$(VAL$(Dayc))
-        # IF Dayc<9.9 THEN Dayc$=" "&Dayc$
-        # Monc$=TRIM$(VAL$(Monc))
-        # IF Monc<9.9 THEN Monc$=" "&Monc$
+        # 8880 Some kind of formatting?
+        # ----- ^ ALL UNNECESSARY? -----
 
-        # Some kind of formatting?
-        # Wgt = .001*int(Wgtsumt_max*1000.+.5)
-        # if POS(Wgt$,".")<.1 :
-        #     Wgt=Wgt$&"."
-        # if Wgtsumt_max<.9999999:
-        #     Wgt="0"&Wgt$
-        # L=LEN(Wgt$)
-        # if ABS(L-4.)<.1:
-        #     Wgt=Wgt$&"0"
-        # if ABS(L-3.)<.1 :
-        #     Wgt=Wgt$&"00"
-        # if ABS(L-2.)<.1:
-        #     Wgt=Wgt$&"000"
-        # if Wgtsumt_max>1.000 AND Wgtsumt_max<9.999999 :
-        #     Wgt=" "&Wgt$
-
-        # Lw=LEN(Wgt$)
-
-        # if St(1)>St(2) and np.abs(St(1)-St(2))>.05:
-        #     St(1)=St(2)
-        #     T(1)=T(2)
-        #     S(1)=S(2)
-        #     Sp(1)=Sp(2)
+        if self.St[1]>self.St[2] and np.abs(self.St[1]-self.St[2])>.05:
+            self.St[1]=self.St[2]
+            self.T[1]=self.T[2]
+            self.S[1]=self.S[2]
+            self.Sp[1]=self.Sp[2]
 
         # # ! Now compute DHgt relative to Pmax
         # Dh(Npress)=0.
         # Q=5.6E-6 ! Q=0.5f/g at station Papa
         return
 
-    def svanom(self, S, T, P0):
+
+    def computeDHgt(self):
+        
+        # Now compute DHgt relative to Pmax
+        # Dh(Npress)=0.
+        Q=5.6E-6 # ! Q=0.5f/g at station Papa
+        for K in range(2, self.nPress):
+            # Ipr=Npress+1-K
+            # Dh(Ipr)=Dh(Ipr+1)+Q*(Sva(Ipr+1)+Sva(Ipr))*Deltap
+            # NEXT K
+            pass
+        
+        for Ipr in range(1, self.nPress):
+            Qte=.001*int(.5+1000.*self.T[Ipr])
+            Qsa=.001*int(.5+1000.*self.S[Ipr])
+            Qst=.001*int(.5+1000.*self.St[Ipr])
+            Qsp=.001*int(.5+1000.*self.Sp[Ipr])
+            Qdh=.001*int(.5+1000.*self.Dh[Ipr])
+            Pc=self.stepSize*(Ipr-1.)
+            
+            Sigref_opt=-1
+            # print "Qst is ", Qst
+            # IF Qst<Sigref_st(1) THEN GOTO 9420
+            # IF Qst>Sigref_st(71) THEN GOTO 9420
+
+            # Updated indexes from HP references 1 -> 0, 71 -> 70
+            if not (Qst < self.Sigref_st[0]) and not (Qst > self.Sigref_st[70]): 
+                # for Icl=1 TO 70
+                #     IF Qst>=Sigref_st(Icl) AND Qst<=Sigref_st(Icl+1) THEN GOTO 9300
+                #     NEXT Icl
+                for Icl in range(0, 69):
+                    if Qst >= self.Sigref_st[Icl] and Qst <= self.Sigref_st[Icl+1]:
+                        tep, sap = self.foundPair()
+                        break
+            
+            # S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qte)
+            xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ','
+            if self.temp:
+                self.tempCSV.write(xCoAndPc + str(Qte))
+            if self.salinity:
+                self.salinityCSV.write(xCoAndPc + str(Qsa))
+            if self.sigmaT:
+                self.sigmaTCSV.write(xCoAndPc + str(Qst))
+            if self.spiciness:
+                self.spicinessCSV.write(xCoAndPc + str(Qsp))
+            if self.dynamicHeight:
+                self.dynamicHeightCSV.write(xCoAndPc + str(Qdh))
+        return
+
+    def foundPair(self, Qst, Icl):
+        # found a pair
+        Ra=(Qst-self.Sigref_st[Icl])/(self.Sigref_st[Icl+1]-self.Sigref_st[Icl])
+        Ter=self.Sigref_te[Icl]+Ra*(self.Sigref_te[Icl+1]-self.Sigref_te[Icl])
+        Sar=self.Sigref_sa[Icl]+Ra*(self.Sigref_sa[Icl+1]-self.Sigref_sa[Icl])
+        Tep=Qte-Ter
+        Sap=Qsa-Sar
+        Tep=.001*int(.5+1000.*Tep)
+        Sap=.001*int(.5+1000.*Sap)
+        # S$=Xcoord$&","&VAL$(Qst)&","&VAL$(Qte)&","&VAL$(Tep)&","&VAL$(Qsa)&","&VAL$(Sap)
+        # OUTPUT @Psclim;S$
+        print "Qst: ", Qst, " Qte: ", Qte, " Tep: ", Tep, " Qsa: ", " Sap: ", Sap
+        return Tep, Sap
+
+    def getSvanom(self, S, T, P0):
         #! Compute the density anomaly, sigma, in kg/m^3
         #! Density anomaly is identical with sigma-t without pressure terms
         #!
@@ -529,81 +774,84 @@ class MainApp(QMainWindow, Ui_MainApp):
         #! T  = Temperature in deg C
         #! S  = salinity in pss-78
         #!
-        R3500=1028.106331
-        R4=4.8314E-4
-        Dr350=28.106331
-        P=P0/10
-        Sr=np.sqrt(S)
-        R1=((((6.536332E-9*T-1.120083E-6)*T+1.001685E-4)*T-9.09529E-3)*T+6.793952E-2)*T-28.263737
-        R2=(((5.3875E-9*T-8.2467E-7)*T+7.6438E-5)*T-4.0899E-3)*T+8.24493E-1
-        R3=(-1.6546E-6*T+1.0227E-4)*T-5.72466E-3
-        Sig=(R4*S+R3*Sr+R2)*S+R1
-        V350p=1/R3500
-        Sva=-Sig*V350p/(R3500+Sig)
-        Sigma=Sig+Dr350
+        R3500 = 1028.106331
+        R4 = 4.8314E-4
+        Dr350 = 28.106331
+        P = P0 / 10
+        Sr = np.sqrt(S)
+        R1 = ((((6.536332E-9 * T - 1.120083E-6) * T + 1.001685E-4)
+               * T - 9.09529E-3) * T + 6.793952E-2) * T - 28.263737
+        R2 = (((5.3875E-9 * T - 8.2467E-7) * T + 7.6438E-5)
+              * T - 4.0899E-3) * T + 8.24493E-1
+        R3 = (-1.6546E-6 * T + 1.0227E-4) * T - 5.72466E-3
+        Sig = (R4 * S + R3 * Sr + R2) * S + R1
+        V350p = 1 / R3500
+        Sva = -Sig * V350p / (R3500 + Sig)
+        Sigma = Sig + Dr350
         #! Scale specific volume anomaly to normally reported units
-        Svan=Sva*1.0E+8
-        if P ==     0:
+        Svan = Sva * 1.0E+8
+        if P == 0:
                     # THEN GOTO 13710
-            return  # ToDo: Might not be correct
-        E=(9.1697E-10*T+2.0816E-8)*T-9.9348E-7
-        Bw=(5.2787E-8*T-6.12293E-6)*T+3.47718E-5
-        B=Bw+E*S
-        D=1.91075E-4
-        C=(-1.6078E-6*T-1.0981E-5)*T+2.2838E-3
-        Aw=((-5.77905E-7*T+1.16092E-4)*T+1.43713E-3)*T-.1194975
-        A=(D*Sr+C)*S+Aw
-        B1=(-5.3009E-4*T+1.6483E-2)*T+7.944E-2
-        A1=((-6.167E-5*T+1.09987E-2)*T-.603459)*T+54.6746
-        Kw=(((-5.155288E-5*T+1.360477E-2)*T-2.327105)*T+148.4206)*T-1930.06
-        K0=(B1*Sr+A1)*S+Kw
-        Dk=(B*P+A)*P+K0
-        K35=(5.03217E-5*P+3.359406)*P+21582.27
-        Gam=P/K35
-        Pk=1.0-Gam
-        Sva=Sva*Pk+(V350p+Sva)*P*Dk/(K35*(K35+Dk))
-        Svan=Sva*1.0E+8
-        V350p=V350p*Pk
+            return 0, 0 # ToDo: Might not be correct
+        E = (9.1697E-10 * T + 2.0816E-8) * T - 9.9348E-7
+        Bw = (5.2787E-8 * T - 6.12293E-6) * T + 3.47718E-5
+        B = Bw + E * S
+        D = 1.91075E-4
+        C = (-1.6078E-6 * T - 1.0981E-5) * T + 2.2838E-3
+        Aw = ((-5.77905E-7 * T + 1.16092E-4) * T + 1.43713E-3) * T - .1194975
+        A = (D * Sr + C) * S + Aw
+        B1 = (-5.3009E-4 * T + 1.6483E-2) * T + 7.944E-2
+        A1 = ((-6.167E-5 * T + 1.09987E-2) * T - .603459) * T + 54.6746
+        Kw = (((-5.155288E-5 * T + 1.360477E-2) * T - 2.327105)
+              * T + 148.4206) * T - 1930.06
+        K0 = (B1 * Sr + A1) * S + Kw
+        Dk = (B * P + A) * P + K0
+        K35 = (5.03217E-5 * P + 3.359406) * P + 21582.27
+        Gam = P / K35
+        Pk = 1.0 - Gam
+        Sva = Sva * Pk + (V350p + Sva) * P * Dk / (K35 * (K35 + Dk))
+        Svan = Sva * 1.0E+8
+        V350p = V350p * Pk
         # Density anomaly computed relative to 1000 kg/m^3
         # DR350 = density anomaly at 35 pss, 0 deg C and 0 decibars
         # dr35p = density anomaly at 35 pss, 0 deg C and pressure = p0 decibars
         # Dvan  = Density anomaly variations involving spec vol anom
-        Dr35p=Gam/V350p
-        Dvan=Sva/(V350p*(V350p+Sva))
-        Sigma=Dr350+Dr35p-Dvan
+        Dr35p = Gam / V350p
+        Dvan = Sva / (V350p * (V350p + Sva))
+        Sigma = Dr350 + Dr35p - Dvan
         # SUBEND
         return Sigma, Dvan
 
-    def spiciness(self, spice, temp, salt):
+    def getSpiciness(self, spice, temp, salt):
         # Hardcoded by Howard
-        B = np.array([0.0,.77442,-.00585,.000984,-.000206],
-                [.051665,.002034,-.0002745,-.0000085,.0000136],
-                [-6.64783E-3,-2.4681E-4,-1.428E-5,3.337E-5,7.894E-6],
-                [-5.4023E-5,7.326E-6,7.0036E-6,-3.0412E-6,-1.0853E-6],
-                [3.949E-7,-3.029E-8,-3.8209E-7,1.0012E-7,4.7133E-8],
-                [-6.36E-10,-1.309E-9,6.048E-9,-1.1409E-9,-6.676E-10])
-        Spice=0.
-        Sp=Salt-35.
-        Theta=Temp
+        B = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
+                     [.051665, .002034, -.0002745, -.0000085, .0000136],
+                     [-6.64783E-3, -2.4681E-4, -1.428E-5, 3.337E-5, 7.894E-6],
+                     [-5.4023E-5, 7.326E-6, 7.0036E-6, -3.0412E-6, -1.0853E-6],
+                     [3.949E-7, -3.029E-8, -3.8209E-7, 1.0012E-7, 4.7133E-8],
+                     [-6.36E-10, -1.309E-9, 6.048E-9, -1.1409E-9, -6.676E-10]])
+        spice = 0
+        Sp = salt - 35
+        Theta = temp
         # Reversed I and J here, are arrays backwards in HP Basic?
         for I in range(0, 5):
-            Ii=I-1
+            Ii = I - 1
             for J in range(0, 4):
-                Jj=J-1
+                Jj = J - 1
                 # In Python, ^ is XOR 8 ^ 3 => 1000 ^ 0011 => 1011 = 11
-                Spice = Spice + B(I, J) * (Theta^I) * (Sp^J)
-        return Spice
+                spice = spice + B[I, J] * (Theta ^ I) * (Sp ^ J)
+        return spice
 
     def sanityCheck(self):
         # ToDo
         return
 
     def checkFloatsFromIndex(self, folder):
-        with open((folder + str(self.curYear)  
-                    + str(self.curMonth).zfill(2) 
-                    + str(self.curDay).zfill(2) 
-                    + '_index.csv'),
-             'rb') as indexCSV:
+        with open((folder + str(self.curYear)
+                   + str(self.curMonth).zfill(2)
+                   + str(self.curDay).zfill(2)
+                   + '_index.csv'),
+                  'rb') as indexCSV:
             print "Opened index"
             reader = csv.reader(indexCSV)
             buoysToUse = []
@@ -611,21 +859,39 @@ class MainApp(QMainWindow, Ui_MainApp):
             # [1:] means skip the first. Skip it because it's a header
             reader.next()
             for row in reader:
-                print "Interp depth ", float(row[3])
+                if float(row[3]) < self.pressureCutOff:
+                    print "Long ", float(row[2])
+                    print "Lat ", float(row[1])
+                
                 # ToDo: Does not account for users with lat2 < lat1
-                if (    float(row[1]) < self.firstLatitude 
-                    and float(row[1]) > self.secondLatitude 
-                    and float(row[2]) < self.firstLongitude
-                    and float(row[2]) > self.secondLongitude
-                    and float(row[3]) < self.pressureCutOff):
-                        self.numFloats += 1
-                        buoysToUse.append(row[0])
-                        self.Lat[self.numFloats] = float(row[1])
-                        self.Lon[self.numFloats] = float(row[2])
+                if (float(row[1]) > self.firstLatitude
+                        and float(row[1]) < self.secondLatitude
+                        and float(row[2]) > self.firstLongitude
+                        and float(row[2]) < self.secondLongitude
+                        and float(row[3]) > self.pressureCutOff):
+                    # ToDo: FOR TESTING
+                    buoysToUse.append("20160518_2901481.IOS")
+                    # ToDo: Reactivate for real
+                    # buoysToUse.append(row[0]) 
+                    self.passedFloat(row)
+                    self.numFloats += 1
+                    break # ToDo: Only active for testing
                     # Save it
                 # print row[0]
         print "Bouys to use is ", buoysToUse
         return buoysToUse
+
+    def passedFloat(self, row):
+        self.Lat[self.numFloats] = float(row[1])
+        self.Lon[self.numFloats] = float(row[2])
+        Dx=self.Scx0*(float(row[2])- self.longitudeDesired)
+        Dy=self.Scy*(float(row[1])- self.latitudeDesired)
+        Rho=np.sqrt(Dx*Dx+Dy*Dy)
+        if self.Closest > Rho:
+            self.Closest = Rho
+            self.Closest_fltnm = row[0]
+        # ToDo: A lot left out here, maybe unecessary? 
+        return
 
     # Line 0-45
     def initVars(self):
@@ -640,48 +906,43 @@ class MainApp(QMainWindow, Ui_MainApp):
 
         self.Pdel = np.empty((1000))
         self.Sva = np.empty((1000))
-        Dh = np.empty((1000))
-        # 40 DIM S$[100],T$[100],U$[500],Path0$[80],self.outPath$[80],Path$[80],R$[600],Closest_fltnm$[100]
-        # Ignore all these declarations if they're strings, since I can do them at use-time
+        self.Dh = np.empty((1000))
+
         Sa_av = np.empty(12)
         Sa_knt = np.empty(12)
-        # 70 DIM Fil$[100],Filte$[100],Filsa$[100],Filst$[100],Out$[200],App$[200]
-        # 80 DIM Ste$[500],Ssa$[500],Sst$[500],Ssp$[500],Sdh$[500],Shgt$[500],Pa$[500],Sclim$[500]
-        # 90 DIM Location$[100],Param$[50],Lstmsg$[50]
-        Sigref_st = np.empty((71))
-        Sigref_te = np.empty((71))
-        Sigref_sa = np.empty((71))
+
+        self.Sigref_st = np.empty((71))
+        self.Sigref_te = np.empty((71))
+        self.Sigref_sa = np.empty((71))
         # 110! Dimensions of data to be read from files
-        self.P = np.empty((2000))
+        self.P = np.zeros((2000))
         self.T = np.empty((2000))
         self.S = np.empty((2000))
         self.St = np.empty((2000))
         self.Sp = np.empty((2000))
         # 140 ! ALPHA PEN 1
         # 150 Tabrow=11
-        Scy = 111.2     # Scy = km/degree of latitude
-        Rho0 = 300      # Decay scale of weighting function
-        Pref = 1000     # Reference level for dynamic height calculations
-        Closest = 9999.9
+        self.Closest = 9999.9
         # 240 ! Initialize data matrices with nul values 999.9
         # Should I do the NumPy NULL or just stick with 999.9?
         self.Te[:] = 999.9
-        self.Sa[:] = 999.9    
+        self.Sa[:] = 999.9
         self.Lat[:] = 999.9
         self.Lon[:] = 999.9
         self.Accpt[:] = (-1)
         Sa_av[:] = 0
         Sa_knt[:] = 0
-        # Dout backslash because in Python you need to escape special chearacters
+        # Dout backslash because in Python you need to escape special
+        # chearacters
         self.drive = "E:\\"
         # 350 CALL Lastrun(self.drive$,2)
         self.lastRun(self.drive, 2)
         self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
-        self.outPath = self.drive + "argo_out\\"
-        Sigpath = self.drive + "projects\\Sigma_Climate\\"
+        self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
+        self.sigPath = self.drive + "projects\\Sigma_Climate\\"
         # Made this file empty here when he writes 3x71 empties
         # if problems: change this maybe
-        csvF = open((Sigpath + "Mp26_i.csv"), 'w')
+        csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
         csvF.close()
         return
 
@@ -692,7 +953,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 480 ASSIGN @Pin TO Drive$&"argo_programs\TSlast.txt";FORMAT ON
         # ToDo: Change to 'a'
         settingsF = open((self.drive + "argo_programs\\TSlast.txt"), 'r+')
-        for x in xrange(1,20):
+        for x in xrange(1, 20):
             pass
         # 490 ON END @Pin GOTO 660
         # 500 FOR L=1 TO 20
@@ -713,7 +974,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 650 PRINT "Param$ = ";Param$
         # 660 ASSIGN @Pin TO *
         # 670 !
-        return 
+        return
 
     def defaultOptions(self):
         self.setEnabledParameters(False)
@@ -721,7 +982,6 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def setEnabledParameters(self, isEnabled):
         self.floatRadiusBox.setEnabled(isEnabled)
-        # self.dayRangeBox.setEnabled(isEnabled)
         self.dayStepSizeBox.setEnabled(isEnabled)
         self.sampleWindowBox.setEnabled(isEnabled)
         self.firstLatitudeBox.setEnabled(isEnabled)
@@ -740,8 +1000,10 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.longitudeDesiredBox.setEnabled(isEnabled)
         self.appendCheckBox.setEnabled(isEnabled)
         self.verboseCheckBox.setEnabled(isEnabled)
+        self.startRangeDateEdit.setEnabled(isEnabled)
+        self.endRangeDateEdit.setEnabled(isEnabled)
         if (not isEnabled):
-            # self.loadDefaults()
+            # self.loadDefaults() ToDo
             pass
         return
 
@@ -755,7 +1017,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         print day, month, year
         self.currentDayDateEdit.setDate(QDate(year, month, day))
         self.writeDefinedSettings()
-        return 
+        return
 
     def writeDefinedSettings(self):
         # 2900 !
@@ -779,49 +1041,49 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 3080 !
         return
 
-
     def prepareOutputFiles(self):
 
-        tempPath = self.outPath + "TS_Te.csv"
-        salinityPath = self.outPath + "TS_Sa.csv"
-        sigmaTPath = self.outPath + "TS_St.csv"
-        spicinessPath = self.outPath + "TS_Sp.csv"
-        dynamicHeightPath = self.outPath + "TS_Dh.csv"
-        self.outputFilesLabel.setText("Output Files:\n" 
-                + tempPath + '\n' 
-                + salinityPath + '\n' 
-                + spicinessPath + '\n' 
-                + dynamicHeightPath)
+        self.tempPath = self.outPath + "TS_Te.csv"
+        self.salinityPath = self.outPath + "TS_Sa.csv"
+        self.sigmaTPath = self.outPath + "TS_St.csv"
+        self.spicinessPath = self.outPath + "TS_Sp.csv"
+        self.dynamicHeightPath = self.outPath + "TS_Dh.csv"
+        self.hgtPath = self.outPath + "TS_Shgt.csv"
+        self.cLimPath = self.sigPath + "Sigref.csv" 
+        self.stratPath = self.outPath + "Strat.csv"
+        self.outputFilesLabel.setText("Output Files:\n"
+                                      + self.tempPath + '\n'
+                                      + self.salinityPath + '\n'
+                                      + self.spicinessPath + '\n'
+                                      + self.dynamicHeightPath + '\n'
+                                      + self.hgtPath + '\n'
+                                      + self.cLimPath + '\n'
+                                      + self.stratPath)
         writeType = 'a'
         if not self.append:
             writeType = 'w'
-        tempCSV = open((tempPath), writeType)
-        salinityCSV = open((salinityPath), writeType)
-        sigmaTCSV = open((sigmaTPath), writeType)
-        spicinessCSV = open((spicinessPath), writeType)
-        dynamicHeightCSV = open((dynamicHeightPath), writeType)
+        self.tempCSV = open((self.tempPath), writeType)
+        self.salinityCSV = open((self.salinityPath), writeType)
+        self.sigmaTCSV = open((self.sigmaTPath), writeType)
+        self.spicinessCSV = open((self.spicinessPath), writeType)
+        self.dynamicHeightCSV = open((self.dynamicHeightPath), writeType)
+        self.hgtCSV = open((self.hgtPath), writeType)
+        self.cLimCSV = open((self.cLimPath), writeType)
+        self.stratCSV = open((self.stratPath), writeType)
         # What the heck is hgt? Mercury...t?
-        # hgtCSV = open((self.outPath + "TS_Shgt.csv"), writeType)
+
         # File on sigma-levels
-        climCSV = open((self.outPath + "Sigref.csv"), writeType)    
         if (self.append):
             self.prepareFilesAndAppend()
         else:
             self.prepareFilesAndClear()
-            # Maybe not necessary? 
-        # Display "Starting interpolation value 1 to value 2" 
-        tempCSV.close()
-        salinityCSV.close()
-        sigmaTCSV.close()
-        spicinessCSV.close()
-        dynamicHeightCSV.close()
-        # hgtCSV.close()
-        climCSV.close()
+            # Maybe not necessary?
+        # Display "Starting interpolation value 1 to value 2"
         return
 
     def prepareFilesAndAppend(self):
         # 3850 !
-        # ALL OF THIS IS JUST TO SET THE FILES UP FOR APPENDING -_______- 
+        # ALL OF THIS IS JUST TO SET THE FILES UP FOR APPENDING -_______-
         # 5840 !
         # 5850 ! End of yes-append option
         # 5860 END IF
@@ -890,6 +1152,11 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 3810 CREATE Pathout$&"Strat.csv",1
         # 3820 ASSIGN @Pstrat TO Pathout$&"Strat.csv";FORMAT ON
         # 3830 ! End of no-append option
+        # Pte = self.pathTemp
+        self.pathTemp = self.pathOut + "temp.csv"
+        # Psclim = self.pathScLim
+        self.pathScLim = self.pathOut + ""
+
         return
 
     def todayInDate(self):
@@ -906,22 +1173,28 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     # Should be working !!! NOT tested
     def julianToDate(self, julDate):
-        yearAmounts = 0
+        yearAmounts = 0.25
         curYear = 0
+        daysIn = 0
         # 7306 is the Julian Date for 2020
         for i in xrange(0, 7306):
             if i <= julDate and (i + int(yearAmounts) + 365) > julDate:
+                daysIn = i + int(yearAmounts)
                 break
             curYear += 1
             yearAmounts += 0.25
             # Move i to the next julian year
             i += (yearAmounts + 365)
         year = curYear + 2001
-        print "Year is ", year
+        result = datetime.datetime(year, 1, 1) + datetime.timedelta(daysIn)
+        month = result.month
+        day = result.day
+        # print "----- Date is ", type(result) 
+        # print "Year is ", year
         # Take out the year <-- Highest subdivision
         # Take out the month
         # Take out the day
-        return
+        return day, month, year
 
     def dateToJulian(self, day, month, year, dayOfYear):
         milleniaRemainder = year % 1000
@@ -931,17 +1204,18 @@ class MainApp(QMainWindow, Ui_MainApp):
         newYear += dayOfYear
         return newYear
 
-
     # Line 1625-1633
     ''' Lastrun (I think) defines if the program was a success or not. 
     Starts with 2 being written, then writes -1 after "Normal End"-ing'''
+
     def lastRun(self, curDrive, status):
         # Overwrite the previous "lastrun.txt" file
         lastRunF = open((curDrive + r"projects\argo\status\lastrun.txt"), 'w')
         # Typecast status to a string because write() uses strings
         lastRunF.write(str(status))
         lastRunF.close()
-        return 
+        return
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
@@ -953,4 +1227,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
