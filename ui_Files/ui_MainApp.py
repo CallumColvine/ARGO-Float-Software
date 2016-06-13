@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainApp.ui'
 #
-# Created: Wed Jun 08 12:06:41 2016
+# Created: Thu Jun 09 14:19:50 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -156,7 +156,7 @@ class Ui_MainApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.startRangeDateEdit.setFont(font)
-        self.startRangeDateEdit.setDate(QtCore.QDate(2001, 1, 1))
+        self.startRangeDateEdit.setDate(QtCore.QDate(2016, 5, 18))
         self.startRangeDateEdit.setCalendarPopup(True)
         self.startRangeDateEdit.setObjectName("startRangeDateEdit")
         self.horizontalLayout_16.addWidget(self.startRangeDateEdit)
@@ -170,7 +170,7 @@ class Ui_MainApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.endRangeDateEdit.setFont(font)
-        self.endRangeDateEdit.setDate(QtCore.QDate(2016, 6, 6))
+        self.endRangeDateEdit.setDate(QtCore.QDate(2016, 5, 23))
         self.endRangeDateEdit.setCalendarPopup(True)
         self.endRangeDateEdit.setObjectName("endRangeDateEdit")
         self.horizontalLayout_16.addWidget(self.endRangeDateEdit)
@@ -244,7 +244,7 @@ class Ui_MainApp(object):
         font.setPointSize(10)
         self.dayStepSizeBox.setFont(font)
         self.dayStepSizeBox.setMaximum(9999)
-        self.dayStepSizeBox.setProperty("value", 20)
+        self.dayStepSizeBox.setProperty("value", 5)
         self.dayStepSizeBox.setObjectName("dayStepSizeBox")
         self.horizontalLayout_8.addWidget(self.dayStepSizeBox)
         self.label_6 = QtGui.QLabel(self.settingsPage)
@@ -263,7 +263,7 @@ class Ui_MainApp(object):
         font.setPointSize(10)
         self.sampleWindowBox.setFont(font)
         self.sampleWindowBox.setMaximum(9999)
-        self.sampleWindowBox.setProperty("value", 100)
+        self.sampleWindowBox.setProperty("value", 10)
         self.sampleWindowBox.setObjectName("sampleWindowBox")
         self.horizontalLayout_9.addWidget(self.sampleWindowBox)
         self.label_7 = QtGui.QLabel(self.settingsPage)

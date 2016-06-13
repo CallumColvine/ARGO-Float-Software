@@ -40,28 +40,28 @@
 400 !
 410 ASSIGN @Pin TO Sigpath$&"Mp26_i.csv";FORMAT ON
 420 FOR I=1 TO 71
-430 ENTER @Pin;Sigref_st(I),Sigref_te(I),Sigref_sa(I)
-440 NEXT I
+	430 ENTER @Pin;Sigref_st(I),Sigref_te(I),Sigref_sa(I)
+	440 NEXT I
 450 ASSIGN @Pin TO *
 460 !
 470 ! Read previous settings
 480 ASSIGN @Pin TO Drive$&"argo_programs\TSlast.txt";FORMAT ON
 490 ON END @Pin GOTO 660
 500 FOR L=1 TO 20
-510 ENTER @Pin;S$
-520 ! PRINT L;S$
-530 Pc=POS(S$,",")
-540 IF POS(S$,"G_opt")>.1 THEN G_opt$=TRIM$(S$[Pc+1])
-550 IF POS(S$,"c1dc")>.1 THEN Dc12$=TRIM$(S$[Pc+1])
-560 IF POS(S$,"Dt")>.1 THEN Dt$=TRIM$(S$[Pc+1])
-570 IF POS(S$,"windo")>.1 THEN Twin$=TRIM$(S$[Pc+1])
-580 IF POS(S$,"at1&L")>.1 THEN Lat$=TRIM$(S$[Pc+1])
-590 IF POS(S$,"on1&L")>.1 THEN Lon$=TRIM$(S$[Pc+1])
-600 IF POS(S$,"cutof")>.1 THEN Pcut$=TRIM$(S$[Pc+1])
-610 IF POS(S$,"max&Del")>.1 THEN Pmax$=TRIM$(S$[Pc+1])
-620 IF POS(S$,"ocatio")>.1 THEN Location$=TRIM$(S$[Pc+1])
-630 IF POS(S$,"ameter")>.1 THEN Param$=TRIM$(S$[Pc+1])
-640 NEXT L
+	510 ENTER @Pin;S$
+	520 ! PRINT L;S$
+	530 Pc=POS(S$,",")
+	540 IF POS(S$,"G_opt")>.1 THEN G_opt$=TRIM$(S$[Pc+1])
+	550 IF POS(S$,"c1dc")>.1 THEN Dc12$=TRIM$(S$[Pc+1])
+	560 IF POS(S$,"Dt")>.1 THEN Dt$=TRIM$(S$[Pc+1])
+	570 IF POS(S$,"windo")>.1 THEN Twin$=TRIM$(S$[Pc+1])
+	580 IF POS(S$,"at1&L")>.1 THEN Lat$=TRIM$(S$[Pc+1])
+	590 IF POS(S$,"on1&L")>.1 THEN Lon$=TRIM$(S$[Pc+1])
+	600 IF POS(S$,"cutof")>.1 THEN Pcut$=TRIM$(S$[Pc+1])
+	610 IF POS(S$,"max&Del")>.1 THEN Pmax$=TRIM$(S$[Pc+1])
+	620 IF POS(S$,"ocatio")>.1 THEN Location$=TRIM$(S$[Pc+1])
+	630 IF POS(S$,"ameter")>.1 THEN Param$=TRIM$(S$[Pc+1])
+	640 NEXT L
 650 PRINT "Param$ = ";Param$
 660 ASSIGN @Pin TO *
 670 !
@@ -77,7 +77,7 @@
 770 PRINT "3 for other"
 780 PRINT "0 for all defaults"
 790 !
-800 OUTPUT KBD;"0ÿH";
+800 OUTPUT KBD;"0Ã¿H";
 810 INPUT "G_opt = ...",G_opt
 820 !
 830 Def_opt=-1
@@ -99,7 +99,7 @@
 990 GESCAPE CRT,33,Sze(*)
 1000 END IF
 1010 IF G_opt=3 THEN
-1020 OUTPUT KBD;"800,600ÿH";
+1020 OUTPUT KBD;"800,600Ã¿H";
 1030 INPUT "Required size of graphics in pixels = Px, Py = ",Px,Py
 1040 Sze(3)=Px
 1050 Sze(4)=Py
@@ -107,7 +107,7 @@
 1070 END IF
 1080 !
 1090 IF Def_opt<.1 THEN
-1100 OUTPUT KBD;"-1ÿH";
+1100 OUTPUT KBD;"-1Ã¿H";
 1110 INPUT "List floats within radius (km) = ...",Rho_print
 1120 ELSE
 1130 Rho_print=-1
@@ -133,21 +133,21 @@
 1330 Td5=5.0*INT(Td/5.0)
 1340 IF Last_final_day>Td5 THEN Td5=Last_final_day
 1350 IF Def_opt<.1 THEN
-1360 OUTPUT KBD;VAL$(Dc1)&","&VAL$(Td5)&"ÿ<ÿ<ÿ<ÿ<";
+1360 OUTPUT KBD;VAL$(Dc1)&","&VAL$(Td5)&"Ã¿<Ã¿<Ã¿<Ã¿<";
 1370 INPUT "Range of days (day numbers of 2001) = ",Dc1,Dc2
 1380 ELSE
 1390 Dc2=Td5
 1400 END IF
 1410!
 1420 IF Def_opt<.1 THEN
-1430 OUTPUT KBD;Dt$&"ÿ<ÿ<ÿ<ÿ<";
+1430 OUTPUT KBD;Dt$&"Ã¿<Ã¿<Ã¿<Ã¿<";
 1440 INPUT "Day step = Dt = (centre estimates on successive Dt days)...",Dt
 1450 ELSE
 1460 Dt=VAL(Dt$)
 1470 END IF
 1480!
 1490 IF Def_opt<.1 THEN
-1500 OUTPUT KBD;Twin$&"ÿ<ÿ<ÿ<ÿ<";
+1500 OUTPUT KBD;Twin$&"Ã¿<Ã¿<Ã¿<Ã¿<";
 1510 INPUT "Sample window i.e. include data centre date +/- (10 is usual)Twin days...",Twin
 1520 ELSE
 1530 Twin=VAL(Twin$)
@@ -163,7 +163,7 @@
 1630 PRINT "Output data at intervals of "&VAL$(Dt)&" days."
 1640!
 1650 IF Def_opt<.1 THEN
-1660 OUTPUT KBD;Lat$&"ÿ<ÿ<ÿ<ÿ<ÿ<";
+1660 OUTPUT KBD;Lat$&"Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<";
 1670 INPUT "Accept data between Lat1 and Lat2....",Lat1,Lat2
 1680 ELSE
 1690 Pc=POS(Lat$,",")
@@ -174,7 +174,7 @@
 1740 IF ABS(Lat1)>90. OR ABS(Lat2)>90. THEN GOTO 1170
 1750 !
 1760 IF Def_opt<.1 THEN
-1770 OUTPUT KBD;Lon$&"ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<";
+1770 OUTPUT KBD;Lon$&"Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<";
 1780 INPUT "Accept data between Lon1 and Lon2....",Lon1,Lon2
 1790 ELSE
 1800 Pc=POS(Lon$,",")
@@ -198,11 +198,11 @@
 1980 Lon2=Lonq
 1990 END IF
 2000!
-2010 PRINT "Latitude range for accepting data = "&VAL$(Lat1)&"°N - "&VAL$(Lat2)&"°N"
-2020 PRINT "Longitude range for accepting data = ";VAL$(Lon1)&"°E, "&VAL$(Lon2)&"°E = ("&VAL$(360.-Lon1)&"°W, "&VAL$(360-Lon2)&"°W)"
+2010 PRINT "Latitude range for accepting data = "&VAL$(Lat1)&"Â°N - "&VAL$(Lat2)&"Â°N"
+2020 PRINT "Longitude range for accepting data = ";VAL$(Lon1)&"Â°E, "&VAL$(Lon2)&"Â°E = ("&VAL$(360.-Lon1)&"Â°W, "&VAL$(360-Lon2)&"Â°W)"
 2030!
 2040 IF Def_opt<.1 THEN
-2050 OUTPUT KBD;Pcut$&"ÿ<ÿ<ÿ<ÿ<";
+2050 OUTPUT KBD;Pcut$&"Ã¿<Ã¿<Ã¿<Ã¿<";
 2060 INPUT "Reject floats with maximum pressure less then Pcutoff = ",Pcutoff
 2070 ELSE
 2080 Pcutoff=VAL(Pcut$)
@@ -210,7 +210,7 @@
 2100 PRINT "Reject floats that don't sample deeper than "&VAL$(Pcutoff)&" dbar"
 2110!
 2120 IF Def_opt<.1 THEN
-2130 OUTPUT KBD;Pmax$&"ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<";
+2130 OUTPUT KBD;Pmax$&"Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<";
 2140 INPUT "Interpolate to Pmax with steps Delta-P...Pmax,DeltaP = ",Pmax,Deltap
 2150 ELSE
 2160 Pc=POS(Pmax$,",")
@@ -224,7 +224,7 @@
 2240 Npress=1+INT(.001+Pmax/Deltap)
 2250 !
 2260 IF Def_opt<.1 THEN
-2270 OUTPUT KBD;Param$&"ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<";
+2270 OUTPUT KBD;Param$&"Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<";
 2280 INPUT "Enter 1 (else 0) to output Temp, Salt, Sig-t, Spiciness, Dyn Hgt......",Te_opt,Sa_opt,St_opt,Sp_opt,Dh_opt
 2290 ELSE
 2300 Pc1=POS(Param$,",")
@@ -251,7 +251,7 @@
 2510 PRINT Out$
 2520 !
 2530 IF Def_opt<.1 THEN
-2540 OUTPUT KBD;Location$&"ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<ÿ<";
+2540 OUTPUT KBD;Location$&"Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<Ã¿<";
 2550 INPUT "Enter latitude and longitude of the station to interpolate to.....",Latc,Lonc
 2560 ELSE
 2570 Pc=POS(Location$,",")
@@ -259,29 +259,29 @@
 2590 Lonc=VAL(Location$[Pc+1])
 2600 END IF
 2610 !
-2620 PRINT "Will interpolate to the station:- "&TRIM$(VAL$(Latc))&"°N, "&TRIM$(VAL$(Lonc))&"°E ("&TRIM$(VAL$(360.-Lonc))&"°W)"
+2620 PRINT "Will interpolate to the station:- "&TRIM$(VAL$(Latc))&"Â°N, "&TRIM$(VAL$(Lonc))&"Â°E ("&TRIM$(VAL$(360.-Lonc))&"Â°W)"
 2630 !
 2640 DEG
 2650 Scx0=Scy*COS(Latc)
 2660 !
 2670 IF Def_opt<.1 THEN
-2680 !IF ABS(Dc1-Dc2)<151. THEN OUTPUT KBD;"1ÿ<";
-2690 !IF ABS(Dc1-Dc2)>151. THEN OUTPUT KBD;"0ÿ<";
-2700 OUTPUT KBD;"1ÿ<";
+2680 !IF ABS(Dc1-Dc2)<151. THEN OUTPUT KBD;"1Ã¿<";
+2690 !IF ABS(Dc1-Dc2)>151. THEN OUTPUT KBD;"0Ã¿<";
+2700 OUTPUT KBD;"1Ã¿<";
 2710 INPUT "Enter 1 to append to existing files, otherwise 0....",Append_opt
 2720 ELSE
 2730 Append_opt=1
 2740 END IF
 2750 !
 2760 IF Def_opt<.1 THEN
-2770 OUTPUT KBD;"0ÿ<";
+2770 OUTPUT KBD;"0Ã¿<";
 2780 INPUT "Enter 1 for verbose option....",Verb_opt
 2790 ELSE
 2800 Verb_opt=0
 2810 END IF
 2820 !
 2830 IF Def_opt<.1 THEN
-2840 OUTPUT KBD;"1ÿ<";
+2840 OUTPUT KBD;"1Ã¿<";
 2850 INPUT "Enter 1 if all entries are OK, 0 to return....",Ret_opt
 2860 ELSE
 2870 Ret_opt=1
@@ -622,393 +622,393 @@
 6220 PRINT R$&"<"&Lstmsg$
 6230 PRINT "| - - - - - - - - + - - - - - - - - - - - - + - - - - - - - - - - - - |"
 6240 FOR Dc=Dc1 TO Dc2 STEP Dt
-6250 IF Verb_opt>.5 THEN PRINT Dc1;Dc;Dc2
-6260 Closest=9999.9
-6270 Jd1=Dc-Twin
-6280 Jd2=Dc+Twin
-6290 Nfloats=0
-6300 Xcoord$=TRIM$(VAL$(Dc))
-6310 !
-6320 U$="Interpolating Dc = "&VAL$(Dc)&" of ("&VAL$(Dc1)&"-"&VAL$(Dc2)
-6330 U$=U$&") using ("&VAL$(Jd1)&"-"&VAL$(Jd2)&") = ("
-6340 CALL Julday(1,Jd1,Domc1,Monc1,Yearc1)
-6350 CALL Julday(1,Jd2,Domc2,Monc2,Yearc2)
-6360 Yc1$=TRIM$(VAL$(Yearc1))
-6370 Yc2$=TRIM$(VAL$(Yearc2))
-6380 Monc1$=TRIM$(VAL$(Monc1))
-6390 IF Monc1<9.5 THEN Monc1$="0"&Monc1$
-6400 Monc2$=TRIM$(VAL$(Monc2))
-6410 IF Monc2<9.5 THEN Monc2$="0"&Monc2$
-6420 Domc1$=TRIM$(VAL$(Domc1))
-6430 IF Domc1<9.5 THEN Domc1$="0"&Domc1$
-6440 Domc2$=TRIM$(VAL$(Domc2))
-6450 IF Domc2<9.5 THEN Domc2$="0"&Domc2$
-6460 U$=U$&Domc1$&"/"&Monc1$&"/"&Yc1$&"-"
-6470 DISP U$&Domc2$&"/"&Monc2$&"/"&Yc2$&")"
-6480 !
-6490 FOR Jd=Jd1 TO Jd2
-6500 ! Find directories
-6510 CALL Julday(1,Jd,Day,Mon,Year)
-6520 Year$=TRIM$(VAL$(Year))
-6530 Mon$=TRIM$(VAL$(Mon))
-6540 IF Mon<9.5 THEN Mon$="0"&Mon$
-6550 Day$=TRIM$(VAL$(Day))
-6560 IF Day<9.5 THEN Day$="0"&Day$
-6570 !
-6580 Path$=Path0$&Year$&"\"&Mon$&"\"&Day$&"\"
-6590 !
-6600 ON ERROR GOTO 7510
-6610 ASSIGN @Pin TO Path$&Year$&Mon$&Day$&"_index.csv";FORMAT ON
-6620 ! PRINT Path$
-6630 OFF ERROR
-6640 ON END @Pin GOTO 7490
-6650 ENTER @Pin;S$
-6660      !
-6670 ENTER @Pin;S$
-6680 IF POS(S$,"****")>0 THEN GOTO 6670
-6690 Pc1=POS(S$,",")
-6700 S$[Pc1,Pc1]=";"
-6710 Pc2=POS(S$,",")
-6720 S$[Pc2,Pc2]=";"
-6730 Pc3=POS(S$,",")
-6740 S$[Pc3,Pc3]=";"
-6750 Ls=LEN(S$)
-6760 !
-6770 Fil$=TRIM$(S$[1,Pc1-1])
-6780 Qlat=VAL(S$[Pc1+1,Pc2-1])
-6790 Qlon=VAL(S$[Pc2+1,Pc3-1])
-6800 IF Qlon<0 THEN Qlon=360.+Qlon
-6810 !
-6820 Maxdep=VAL(S$[Pc3+1])
-6830 !
-6840 IF Qlat<Lat1 THEN GOTO 6670
-6850 IF Qlat>Lat2 THEN GOTO 6670
-6860 IF Qlon<Lon1 THEN GOTO 6670
-6870 IF Qlon>Lon2 THEN GOTO 6670
-6880 IF Maxdep<Pcutoff THEN GOTO 6670
-6890 !
-6900 !
-6910 ! This one passes, store index information
-6920 Nfloats=Nfloats+1
-6930 Fltnm$(Nfloats)=Fil$
-6940 Lat(Nfloats)=Qlat
-6950 Lon(Nfloats)=Qlon
-6960 !
-6970 Dx=Scx0*(Qlon-Lonc)
-6980 Dy=Scy*(Qlat-Latc)
-6990 Rho=SQR(Dx*Dx+Dy*Dy)
-7000 IF Rho<Closest THEN
-7010 Closest=Rho
-7020 Closest_fltnm$=Fltnm$(Nfloats)
-7030 END IF
-7040 !
-7050 IF Rho>Rho_print THEN GOTO 7470
-7060 Rho=.1*INT(10.*Rho+.5)
-7070 !
-7080 Qlat=.01*INT(.5+Qlat*100.)
-7090 Qlat$=TRIM$(VAL$(Qlat))
-7100 L0=LEN(Qlat$)
-7110 IF L0>4.99 THEN GOTO 7150
-7120 Qlat$=Qlat$&"0"
-7130 GOTO 7100
-7140 !
-7150 Qlon=.01*INT(.5+Qlon*100.)
-7160 Qlon=Qlon-360.
-7170 Qlon$=TRIM$(VAL$(Qlon))
-7180 L0=LEN(Qlon$)
-7190 IF L0>6.9 THEN GOTO 7230
-7200 Qlon$=Qlon$&"0"
-7210 GOTO 7170
-7220 !
-7230 Rho$=TRIM$(VAL$(Rho))
-7240 L0=LEN(Rho$)
-7250 Pp=POS(Rho$,".")
-7260 IF Pp>.1 THEN GOTO 7300
-7270 Rho$=Rho$&".0"
-7280 GOTO 7240
-7290 !
-7300 ! Pp >0
-7310 IF ABS(Pp-L0)<.1 THEN
-7320 Rho$=Rho$&"0"
-7330 END IF
-7340 !
-7350 IF Rho<9.9999 THEN Rho$=" "&Rho$
-7360 IF Rho<99.999 THEN Rho$=" "&Rho$
-7370 !
-7380 Nfloats$=TRIM$(VAL$(Nfloats))
-7390 L0=LEN(Nfloats$)
-7400 IF L0>2.9 THEN GOTO 7440
-7410 Nfloats$=" "&Nfloats$
-7420 GOTO 7390
-7430 !
-7440 Pp=POS(Fil$,".")
-7450 PRINT "                                              ";Nfloats$&" "&Qlat$&" "&Qlon$&" "&Rho$&" "&Fil$[1,Pp-1]
-7460 !
-7470 GOTO 6670
-7480 !
-7490 ASSIGN @Pin TO *
-7500 !
-7510 OFF ERROR
-7520 NEXT Jd
-7530 IF Verb_opt>.5 THEN PRINT
-7540 IF Verb_opt>.5 THEN PRINT "Total number of floats reporting inside box = ";Nfloats
-7550 !
-7560 ! Now read data files, put Pressure, Temp and Salt into P(i), T(i) and S(i)
-7570 Stav=0.
-7580 Stav2=0.
-7590 Stknt=0
-7600 FOR Iflt=1 TO Nfloats
-7610 Rflag=-1
-7620 !
-7630 CALL Getprofile(Fltnm$(Iflt),Path0$,P(*),T(*),S(*),Nrecs,Rflag)
-7640 !
-7650 ! Exclusion
-7660 ! IF POS(Fltnm$(Iflt),"20150317_4901191")>.5 THEN GOTO 8070
-7670 !
-7680 !
-7690 IF Rflag<0 THEN GOTO 8130
-7700 !
-7710 CALL Sanity_check(P(*),T(*),S(*),Nrecs)
-7720 !
-7730 Accpt(Iflt)=1.
-7740 !
-7750 ! Have read in data for Float # Iflt data are in P, T and S(i)
-7760 CALL Sigma_t(S(1),T(1),Qst)
-7770 Qst=.001*INT(.5+1000.*Qst)
-7780 IF Verb_opt>.5 THEN PRINT Iflt;Dc;Fltnm$(Iflt);T(1);S(1);Qst
-7790 !
-7800 IF Qst>5. AND Qst<30. THEN
-7810 Stav=Stav+Qst
-7820 Stav2=Stav2+Qst*Qst
-7830 Stknt=Stknt+1
-7840 END IF
-7850 !
-7860 IF P(1)<20. THEN P(1)=0.
-7870 FOR Ipr=1 TO 300
-7880 Te(Iflt,Ipr)=999.9
-7890 Sa(Iflt,Ipr)=999.9
-7900 NEXT Ipr
-7910 !
-7920 FOR Ipr=1 TO Npress
-7930 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
-7940 IF Pc<P(1) THEN GOTO 8110
-7950 IF Pc>P(Nrecs) THEN GOTO 8120
-7960 !
-7970 ! Somewhere in P(Ipr) there is data at pressure Pc
-7980 Eps=1.0E-6
-7990 FOR K=2 TO Nrecs
-8000 IF Pc>=P(K-1) AND Pc<=P(K) THEN
-8010 Del_p=P(K)-P(K-1)
-8020 IF Del_p<100. THEN
-8030 Rho=(Pc-P(K-1))/(P(K)-P(K-1)+Eps)
-8040 Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1)+Eps)
-8050 Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1)+Eps)
-8060 END IF
-8070 GOTO 8110
-8080 END IF
-8090 NEXT K
-8100 !
-8110 NEXT Ipr
-8120 ! Finished interpolation to standard pressures for Float Iflt
-8130 NEXT Iflt
-8140 ! Finished interpolation to standard pressures for all floats
-8150 Stav=Stav/Stknt
-8160 Stav2=Stav2/Stknt
-8170 Stsd=SQR(Stav2-Stav*Stav)
-8180 IF Verb_opt>.5 THEN PRINT "Mean & std dev of St = ";Stav;Stsd
-8190 !
-8200 ! Interpolate to station
-8210 !
-8220 MAT Pdel=(-9999.9)
-8230 MAT Sva=(-9999.9)
-8240 MAT Dh=(-9999.9)
-8250 Kdel=0
-8260 !
-8270 Ipr75=INT(1.1+75./Deltap)
-8280 !
-8290 Wgtsumt_max=0.
-8300 FOR Ipr=1 TO Npress
-8310 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
-8320 !
-8330 REM IF Pc>Wdep THEN GOTO 5000
-8340 Wgtsums=0.
-8350 Wgtsumt=0.
-8360 Swgtsum=0.
-8370 Twgtsum=0.
-8380 !
-8390 FOR Iflt=1 TO Nfloats
-8400 IF Accpt(Iflt)<0. THEN GOTO 8610
-8410 Latav=.5*(Lat(Iflt)+Latc)
-8420 Scx=Scy*COS(Latav)
-8430 Dx=Scx*(Lonc-Lon(Iflt))
-8440 Dy=Scy*(Latc-Lat(Iflt))
-8450 Rho=SQR(Dx*Dx+Dy*Dy)
-8460 Z=Rho/Rho0
-8470 IF Z>5. THEN GOTO 8610
-8480 Wgt=EXP(-Z*Z)
-8490 !
-8500 IF Te(Iflt,Ipr)>-1.5 AND Te(Iflt,Ipr)<40. THEN
-8510 Wgtsumt=Wgtsumt+Wgt
-8520 Twgtsum=Twgtsum+Wgt*Te(Iflt,Ipr)
-8530 !
-8540 END IF
-8550 !
-8560 IF Sa(Iflt,Ipr)>20. AND Sa(Iflt,Ipr)<40. THEN
-8570 Wgtsums=Wgtsums+Wgt
-8580 Swgtsum=Swgtsum+Wgt*Sa(Iflt,Ipr)
-8590 END IF
-8600 !
-8610 NEXT Iflt
-8620 !
-8630 IF Wgtsumt>Wgtsumt_max THEN Wgtsumt_max=Wgtsumt
-8640 Qte=Twgtsum/Wgtsumt
-8650 Qsa=Swgtsum/Wgtsums
-8660 !
-8670 CALL Sigma_t(Qsa,Qte,Qst)
-8680 CALL Spiciness(Qsp,Qte,Qsa)
-8690 CALL Svanom(Qsa,Qte,0.,Sigma,Svan)
-8700 !
-8710 P(Ipr)=Deltap*(Ipr-1.)
-8720 T(Ipr)=Qte
-8730 S(Ipr)=Qsa
-8740 St(Ipr)=Qst
-8750 Sp(Ipr)=Qsp
-8760 Kdel=Kdel+1
-8770 Pdel(Kdel)=Pc
-8780 Sva(Kdel)=Svan
-8790 !
-8800 NEXT Ipr
-8810 !
-8820 CALL Julday(1,Dc,Dayc,Monc,Yearc)
-8830 Dayc$=TRIM$(VAL$(Dayc))
-8840 IF Dayc<9.9 THEN Dayc$=" "&Dayc$
-8850 Monc$=TRIM$(VAL$(Monc))
-8860 IF Monc<9.9 THEN Monc$=" "&Monc$
-8870 !
-8880 Wgt$=VAL$(.001*INT(Wgtsumt_max*1000.+.5))
-8890 IF POS(Wgt$,".")<.1 THEN Wgt$=Wgt$&"."
-8900 IF Wgtsumt_max<.9999999 THEN Wgt$="0"&Wgt$
-8910 L=LEN(Wgt$)
-8920 IF ABS(L-4.)<.1 THEN Wgt$=Wgt$&"0"
-8930 IF ABS(L-3.)<.1 THEN Wgt$=Wgt$&"00"
-8940 IF ABS(L-2.)<.1 THEN Wgt$=Wgt$&"000"
-8950 IF Wgtsumt_max>1.000 AND Wgtsumt_max<9.999999 THEN Wgt$=" "&Wgt$
-8960 !
-8970 Lw=LEN(Wgt$)
-8980 !
-8990 IF St(1)>St(2) AND ABS(St(1)-St(2))>.05 THEN
-9000 St(1)=St(2)
-9010 T(1)=T(2)
-9020 S(1)=S(2)
-9030 Sp(1)=Sp(2)
-9040 END IF
-9050 !
-9060 ! Now compute DHgt relative to Pmax
-9070 Dh(Npress)=0.
-9080 Q=5.6E-6 ! Q=0.5f/g at station Papa
-9090 FOR K=2 TO Npress
-9100 Ipr=Npress+1-K
-9110 Dh(Ipr)=Dh(Ipr+1)+Q*(Sva(Ipr+1)+Sva(Ipr))*Deltap
-9120 NEXT K
-9130 !
-9140 FOR Ipr=1 TO Npress
-9150 Qte=.001*INT(.5+1000.*T(Ipr))
-9160 Qsa=.001*INT(.5+1000.*S(Ipr))
-9170 Qst=.001*INT(.5+1000.*St(Ipr))
-9180 Qsp=.001*INT(.5+1000.*Sp(Ipr))
-9190 Qdh=.001*INT(.5+1000.*Dh(Ipr))
-9200 Pc=Deltap*(Ipr-1.)
-9210 !
-9220 Sigref_opt=-1
-9230 IF Qst<Sigref_st(1) THEN GOTO 9420
-9240 IF Qst>Sigref_st(71) THEN GOTO 9420
-9250 FOR Icl=1 TO 70
-9260 IF Qst>=Sigref_st(Icl) AND Qst<=Sigref_st(Icl+1) THEN GOTO 9300
-9270 NEXT Icl
-9280 GOTO 9420
-9290 !
-9300 ! found a pair
-9310 Ra=(Qst-Sigref_st(Icl))/(Sigref_st(Icl+1)-Sigref_st(Icl))
-9320 Ter=Sigref_te(Icl)+Ra*(Sigref_te(Icl+1)-Sigref_te(Icl))
-9330 Sar=Sigref_sa(Icl)+Ra*(Sigref_sa(Icl+1)-Sigref_sa(Icl))
-9340 Tep=Qte-Ter
-9350 Sap=Qsa-Sar
-9360 Tep=.001*INT(.5+1000.*Tep)
-9370 Sap=.001*INT(.5+1000.*Sap)
-9380 !
-9390 S$=Xcoord$&","&VAL$(Qst)&","&VAL$(Qte)&","&VAL$(Tep)&","&VAL$(Qsa)&","&VAL$(Sap)
-9400 OUTPUT @Psclim;S$
-9410 !
-9420 ! continue
-9430 !
-9440 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qte)
-9450 IF Te_opt>.5 THEN OUTPUT @Pte;S$
-9460 !
-9470 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qsa)
-9480 IF Sa_opt>.5 THEN OUTPUT @Psa;S$
-9490 !
-9500 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qst)
-9510 IF St_opt>.5 THEN OUTPUT @Pst;S$
-9520 !
-9530 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qsp)
-9540 IF Sp_opt>.5 THEN OUTPUT @Psp;S$
-9550 !
-9560 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qdh)
-9570 IF Dh_opt>.5 THEN OUTPUT @Pdh;S$
-9580 !
-9590 NEXT Ipr
-9600 !
-9610 S$=Xcoord$&","&VAL$(Dh(1))&","&Wgt$
-9620 IF Dh_opt>.5 THEN OUTPUT @Psu;S$
-9630 !
-9640 Stdiff=St(Ipr75)-St(1)
-9650 IF Stdiff<-.002 THEN Stdiff=0.
-9660 S$=Xcoord$&","&VAL$(Stdiff)&","&VAL$(St(1))&","&VAL$(St(Ipr75))&","&Wgt$
-9670 OUTPUT @Pstrat;S$
-9680 !
-9690 Stdiff=.001*INT(1000.*Stdiff+.5)
-9700 Stdiff$=TRIM$(VAL$(Stdiff))
-9710 IF Stdiff<.9999999 THEN Stdiff$="0"&Stdiff$
-9720 Ls=LEN(Stdiff$)
-9730 IF ABS(Ls-3.)<.1 THEN Stdiff$=Stdiff$&"00"
-9740 IF ABS(Ls-4.)<.1 THEN Stdiff$=Stdiff$&"0"
-9750 IF Stdiff<.001 THEN Stdiff$="0.000"
-9760 !
-9770 St1$=VAL$(.001*INT(.5+1000.*St(1)))
-9780 Ls=LEN(St1$)
-9790 IF ABS(Ls-5.)<.1 THEN St1$=St1$&"0"
-9800 IF ABS(Ls-4.)<.1 THEN St1$=St1$&"00"
-9810 IF ABS(Ls-3.)<.1 THEN St1$=St1$&"000"
-9820 !
-9830 IF ABS(Lw-5.)<.1 THEN Wgt$=Wgt$&"0"
-9840 !
-9850 R$="| "&TRIM$(VAL$(Dc))&" "&Dayc$&"/"&Monc$&"/"&VAL$(Yearc)&" | "&Wgt$&"  "&Stdiff$&"    "&St1$
-9860 Closest=.1*INT(10.*Closest+.5)
-9870 Closest$=TRIM$(VAL$(Closest))
-9880 IF Closest<1.0 THEN Closest$="0"&Closest$
-9890 IF Closest<10.0 THEN Closest$=" "&Closest$
-9900 IF Closest<100.0 THEN Closest$=" "&Closest$
-9910 !Closest$=" "&Closest$
-9920 !
-9930 Lc=LEN(Closest$)
-9940 Pp=POS(Closest$,".")
-9950 IF Pp<.1 THEN Closest$=Closest$&".0"
-9960 !IF Pp>.1 AND ABS(Lc-Pp-1.)<.1 THEN Closest$=Closest$&"0"
-9970 !
-9980 Pp=POS(Closest_fltnm$,".")
-9990 R$=R$&" | "&Closest$&"  "&Closest_fltnm$[1,Pp-1]&" |"
-10000 PRINT R$
-10010!
-10020 ON ERROR GOTO 10040
-10030 PURGE "d:\argo_out\lstmsge.csv"
-10040 OFF ERROR
-10050 CREATE "d:\argo_out\lstmsge.csv",1
-10060 ASSIGN @Plst TO "d:\argo_out\lstmsge.csv";FORMAT ON
-10070 OUTPUT @Plst;R$
-10080 ASSIGN @Plst TO *
-10090!
-10100 IF Verb_opt>.5 THEN PRINT "Done ";Dc1;Dc;Dc2
-10110 NEXT Dc
+	6250 IF Verb_opt>.5 THEN PRINT Dc1;Dc;Dc2
+	6260 Closest=9999.9
+	6270 Jd1=Dc-Twin
+	6280 Jd2=Dc+Twin
+	6290 Nfloats=0
+	6300 Xcoord$=TRIM$(VAL$(Dc))
+	6310 !
+	6320 U$="Interpolating Dc = "&VAL$(Dc)&" of ("&VAL$(Dc1)&"-"&VAL$(Dc2)
+	6330 U$=U$&") using ("&VAL$(Jd1)&"-"&VAL$(Jd2)&") = ("
+	6340 CALL Julday(1,Jd1,Domc1,Monc1,Yearc1)
+	6350 CALL Julday(1,Jd2,Domc2,Monc2,Yearc2)
+	6360 Yc1$=TRIM$(VAL$(Yearc1))
+	6370 Yc2$=TRIM$(VAL$(Yearc2))
+	6380 Monc1$=TRIM$(VAL$(Monc1))
+	6390 IF Monc1<9.5 THEN Monc1$="0"&Monc1$
+	6400 Monc2$=TRIM$(VAL$(Monc2))
+	6410 IF Monc2<9.5 THEN Monc2$="0"&Monc2$
+	6420 Domc1$=TRIM$(VAL$(Domc1))
+	6430 IF Domc1<9.5 THEN Domc1$="0"&Domc1$
+	6440 Domc2$=TRIM$(VAL$(Domc2))
+	6450 IF Domc2<9.5 THEN Domc2$="0"&Domc2$
+	6460 U$=U$&Domc1$&"/"&Monc1$&"/"&Yc1$&"-"
+	6470 DISP U$&Domc2$&"/"&Monc2$&"/"&Yc2$&")"
+	6480 !
+	6490 FOR Jd=Jd1 TO Jd2	
+		6500 ! Find directories
+		6510 CALL Julday(1,Jd,Day,Mon,Year)
+		6520 Year$=TRIM$(VAL$(Year))
+		6530 Mon$=TRIM$(VAL$(Mon))
+		6540 IF Mon<9.5 THEN Mon$="0"&Mon$
+		6550 Day$=TRIM$(VAL$(Day))
+		6560 IF Day<9.5 THEN Day$="0"&Day$
+		6570 !
+		6580 Path$=Path0$&Year$&"\"&Mon$&"\"&Day$&"\"
+		6590 !
+		6600 ON ERROR GOTO 7510
+		6610 ASSIGN @Pin TO Path$&Year$&Mon$&Day$&"_index.csv";FORMAT ON
+		6620 ! PRINT Path$
+		6630 OFF ERROR
+		6640 ON END @Pin GOTO 7490
+		6650 ENTER @Pin;S$
+		6660      !
+		6670 ENTER @Pin;S$
+		6680 IF POS(S$,"****")>0 THEN GOTO 6670
+		6690 Pc1=POS(S$,",")
+		6700 S$[Pc1,Pc1]=";"
+		6710 Pc2=POS(S$,",")
+		6720 S$[Pc2,Pc2]=";"
+		6730 Pc3=POS(S$,",")
+		6740 S$[Pc3,Pc3]=";"
+		6750 Ls=LEN(S$)
+		6760 !
+		6770 Fil$=TRIM$(S$[1,Pc1-1])
+		6780 Qlat=VAL(S$[Pc1+1,Pc2-1])
+		6790 Qlon=VAL(S$[Pc2+1,Pc3-1])
+		6800 IF Qlon<0 THEN Qlon=360.+Qlon
+		6810 !
+		6820 Maxdep=VAL(S$[Pc3+1])
+		6830 !
+		6840 IF Qlat<Lat1 THEN GOTO 6670
+		6850 IF Qlat>Lat2 THEN GOTO 6670
+		6860 IF Qlon<Lon1 THEN GOTO 6670
+		6870 IF Qlon>Lon2 THEN GOTO 6670
+		6880 IF Maxdep<Pcutoff THEN GOTO 6670
+		6890 !
+		6900 !
+		6910 ! This one passes, store index information
+		6920 Nfloats=Nfloats+1
+		6930 Fltnm$(Nfloats)=Fil$
+		6940 Lat(Nfloats)=Qlat
+		6950 Lon(Nfloats)=Qlon
+		6960 !
+		6970 Dx=Scx0*(Qlon-Lonc)
+		6980 Dy=Scy*(Qlat-Latc)
+		6990 Rho=SQR(Dx*Dx+Dy*Dy)
+		7000 IF Rho<Closest THEN
+		7010 Closest=Rho
+		7020 Closest_fltnm$=Fltnm$(Nfloats)
+		7030 END IF
+		7040 !
+		7050 IF Rho>Rho_print THEN GOTO 7470
+		7060 Rho=.1*INT(10.*Rho+.5)
+		7070 !
+		7080 Qlat=.01*INT(.5+Qlat*100.)
+		7090 Qlat$=TRIM$(VAL$(Qlat))
+		7100 L0=LEN(Qlat$)
+		7110 IF L0>4.99 THEN GOTO 7150
+		7120 Qlat$=Qlat$&"0"
+		7130 GOTO 7100
+		7140 !
+		7150 Qlon=.01*INT(.5+Qlon*100.)
+		7160 Qlon=Qlon-360.
+		7170 Qlon$=TRIM$(VAL$(Qlon))
+		7180 L0=LEN(Qlon$)
+		7190 IF L0>6.9 THEN GOTO 7230
+		7200 Qlon$=Qlon$&"0"
+		7210 GOTO 7170
+		7220 !
+		7230 Rho$=TRIM$(VAL$(Rho))
+		7240 L0=LEN(Rho$)
+		7250 Pp=POS(Rho$,".")
+		7260 IF Pp>.1 THEN GOTO 7300
+		7270 Rho$=Rho$&".0"
+		7280 GOTO 7240
+		7290 !
+		7300 ! Pp >0
+		7310 IF ABS(Pp-L0)<.1 THEN
+		7320 Rho$=Rho$&"0"
+		7330 END IF
+		7340 !
+		7350 IF Rho<9.9999 THEN Rho$=" "&Rho$
+		7360 IF Rho<99.999 THEN Rho$=" "&Rho$
+		7370 !
+		7380 Nfloats$=TRIM$(VAL$(Nfloats))
+		7390 L0=LEN(Nfloats$)
+		7400 IF L0>2.9 THEN GOTO 7440
+		7410 Nfloats$=" "&Nfloats$
+		7420 GOTO 7390
+		7430 !
+		7440 Pp=POS(Fil$,".")
+		7450 PRINT "                                              ";Nfloats$&" "&Qlat$&" "&Qlon$&" "&Rho$&" "&Fil$[1,Pp-1]
+		7460 !
+		7470 GOTO 6670
+		7480 !
+		7490 ASSIGN @Pin TO *
+		7500 !
+		7510 OFF ERROR
+		7520 NEXT Jd
+	7530 IF Verb_opt>.5 THEN PRINT
+	7540 IF Verb_opt>.5 THEN PRINT "Total number of floats reporting inside box = ";Nfloats
+	7550 !
+	7560 ! Now read data files, put Pressure, Temp and Salt into P(i), T(i) and S(i)
+	7570 Stav=0.
+	7580 Stav2=0.
+	7590 Stknt=0
+	7600 FOR Iflt=1 TO Nfloats
+		7610 Rflag=-1
+		7620 !
+		7630 CALL Getprofile(Fltnm$(Iflt),Path0$,P(*),T(*),S(*),Nrecs,Rflag)
+		7640 !
+		7650 ! Exclusion
+		7660 ! IF POS(Fltnm$(Iflt),"20150317_4901191")>.5 THEN GOTO 8070
+		7670 !
+		7680 !
+		7690 IF Rflag<0 THEN GOTO 8130
+		7700 !
+		7710 CALL Sanity_check(P(*),T(*),S(*),Nrecs)
+		7720 !
+		7730 Accpt(Iflt)=1.
+		7740 !
+		7750 ! Have read in data for Float # Iflt data are in P, T and S(i)
+		7760 CALL Sigma_t(S(1),T(1),Qst)
+		7770 Qst=.001*INT(.5+1000.*Qst)
+		7780 IF Verb_opt>.5 THEN PRINT Iflt;Dc;Fltnm$(Iflt);T(1);S(1);Qst
+		7790 !
+		7800 IF Qst>5. AND Qst<30. THEN
+		7810 Stav=Stav+Qst
+		7820 Stav2=Stav2+Qst*Qst
+		7830 Stknt=Stknt+1
+		7840 END IF
+		7850 !
+		7860 IF P(1)<20. THEN P(1)=0.
+		7870 FOR Ipr=1 TO 300
+			7880 Te(Iflt,Ipr)=999.9
+			7890 Sa(Iflt,Ipr)=999.9
+			7900 NEXT Ipr
+		7910 !
+		7920 FOR Ipr=1 TO Npress
+			7930 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
+			7940 IF Pc<P(1) THEN GOTO 8110
+			7950 IF Pc>P(Nrecs) THEN GOTO 8120
+			7960 !
+			7970 ! Somewhere in P(Ipr) there is data at pressure Pc
+			7980 Eps=1.0E-6
+			7990 FOR K=2 TO Nrecs
+				8000 IF Pc>=P(K-1) AND Pc<=P(K) THEN
+				8010 Del_p=P(K)-P(K-1)
+				8020 IF Del_p<100. THEN
+				8030 Rho=(Pc-P(K-1))/(P(K)-P(K-1)+Eps)
+				8040 Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1)+Eps)
+				8050 Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1)+Eps)
+				8060 END IF
+				8070 GOTO 8110
+				8080 END IF
+				8090 NEXT K
+			8100 !
+			8110 NEXT Ipr
+		8120 ! Finished interpolation to standard pressures for Float Iflt
+		8130 NEXT Iflt
+	8140 ! Finished interpolation to standard pressures for all floats
+	8150 Stav=Stav/Stknt
+	8160 Stav2=Stav2/Stknt
+	8170 Stsd=SQR(Stav2-Stav*Stav)
+	8180 IF Verb_opt>.5 THEN PRINT "Mean & std dev of St = ";Stav;Stsd
+	8190 !
+	8200 ! Interpolate to station
+	8210 !
+	8220 MAT Pdel=(-9999.9)
+	8230 MAT Sva=(-9999.9)
+	8240 MAT Dh=(-9999.9)
+	8250 Kdel=0
+	8260 !
+	8270 Ipr75=INT(1.1+75./Deltap)
+	8280 !
+	8290 Wgtsumt_max=0.
+	8300 FOR Ipr=1 TO Npress
+		8310 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
+		8320 !
+		8330 REM IF Pc>Wdep THEN GOTO 5000
+		8340 Wgtsums=0.
+		8350 Wgtsumt=0.
+		8360 Swgtsum=0.
+		8370 Twgtsum=0.
+		8380 !
+		8390 FOR Iflt=1 TO Nfloats
+			8400 IF Accpt(Iflt)<0. THEN GOTO 8610
+			8410 Latav=.5*(Lat(Iflt)+Latc)
+			8420 Scx=Scy*COS(Latav)
+			8430 Dx=Scx*(Lonc-Lon(Iflt))
+			8440 Dy=Scy*(Latc-Lat(Iflt))
+			8450 Rho=SQR(Dx*Dx+Dy*Dy)
+			8460 Z=Rho/Rho0
+			8470 IF Z>5. THEN GOTO 8610
+			8480 Wgt=EXP(-Z*Z)
+			8490 !
+			8500 IF Te(Iflt,Ipr)>-1.5 AND Te(Iflt,Ipr)<40. THEN
+			8510 Wgtsumt=Wgtsumt+Wgt
+			8520 Twgtsum=Twgtsum+Wgt*Te(Iflt,Ipr)
+			8530 !
+			8540 END IF
+			8550 !
+			8560 IF Sa(Iflt,Ipr)>20. AND Sa(Iflt,Ipr)<40. THEN
+			8570 Wgtsums=Wgtsums+Wgt
+			8580 Swgtsum=Swgtsum+Wgt*Sa(Iflt,Ipr)
+			8590 END IF
+			8600 !
+			8610 NEXT Iflt
+		8620 !
+		8630 IF Wgtsumt>Wgtsumt_max THEN Wgtsumt_max=Wgtsumt
+		8640 Qte=Twgtsum/Wgtsumt
+		8650 Qsa=Swgtsum/Wgtsums
+		8660 !
+		8670 CALL Sigma_t(Qsa,Qte,Qst)
+		8680 CALL Spiciness(Qsp,Qte,Qsa)
+		8690 CALL Svanom(Qsa,Qte,0.,Sigma,Svan)
+		8700 !
+		8710 P(Ipr)=Deltap*(Ipr-1.)
+		8720 T(Ipr)=Qte
+		8730 S(Ipr)=Qsa
+		8740 St(Ipr)=Qst
+		8750 Sp(Ipr)=Qsp
+		8760 Kdel=Kdel+1
+		8770 Pdel(Kdel)=Pc
+		8780 Sva(Kdel)=Svan
+		8790 !
+		8800 NEXT Ipr
+	8810 !
+	8820 CALL Julday(1,Dc,Dayc,Monc,Yearc)
+	8830 Dayc$=TRIM$(VAL$(Dayc))
+	8840 IF Dayc<9.9 THEN Dayc$=" "&Dayc$
+	8850 Monc$=TRIM$(VAL$(Monc))
+	8860 IF Monc<9.9 THEN Monc$=" "&Monc$
+	8870 !
+	8880 Wgt$=VAL$(.001*INT(Wgtsumt_max*1000.+.5))
+	8890 IF POS(Wgt$,".")<.1 THEN Wgt$=Wgt$&"."
+	8900 IF Wgtsumt_max<.9999999 THEN Wgt$="0"&Wgt$
+	8910 L=LEN(Wgt$)
+	8920 IF ABS(L-4.)<.1 THEN Wgt$=Wgt$&"0"
+	8930 IF ABS(L-3.)<.1 THEN Wgt$=Wgt$&"00"
+	8940 IF ABS(L-2.)<.1 THEN Wgt$=Wgt$&"000"
+	8950 IF Wgtsumt_max>1.000 AND Wgtsumt_max<9.999999 THEN Wgt$=" "&Wgt$
+	8960 !
+	8970 Lw=LEN(Wgt$)
+	8980 !
+	8990 IF St(1)>St(2) AND ABS(St(1)-St(2))>.05 THEN
+	9000 St(1)=St(2)
+	9010 T(1)=T(2)
+	9020 S(1)=S(2)
+	9030 Sp(1)=Sp(2)
+	9040 END IF
+	9050 !
+	9060 ! Now compute DHgt relative to Pmax
+	9070 Dh(Npress)=0.
+	9080 Q=5.6E-6 ! Q=0.5f/g at station Papa
+	9090 FOR K=2 TO Npress
+		9100 Ipr=Npress+1-K
+		9110 Dh(Ipr)=Dh(Ipr+1)+Q*(Sva(Ipr+1)+Sva(Ipr))*Deltap
+		9120 NEXT K
+	9130 !
+	9140 FOR Ipr=1 TO Npress
+		9150 Qte=.001*INT(.5+1000.*T(Ipr))
+		9160 Qsa=.001*INT(.5+1000.*S(Ipr))
+		9170 Qst=.001*INT(.5+1000.*St(Ipr))
+		9180 Qsp=.001*INT(.5+1000.*Sp(Ipr))
+		9190 Qdh=.001*INT(.5+1000.*Dh(Ipr))
+		9200 Pc=Deltap*(Ipr-1.)
+		9210 !
+		9220 Sigref_opt=-1
+		9230 IF Qst<Sigref_st(1) THEN GOTO 9420
+		9240 IF Qst>Sigref_st(71) THEN GOTO 9420
+		9250 FOR Icl=1 TO 70
+			9260 IF Qst>=Sigref_st(Icl) AND Qst<=Sigref_st(Icl+1) THEN GOTO 9300
+			9270 NEXT Icl
+		9280 GOTO 9420
+		9290 !
+		9300 ! found a pair
+		9310 Ra=(Qst-Sigref_st(Icl))/(Sigref_st(Icl+1)-Sigref_st(Icl))
+		9320 Ter=Sigref_te(Icl)+Ra*(Sigref_te(Icl+1)-Sigref_te(Icl))
+		9330 Sar=Sigref_sa(Icl)+Ra*(Sigref_sa(Icl+1)-Sigref_sa(Icl))
+		9340 Tep=Qte-Ter
+		9350 Sap=Qsa-Sar
+		9360 Tep=.001*INT(.5+1000.*Tep)
+		9370 Sap=.001*INT(.5+1000.*Sap)
+		9380 !
+		9390 S$=Xcoord$&","&VAL$(Qst)&","&VAL$(Qte)&","&VAL$(Tep)&","&VAL$(Qsa)&","&VAL$(Sap)
+		9400 OUTPUT @Psclim;S$
+		9410 !
+		9420 ! continue
+		9430 !
+		9440 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qte)
+		9450 IF Te_opt>.5 THEN OUTPUT @Pte;S$
+		9460 !
+		9470 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qsa)
+		9480 IF Sa_opt>.5 THEN OUTPUT @Psa;S$
+		9490 !
+		9500 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qst)
+		9510 IF St_opt>.5 THEN OUTPUT @Pst;S$
+		9520 !
+		9530 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qsp)
+		9540 IF Sp_opt>.5 THEN OUTPUT @Psp;S$
+		9550 !
+		9560 S$=Xcoord$&","&VAL$(-Pc)&","&VAL$(Qdh)
+		9570 IF Dh_opt>.5 THEN OUTPUT @Pdh;S$
+		9580 !
+		9590 NEXT Ipr
+	9600 !
+	9610 S$=Xcoord$&","&VAL$(Dh(1))&","&Wgt$
+	9620 IF Dh_opt>.5 THEN OUTPUT @Psu;S$
+	9630 !
+	9640 Stdiff=St(Ipr75)-St(1)
+	9650 IF Stdiff<-.002 THEN Stdiff=0.
+	9660 S$=Xcoord$&","&VAL$(Stdiff)&","&VAL$(St(1))&","&VAL$(St(Ipr75))&","&Wgt$
+	9670 OUTPUT @Pstrat;S$
+	9680 !
+	9690 Stdiff=.001*INT(1000.*Stdiff+.5)
+	9700 Stdiff$=TRIM$(VAL$(Stdiff))
+	9710 IF Stdiff<.9999999 THEN Stdiff$="0"&Stdiff$
+	9720 Ls=LEN(Stdiff$)
+	9730 IF ABS(Ls-3.)<.1 THEN Stdiff$=Stdiff$&"00"
+	9740 IF ABS(Ls-4.)<.1 THEN Stdiff$=Stdiff$&"0"
+	9750 IF Stdiff<.001 THEN Stdiff$="0.000"
+	9760 !
+	9770 St1$=VAL$(.001*INT(.5+1000.*St(1)))
+	9780 Ls=LEN(St1$)
+	9790 IF ABS(Ls-5.)<.1 THEN St1$=St1$&"0"
+	9800 IF ABS(Ls-4.)<.1 THEN St1$=St1$&"00"
+	9810 IF ABS(Ls-3.)<.1 THEN St1$=St1$&"000"
+	9820 !
+	9830 IF ABS(Lw-5.)<.1 THEN Wgt$=Wgt$&"0"
+	9840 !
+	9850 R$="| "&TRIM$(VAL$(Dc))&" "&Dayc$&"/"&Monc$&"/"&VAL$(Yearc)&" | "&Wgt$&"  "&Stdiff$&"    "&St1$
+	9860 Closest=.1*INT(10.*Closest+.5)
+	9870 Closest$=TRIM$(VAL$(Closest))
+	9880 IF Closest<1.0 THEN Closest$="0"&Closest$
+	9890 IF Closest<10.0 THEN Closest$=" "&Closest$
+	9900 IF Closest<100.0 THEN Closest$=" "&Closest$
+	9910 !Closest$=" "&Closest$
+	9920 !
+	9930 Lc=LEN(Closest$)
+	9940 Pp=POS(Closest$,".")
+	9950 IF Pp<.1 THEN Closest$=Closest$&".0"
+	9960 !IF Pp>.1 AND ABS(Lc-Pp-1.)<.1 THEN Closest$=Closest$&"0"
+	9970 !
+	9980 Pp=POS(Closest_fltnm$,".")
+	9990 R$=R$&" | "&Closest$&"  "&Closest_fltnm$[1,Pp-1]&" |"
+	10000 PRINT R$
+	10010!
+	10020 ON ERROR GOTO 10040
+	10030 PURGE "d:\argo_out\lstmsge.csv"
+	10040 OFF ERROR
+	10050 CREATE "d:\argo_out\lstmsge.csv",1
+	10060 ASSIGN @Plst TO "d:\argo_out\lstmsge.csv";FORMAT ON
+	10070 OUTPUT @Plst;R$
+	10080 ASSIGN @Plst TO *
+	10090!
+	10100 IF Verb_opt>.5 THEN PRINT "Done ";Dc1;Dc;Dc2
+	10110 NEXT Dc
 10120!
 10130 IF Te_opt>.5 THEN ASSIGN @Pte TO *
 10140 IF Sa_opt>.5 THEN ASSIGN @Psa TO *
@@ -1200,11 +1200,11 @@
 12000 !
 12010 IF Jdn>.5 AND Jdn<Mdoy(1)+.1 THEN Mon=1
 12020 FOR M=2 TO 12
-12030 IF Jdn>Mdoy(M-1)+.1 AND Jdn<Mdoy(M)+.1 THEN
-12040 Mon=M
-12050 GOTO Cont2
-12060 END IF
-12070 NEXT M
+	12030 IF Jdn>Mdoy(M-1)+.1 AND Jdn<Mdoy(M)+.1 THEN
+	12040 Mon=M
+	12050 GOTO Cont2
+	12060 END IF
+	12070 NEXT M
 12080 !
 12090 Cont2:  ! Got month
 12100 IF ABS(Mon-1.)<.1 THEN Dom=Jdn
@@ -1261,7 +1261,7 @@
 12610!
 12620 SUB Sigma_t(S,T,Sigma_t)
 12630!
-12640! T  = Temperature in ³C
+12640! T  = Temperature in Â³C
 12650! S  = salinity in pss-78
 12660!
 12670 R4=4.8314E-4
@@ -1278,11 +1278,11 @@
 12780 SUB Despike(T(*),N)
 12790 Nm1=N-1
 12800 FOR I=2 TO Nm1
-12810 Dt1=T(I)-T(I-1)
-12820 Dt2=T(I+1)-T(I)
-12830 Pr=Dt1*Dt2
-12840 IF Pr<0. AND ABS(Dt1)>3. AND ABS(Dt2)>3. THEN T(I)=.5*(T(I+1)+T(I-1))
-12850 NEXT I
+	12810 Dt1=T(I)-T(I-1)
+	12820 Dt2=T(I+1)-T(I)
+	12830 Pr=Dt1*Dt2
+	12840 IF Pr<0. AND ABS(Dt1)>3. AND ABS(Dt2)>3. THEN T(I)=.5*(T(I+1)+T(I-1))
+	12850 NEXT I
 12860 SUBEND
 12870!
 12880 SUB Spiciness(Spice,Temp,Salt)
@@ -1294,20 +1294,20 @@
 12940 DATA 3.949E-7,-3.029E-8,-3.8209E-7,1.0012E-7,4.7133E-8
 12950 DATA -6.36E-10,-1.309E-9,6.048E-9,-1.1409E-9,-6.676E-10
 12960 FOR J=1 TO 6
-12970 FOR I=1 TO 5
-12980 READ B(I,J)
-12990 NEXT I
-13000 NEXT J
+	12970 FOR I=1 TO 5
+		12980 READ B(I,J)
+		12990 NEXT I
+	13000 NEXT J
 13010 Spice=0.
 13020 Sp=Salt-35.
 13030 Theta=Temp
 13040 FOR I=1 TO 6
-13050 Ii=I-1
-13060 FOR J=1 TO 5
-13070 Jj=J-1
-13080 Spice=Spice+B(J,I)*(Theta^Ii)*(Sp^Jj)
-13090 NEXT J
-13100 NEXT I
+	13050 Ii=I-1
+	13060 FOR J=1 TO 5
+		13070 Jj=J-1
+		13080 Spice=Spice+B(J,I)*(Theta^Ii)*(Sp^Jj)
+		13090 NEXT J
+	13100 NEXT I
 13110!
 13120 SUBEND
 13130!
@@ -1317,7 +1317,7 @@
 13170! Density anomaly is identical with sigma-t without pressure terms
 13180!
 13190! P0 = Pressure in decibars
-13200! T  = Temperature in ³C
+13200! T  = Temperature in Â³C
 13210! S  = salinity in pss-78
 13220!
 13230 R3500=1028.106331
@@ -1361,8 +1361,8 @@
 13610 V350p=V350p*Pk
 13620!
 13630! Density anomaly computed relative to 1000 kg/m^3
-13640! DR350 = density anomaly at 35 pss, 0³C and 0 decibars
-13650! dr35p = density anomaly at 35 pss, 0³C and pressure = p0 decibars
+13640! DR350 = density anomaly at 35 pss, 0Â³C and 0 decibars
+13650! dr35p = density anomaly at 35 pss, 0Â³C and pressure = p0 decibars
 13660! Dvan  = Density anomaly variations involving spec vol anom
 13670!
 13680 Dr35p=Gam/V350p
@@ -1375,12 +1375,12 @@
 13750 Ls=LEN(S$)
 13760 K=0
 13770 FOR I=1 TO Ls
-13780 IF S$[I,I]=" " THEN
-13790 K=K+1
-13800 IF K=1 THEN Pb1=I
-13810 IF K=2 THEN Pb2=I
-13820 END IF
-13830 NEXT I
+	13780 IF S$[I,I]=" " THEN
+	13790 K=K+1
+	13800 IF K=1 THEN Pb1=I
+	13810 IF K=2 THEN Pb2=I
+	13820 END IF
+	13830 NEXT I
 13840 D=VAL(S$[1,Pb1])
 13850 Mon$=TRIM$(S$[Pb1+1,Pb2-1])
 13860 Y=VAL(S$[Pb2,Ls])
@@ -1480,125 +1480,125 @@
 14800 ! Get here, we know the number of records and are ready to read data records
 14810 Rflag=1
 14820 FOR I=1 TO Nrecs
-14830 ON ERROR GOTO Line_rflag
-14840 ENTER @Pin;S$
-14850 GOTO Line_offerr1
-14860 Line_rflag: Rflag=-1
-14870 OFF ERROR
-14880 GOTO Line1
-14890 !
-14900 Line_offerr1: OFF ERROR
-14910 T$=S$
-14920 Pc1=POS(T$,".")
-14930 T$[Pc1,Pc1]="/"
-14940 Pc2=POS(T$,".")
-14950 T$[Pc2,Pc2]="/"
-14960 Pc3=POS(T$,".")
-14970 T$[Pc3,Pc3]="/"
-14980 Pc4=POS(T$,".")
-14990 T$[Pc4,Pc4]="/"
-15000 Pc5=POS(T$,".")
-15010 T$[Pc5,Pc5]="/"
-15020 Pc6=POS(T$,".")
-15030 T$[Pc6,Pc6]="/"
-15040 Pc7=POS(T$,".")
-15050 T$[Pc7,Pc7]="/"
-15060 Pc8=POS(T$,".")
-15070 T$[Pc8,Pc8]="/"
-15080 Pc9=POS(T$,".")
-15090 IF ABS(Pc9)>1.5 THEN T$[Pc9,Pc9]="/"
-15100 !
-15110 !
-15120 SELECT Chanord
-15130 CASE 1
-15140 Ppo=Pc1
-15150 Ppc=Pc2
-15160 Pto=Pc4
-15170 Ptc=Pc5
-15180 Pso=Pc7
-15190 Psc=Pc8
-15200 CASE 2
-15210 Ppo=Pc1
-15220 Ppc=Pc2
-15230 Pso=Pc4
-15240 Psc=Pc5
-15250 Pto=Pc7
-15260 Ptc=Pc8
-15270 CASE 3
-15280 Pto=Pc1
-15290 Ptc=Pc2
-15300 Ppo=Pc4
-15310 Ppc=Pc5
-15320 Pso=Pc7
-15330 Psc=Pc8
-15340 CASE 4
-15350 Pto=Pc1
-15360 Ptc=Pc2
-15370 Pso=Pc4
-15380 Psc=Pc5
-15390 Ppo=Pc7
-15400 Ppc=Pc8
-15410 CASE 5
-15420 Pso=Pc1
-15430 Psc=Pc2
-15440 Pto=Pc4
-15450 Ptc=Pc5
-15460 Ppo=Pc7
-15470 Ppc=Pc8
-15480 CASE 6
-15490 Pso=Pc1
-15500 Psc=Pc2
-15510 Ppo=Pc4
-15520 Ppc=Pc5
-15530 Pto=Pc7
-15540 Ptc=Pc8
-15550 END SELECT
-15560 !
-15570 Po=VAL(S$[Ppo-5,Ppo+1])
-15580 Pc=VAL(S$[Ppc-5,Ppc+1])
-15590 ON ERROR GOTO Line_pqual
-15600 Pqual=VAL(S$[Ppo+2,Ppo+3])
-15610 GOTO Line_po
-15620 Line_pqual: Pqual=2
-15630 Line_po: IF ABS(Pc)<9000. THEN Po=Pc
-15640 OFF ERROR
-15650 !
-15660 To=VAL(S$[Pto-5,Pto+3])
-15670 Tc=VAL(S$[Ptc-5,Ptc+3])
-15680 ON ERROR GOTO Line_tqual
-15690 Tqual=VAL(S$[Pto+4,Pto+5])
-15700 GOTO Line_to
-15710 Line_tqual: Tqual=2
-15720 Line_to: IF ABS(Tc)<9000. THEN To=Tc
-15730 OFF ERROR
-15740 !
-15750 So=VAL(S$[Pso-5,Pso+3])
-15760 Sc=VAL(S$[Psc-5,Psc+3])
-15770 ON ERROR GOTO Line_squal
-15780 Squal=VAL(S$[Pso+4,Pso+5])
-15790 GOTO Line_so
-15800 Line_squal: Squal=2
-15810 Line_so: IF ABS(Sc)<9000. THEN So=Sc
-15820 OFF ERROR
-15830 !
-15840 P(I)=Po
-15850 T(I)=To
-15860 S(I)=So
-15870 IF ABS(I-1.)>.1 THEN GOTO Line_pad
-15880 IF P(1)<69. THEN GOTO Line_pad
-15890 Rflag=-1
-15900 GOTO Line1
-15910 !
-15920 Line_pad:  ! Continue
-15930 IF Pqual>3 OR Tqual>3 OR Squal>3 THEN
-15940 T(I)=999.9
-15950 S(I)=999.9
-15960 END IF
-15970 !
-15980 IF T(I)>35. OR T(I)<-2.0 THEN T(I)=999.9
-15990 IF S(I)>38. OR S(I)<20. THEN S(I)=999.9
-16000 !
-16010 NEXT I
+	14830 ON ERROR GOTO Line_rflag
+	14840 ENTER @Pin;S$
+	14850 GOTO Line_offerr1
+	14860 Line_rflag: Rflag=-1
+	14870 OFF ERROR
+	14880 GOTO Line1
+	14890 !
+	14900 Line_offerr1: OFF ERROR
+	14910 T$=S$
+	14920 Pc1=POS(T$,".")
+	14930 T$[Pc1,Pc1]="/"
+	14940 Pc2=POS(T$,".")
+	14950 T$[Pc2,Pc2]="/"
+	14960 Pc3=POS(T$,".")
+	14970 T$[Pc3,Pc3]="/"
+	14980 Pc4=POS(T$,".")
+	14990 T$[Pc4,Pc4]="/"
+	15000 Pc5=POS(T$,".")
+	15010 T$[Pc5,Pc5]="/"
+	15020 Pc6=POS(T$,".")
+	15030 T$[Pc6,Pc6]="/"
+	15040 Pc7=POS(T$,".")
+	15050 T$[Pc7,Pc7]="/"
+	15060 Pc8=POS(T$,".")
+	15070 T$[Pc8,Pc8]="/"
+	15080 Pc9=POS(T$,".")
+	15090 IF ABS(Pc9)>1.5 THEN T$[Pc9,Pc9]="/"
+	15100 !
+	15110 !
+	15120 SELECT Chanord
+	15130 CASE 1
+	15140 Ppo=Pc1
+	15150 Ppc=Pc2
+	15160 Pto=Pc4
+	15170 Ptc=Pc5
+	15180 Pso=Pc7
+	15190 Psc=Pc8
+	15200 CASE 2
+	15210 Ppo=Pc1
+	15220 Ppc=Pc2
+	15230 Pso=Pc4
+	15240 Psc=Pc5
+	15250 Pto=Pc7
+	15260 Ptc=Pc8
+	15270 CASE 3
+	15280 Pto=Pc1
+	15290 Ptc=Pc2
+	15300 Ppo=Pc4
+	15310 Ppc=Pc5
+	15320 Pso=Pc7
+	15330 Psc=Pc8
+	15340 CASE 4
+	15350 Pto=Pc1
+	15360 Ptc=Pc2
+	15370 Pso=Pc4
+	15380 Psc=Pc5
+	15390 Ppo=Pc7
+	15400 Ppc=Pc8
+	15410 CASE 5
+	15420 Pso=Pc1
+	15430 Psc=Pc2
+	15440 Pto=Pc4
+	15450 Ptc=Pc5
+	15460 Ppo=Pc7
+	15470 Ppc=Pc8
+	15480 CASE 6
+	15490 Pso=Pc1
+	15500 Psc=Pc2
+	15510 Ppo=Pc4
+	15520 Ppc=Pc5
+	15530 Pto=Pc7
+	15540 Ptc=Pc8
+	15550 END SELECT
+	15560 !
+	15570 Po=VAL(S$[Ppo-5,Ppo+1])
+	15580 Pc=VAL(S$[Ppc-5,Ppc+1])
+	15590 ON ERROR GOTO Line_pqual
+	15600 Pqual=VAL(S$[Ppo+2,Ppo+3])
+	15610 GOTO Line_po
+	15620 Line_pqual: Pqual=2
+	15630 Line_po: IF ABS(Pc)<9000. THEN Po=Pc
+	15640 OFF ERROR
+	15650 !
+	15660 To=VAL(S$[Pto-5,Pto+3])
+	15670 Tc=VAL(S$[Ptc-5,Ptc+3])
+	15680 ON ERROR GOTO Line_tqual
+	15690 Tqual=VAL(S$[Pto+4,Pto+5])
+	15700 GOTO Line_to
+	15710 Line_tqual: Tqual=2
+	15720 Line_to: IF ABS(Tc)<9000. THEN To=Tc
+	15730 OFF ERROR
+	15740 !
+	15750 So=VAL(S$[Pso-5,Pso+3])
+	15760 Sc=VAL(S$[Psc-5,Psc+3])
+	15770 ON ERROR GOTO Line_squal
+	15780 Squal=VAL(S$[Pso+4,Pso+5])
+	15790 GOTO Line_so
+	15800 Line_squal: Squal=2
+	15810 Line_so: IF ABS(Sc)<9000. THEN So=Sc
+	15820 OFF ERROR
+	15830 !
+	15840 P(I)=Po
+	15850 T(I)=To
+	15860 S(I)=So
+	15870 IF ABS(I-1.)>.1 THEN GOTO Line_pad
+	15880 IF P(1)<69. THEN GOTO Line_pad
+	15890 Rflag=-1
+	15900 GOTO Line1
+	15910 !
+	15920 Line_pad:  ! Continue
+	15930 IF Pqual>3 OR Tqual>3 OR Squal>3 THEN
+	15940 T(I)=999.9
+	15950 S(I)=999.9
+	15960 END IF
+	15970 !
+	15980 IF T(I)>35. OR T(I)<-2.0 THEN T(I)=999.9
+	15990 IF S(I)>38. OR S(I)<20. THEN S(I)=999.9
+	16000 !
+	16010 NEXT I
 16020 !
 16030 !CALL Despike(T(*),Nrecs)
 16040 !CALL Despike(S(*),Nrecs)
@@ -1620,7 +1620,7 @@
 16200 !
 16210 Line1: ASSIGN @Pin TO *
 16220 !
-16230 SUBEND
+16230 Sub_logit_end
 16240 !
 16250 SUB Lastrun(Drive$,M)
 16260 !
@@ -1637,13 +1637,13 @@
 16370 Check_oor: ! Check for out-of range values
 16380 K=-1
 16390 FOR I=1 TO Nrecs
-16400 IF P(I)<-.5 THEN K=I
-16410 IF P(I)>2200. THEN K=I
-16420 IF T(I)<-2.5 THEN K=I
-16430 IF T(I)>30. THEN K=I
-16440 IF S(I)<30. THEN K=I
-16450 IF S(I)>39. THEN K=I
-16460 NEXT I
+	16400 IF P(I)<-.5 THEN K=I
+	16410 IF P(I)>2200. THEN K=I
+	16420 IF T(I)<-2.5 THEN K=I
+	16430 IF T(I)>30. THEN K=I
+	16440 IF S(I)<30. THEN K=I
+	16450 IF S(I)>39. THEN K=I
+	16460 NEXT I
 16470 IF K>.5 THEN GOTO Is_oor
 16480 GOTO No_oor
 16490 !
@@ -1653,10 +1653,10 @@
 16530 IF ABS(K-Nrecs)<.1 THEN GOTO Check_oor
 16540 !
 16550 FOR J=K TO Nrecs
-16560 P(J)=P(J+1)
-16570 T(J)=T(J+1)
-16580 S(J)=S(J+1)
-16590 NEXT J
+	16560 P(J)=P(J+1)
+	16570 T(J)=T(J+1)
+	16580 S(J)=S(J+1)
+	16590 NEXT J
 16600 GOTO Check_oor
 16610 !
 16620 No_oor: ! There are no out-of-range values
@@ -1666,9 +1666,9 @@
 16660 !
 16670 K=-1
 16680 FOR I=2 TO Nrecs-1
-16690 IF P(I)>P(I-1) AND P(I)>P(I+1) THEN K=I
-16700 IF P(I)<P(I-1) AND P(I)<P(I+1) THEN K=I
-16710 NEXT I
+	16690 IF P(I)>P(I-1) AND P(I)>P(I+1) THEN K=I
+	16700 IF P(I)<P(I-1) AND P(I)<P(I+1) THEN K=I
+	16710 NEXT I
 16720 !
 16730 IF K<.5 THEN GOTO No_corrs
 16740 !
@@ -1677,10 +1677,10 @@
 16770 IF ABS(K-Nrecs)<.1 THEN GOTO P_mono
 16780 !
 16790 FOR J=K TO Nrecs
-16800 P(J)=P(J+1)
-16810 T(J)=T(J+1)
-16820 S(J)=S(J+1)
-16830 NEXT J
+	16800 P(J)=P(J+1)
+	16810 T(J)=T(J+1)
+	16820 S(J)=S(J+1)
+	16830 NEXT J
 16840 GOTO P_mono
 16850 !
 16860 No_corrs: ! No further corrections
