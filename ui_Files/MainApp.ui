@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1402</width>
-    <height>909</height>
+    <width>925</width>
+    <height>765</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,11 +48,11 @@
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::MinimumExpanding</enum>
+         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>400</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
@@ -233,11 +233,11 @@
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>1231</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
@@ -276,6 +276,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
                <widget class="QSpinBox" name="floatRadiusBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -291,6 +294,9 @@
               </item>
               <item>
                <widget class="QLabel" name="label_3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -353,18 +359,18 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="displayFormat">
+                 <string>d/M/yyyy</string>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
                 <property name="date">
                  <date>
                   <year>2016</year>
                   <month>5</month>
                   <day>18</day>
                  </date>
-                </property>
-                <property name="displayFormat">
-                 <string>d/M/yyyy</string>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -387,18 +393,18 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="displayFormat">
+                 <string>d/M/yyyy</string>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
                 <property name="date">
                  <date>
                   <year>2016</year>
                   <month>5</month>
                   <day>23</day>
                  </date>
-                </property>
-                <property name="displayFormat">
-                 <string>d/M/yyyy</string>
-                </property>
-                <property name="calendarPopup">
-                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -511,15 +517,15 @@
                 <property name="buttonSymbols">
                  <enum>QAbstractSpinBox::NoButtons</enum>
                 </property>
+                <property name="displayFormat">
+                 <string>d/M/yyyy</string>
+                </property>
                 <property name="date">
                  <date>
                   <year>2020</year>
                   <month>1</month>
                   <day>1</day>
                  </date>
-                </property>
-                <property name="displayFormat">
-                 <string>d/M/yyyy</string>
                 </property>
                </widget>
               </item>
@@ -564,15 +570,15 @@
                 <property name="buttonSymbols">
                  <enum>QAbstractSpinBox::NoButtons</enum>
                 </property>
+                <property name="displayFormat">
+                 <string>d/M/yyyy</string>
+                </property>
                 <property name="date">
                  <date>
                   <year>2001</year>
                   <month>9</month>
                   <day>7</day>
                  </date>
-                </property>
-                <property name="displayFormat">
-                 <string>d/M/yyyy</string>
                 </property>
                </widget>
               </item>
@@ -692,7 +698,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>20</number>
+                 <number>40</number>
                 </property>
                </widget>
               </item>
@@ -735,7 +741,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>90</number>
+                 <number>65</number>
                 </property>
                </widget>
               </item>
@@ -779,7 +785,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>100</number>
+                 <number>200</number>
                 </property>
                </widget>
               </item>
@@ -822,7 +828,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>200</number>
+                 <number>230</number>
                 </property>
                </widget>
               </item>
@@ -866,7 +872,7 @@
                  <number>99999</number>
                 </property>
                 <property name="value">
-                 <number>2010</number>
+                 <number>970</number>
                 </property>
                </widget>
               </item>
@@ -910,7 +916,7 @@
                  <number>99999</number>
                 </property>
                 <property name="value">
-                 <number>20</number>
+                 <number>1000</number>
                 </property>
                </widget>
               </item>
@@ -950,7 +956,7 @@
                  <number>9999</number>
                 </property>
                 <property name="value">
-                 <number>2</number>
+                 <number>5</number>
                 </property>
                </widget>
               </item>
@@ -1129,7 +1135,7 @@
                      <number>300</number>
                     </property>
                     <property name="value">
-                     <number>144</number>
+                     <number>215</number>
                     </property>
                    </widget>
                   </item>
@@ -1363,134 +1369,16 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_23">
               <item>
-               <widget class="QTableWidget" name="tableWidget">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="rowCount">
-                 <number>30</number>
-                </property>
-                <property name="columnCount">
-                 <number>7</number>
-                </property>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <row/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
-                <column/>
-                <item row="0" column="0">
-                 <property name="text">
-                  <string>Day Number</string>
-                 </property>
-                </item>
-                <item row="0" column="1">
-                 <property name="text">
-                  <string>Date</string>
-                 </property>
-                </item>
-                <item row="0" column="2">
-                 <property name="text">
-                  <string>Weight</string>
-                 </property>
-                </item>
-                <item row="0" column="3">
-                 <property name="text">
-                  <string>Delta Sigma T</string>
-                 </property>
-                </item>
-                <item row="0" column="4">
-                 <property name="text">
-                  <string>Surface Sigma T</string>
-                 </property>
-                </item>
-                <item row="0" column="5">
-                 <property name="text">
-                  <string>Closest Float (Km)</string>
-                 </property>
-                </item>
-                <item row="0" column="6">
-                 <property name="text">
-                  <string>Closest Float Filename</string>
-                 </property>
-                </item>
-                <item row="1" column="0">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-                <item row="1" column="1">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-                <item row="1" column="2">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-                <item row="1" column="3">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-                <item row="1" column="4">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-                <item row="1" column="5">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
                <spacer name="horizontalSpacer_30">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Preferred</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>583</width>
+                  <width>200</width>
                   <height>20</height>
                  </size>
                 </property>
