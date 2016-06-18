@@ -33,7 +33,6 @@ import time
 import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
-from math import floor
 
 
 # TESTING is used to define if the project should limit which files it takes in
@@ -79,10 +78,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.pressureCutOff = self.pressureCutOffBox.value()
         self.maxInterpDepth = self.maxInterpDepthBox.value()
         self.stepSize = self.stepSizeBox.value()
-        self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
-        if self.nPress > 300:
-            self.nPress = 300
-
+        self.nPress = 0
+        self.updateNPress()
         self.temp = self.tempCheckBox.isChecked()
         self.salinity = self.salinityCheckBox.isChecked()
         self.sigmaT = self.sigmaTCheckBox.isChecked()
@@ -107,7 +104,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Scy = 111.2  # ! Scy = km/degree of latitude
         self.Scx0 = self.Scy * np.cos(self.latitudeDesired)
         self.Rho0 = 300  # ! Decay scale of weighting function
-        self.Pref = 1000.  # ! Reference level for dynamic height calculations
+        self.Pref = 1000  # ! Reference level for dynamic height calculations
         # Pdel never used
         # self.Pdel = np.empty((1000))
         self.arSva = np.empty((1000))
@@ -138,7 +135,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Accpt[:] = (-1)
 
         # self.plotP = np.empty((2000))
-        # self.plotT = np.empty((2000))
+        self.plotT = []
 
         self.sigRefSigT = np.empty((71))
         self.sigRefTemp = np.empty((71))
@@ -173,6 +170,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # if problems: change this maybe
         csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
         csvF.close()
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     ''' Methods called by the user interacting with the GUI '''
@@ -297,10 +295,12 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def maxInterpDepthBoxEditingFinished(self):
         self.maxInterpDepth = self.maxInterpDepthBox.value()
+        self.updateNPress()
         return
 
     def stepSizeBoxEditingFinished(self):
         self.stepSize = self.stepSizeBox.value()
+        self.updateNPress()
         return
 
     def tempCheckBoxStateChanged(self, boxInput):
@@ -325,6 +325,7 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def latitudeDesiredBoxEditingFinished(self):
         self.latitudeDesired = self.latitudeDesiredBox.value()
+        self.Scx0 = self.Scy * np.cos(self.latitudeDesired)
         return
 
     def longitudeDesiredBoxEditingFinished(self):
@@ -356,6 +357,12 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         self.prepareOutputFiles()
         self.commenceInterpolation()
+        return
+
+    def updateNPress(self):
+        self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
+        if self.nPress > 300:
+            self.nPress = 300
         return
 
     ''' ToDo: verify integrity of data'''
@@ -532,10 +539,15 @@ class MainApp(QMainWindow, Ui_MainApp):
     to determine which floats to use, and then pull the data from each float and
     manipulate it.'''
     def commenceInterpolation(self):
+        julStart, julEnd = self.getJulianStartAndEnd()
         # julStart = 0
         # julEnd = 0
-        julStart, julEnd = self.getJulianStartAndEnd()
+        plotTemp = [[] * (self.maxInterpDepth / self.stepSize)] * (((julEnd - julStart) / self.dayStepSize))
+        plotTime = [] * (((julEnd - julStart) / self.dayStepSize) + 1)
+        plotDepth = np.arange(0, self.maxInterpDepth, self.stepSize)
+        i = 0
         for Dc in xrange(julStart, julEnd, self.dayStepSize):
+            plotTime.append(Dc)
             self.xCoord = Dc
             julWindowStart = Dc - self.sampleWindow
             julWindowEnd = Dc + self.sampleWindow
@@ -547,26 +559,109 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTavSq = 0
             sTKnt = 0
             rFlag = -1
-            i = 0
+            j = 0
             # print "Floats is ", floats
             for singleFloat in floats:
                 numRecs = self.getProfile(singleFloat, rFlag)
                 self.sanityCheck()
                 sigT = self.getSigmaT(self.S[1], self.T[1])
                 sTav, sTavSq, sTKnt = self.calcStats(
-                    sigT, sTav, sTavSq, sTKnt, numRecs, i)
-                i += 1
+                    sigT, sTav, sTavSq, sTKnt, numRecs, j)
+                j += 1
                 if TESTING:
                     break
             Ipr75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
-            self.computeDHgt()
+            self.computeDHgt(plotTemp, plotTime, plotDepth, i)
             self.finishUp(Ipr75)
             self.numFloats = 0
-        # print "Plotting...", self.plotT
-        # plt.plot(self.plotT)
-        plt.show()
+            i += 1
+        # self.plotData()
+        # self.plotContour(plotTemp, plotTime, plotDepth)
         self.cleanUp()
+        return
+
+
+    def plotContour(self, plotTemp, plotTime, plotDepth):
+
+        # # arrange days from start to finish
+        # julStart, julEnd = self.getJulianStartAndEnd()
+        # julDiff = julEnd - julStart
+        # # arrange depth from surface to lower range
+        # depthRange = np.arrange(0, self.maxInterpDepth, self.stepSize)
+        # Make meshgrid
+        X, Y = np.meshgrid(plotTime, plotDepth)
+        CS = plt.contourf(X, Y, plotTemp)
+         # 10,
+         #                  #[-1, -0.1, 0, 0.1],
+         #                  #alpha=0.5,
+         #                  cmap=plt.cm.bone,
+         #                  origin=origin)
+
+        # ----- ----- ----- ----- 
+        # origin = 'lower'
+        # #origin = 'upper'
+
+        # delta = 0.025
+
+        # x = y = np.arange(-3.0, 3.01, delta)
+        # X, Y = np.meshgrid(x, y)
+        # Z1 = plt.mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
+        # Z2 = plt.mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
+        # Z = 10 * (Z1 - Z2)
+
+        # nr, nc = Z.shape
+
+        # # put NaNs in one corner:
+        # Z[-nr//6:, -nc//6:] = np.nan
+        # # contourf will convert these to masked
+
+        # Z = np.ma.array(Z)
+        # # mask another corner:
+        # Z[:nr//6, :nc//6] = np.ma.masked
+
+        # # mask a circle in the middle:
+        # interior = np.sqrt((X**2) + (Y**2)) < 0.5
+        # Z[interior] = np.ma.masked
+
+
+        # # We are using automatic selection of contour levels;
+        # # this is usually not such a good idea, because they don't
+        # # occur on nice boundaries, but we do it here for purposes
+        # # of illustration.
+        # CS = plt.contourf(X, Y, Z, 10,
+        #                   #[-1, -0.1, 0, 0.1],
+        #                   #alpha=0.5,
+        #                   cmap=plt.cm.bone,
+        #                   origin=origin)
+        # # Note that in the following, we explicitly pass in a subset of
+        # # the contour levels used for the filled contours.  Alternatively,
+        # # We could pass in additional levels to provide extra resolution,
+        # # or leave out the levels kwarg to use all of the original levels.
+
+        # CS2 = plt.contour(CS, levels=CS.levels[::2],
+        #                   colors='r',
+        #                   origin=origin,
+        #                   hold='on')
+
+        # plt.title('Nonsense (3 masked regions)')
+        # plt.xlabel('word length anomaly')
+        # plt.ylabel('sentence length anomaly')
+
+        # # Make a colorbar for the ContourSet returned by the contourf call.
+        # cbar = plt.colorbar(CS)
+        # cbar.ax.set_ylabel('verbosity coefficient')
+        # # Add the contour line levels to the colorbar
+        # cbar.add_lines(CS2)
+
+        plt.figure()
+        plt.show()
+        return
+
+    def plotData(self):
+        # print "Plotting...", self.plotT
+        plt.plot(self.plotT)
+        plt.show()                
         return
 
     ''' Closes open files that were used for the TimeSeries app '''
@@ -630,11 +725,14 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTKnt += 1
         if self.P[1] < 20:
             self.P[1] = 0
-        for Ipr in range(1, self.nPress):
+        # Should be 0 right?
+        for Ipr in range(0, self.nPress):
             # Interpolate to pressureCalc
             pressureCalc = self.stepSize * (Ipr - 1.)
-            if (pressureCalc < self.P[1]) or (pressureCalc > self.P[numRecs]):
-                break
+            if (pressureCalc < self.P[0]): 
+                continue
+            if (pressureCalc > self.P[numRecs]):
+                return sTav, sTavSq, sTKnt
             Eps = 1.0E-6
             for K in range(1, numRecs):
                 if pressureCalc >= self.P[K - 1] and pressureCalc <= self.P[K]:
@@ -665,14 +763,14 @@ class MainApp(QMainWindow, Ui_MainApp):
         qSpice = 0
         Ipr75 = int(1.1 + 75 / self.stepSize)
         weightSumTMax = 0
-        for iterPress in range(1, self.nPress):
+        for iterPress in xrange(0, self.nPress):
             pressureCal = self.stepSize * \
                 (iterPress - 1)  # What does this line do
             weightSumS = 0
             weightSumT = 0
             salWeightSumT = 0
             tempWeightSumT = 0
-            for iterFloat in range(1, self.numFloats):
+            for iterFloat in xrange(0, self.numFloats):
                 # IF Accpt(Iflt)<0. THEN GOTO 8610
                 Latav = (self.Lat[iterFloat] + self.latitudeDesired) / 2
                 Scx = self.Scy * np.cos(Latav)
@@ -681,6 +779,14 @@ class MainApp(QMainWindow, Ui_MainApp):
                 Rho = np.sqrt(Dx * Dx + Dy * Dy)
                 Z = Rho / self.Rho0
                 # IF Z>5. THEN GOTO 8610
+                # if iterFloat == 1 and iterPress == 0:
+                #     print "Second run!!!!!!!!"
+                #     # print "weightSumT is ", weightSumT
+                #     # print "tempWeightSumT is ", tempWeightSumT
+                #     print "weight is ", self.weight
+                #     print "Rho is ", Rho
+                #     print "Rho0 is ", self.Rho0
+
                 if not (Z > 5):
                     self.weight = np.exp(-Z * Z)
                     if (self.Te[iterFloat, iterPress] > -1.5 and
@@ -694,21 +800,35 @@ class MainApp(QMainWindow, Ui_MainApp):
                         weightSumS = weightSumS + self.weight
                         salWeightSumT = salWeightSumT + \
                             self.weight * self.Sa[iterFloat, iterPress]
+                else:
+                    pass
+                    if iterFloat == 0 and iterPress == 0:
+                        print "Bugger up run"
+                        print "Te array is ", self.Te[iterFloat, iterPress]
+                    #     print "Z is greater than 5!!!!!!!!!"
+                    #     print "weightSumT is ", weightSumT
+                    #     print "tempWeightSumT is ", tempWeightSumT
+                    #     print "weight is ", self.weight
+                    #     print "Rho is ", Rho
+                    #     print "Rho0 is ", self.Rho0
+
             if weightSumT > weightSumTMax:
                 weightSumTMax = weightSumT
             if weightSumT > 0:
                 qTemp = tempWeightSumT / weightSumT
             else:
+                qTemp = tempWeightSumT
                 print "no floats usable to calculate qTemp"
                 # pass
             if weightSumS > 0:
                 qSal = salWeightSumT / weightSumS
             else:
+
                 print "no floats usable to calculate qSal"
                 # pass
 
             qSigmaT = self.getSigmaT(qSal, qTemp)
-            Spiciness = self.getSpiciness(qSpice, qTemp, qSal)
+            qSpice = self.getSpiciness(qTemp, qSal)
             Sigma, Svan = self.getSvanom(qSal, qTemp, 0)
             self.P[iterPress] = self.stepSize * (iterPress - 1)
             self.T[iterPress] = qTemp
@@ -731,16 +851,19 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
-    def computeDHgt(self):
+    def computeDHgt(self, plotTemp, plotTime, plotDepth, i):
         # Now compute DHgt relative to Pmax
         self.Dh[self.nPress] = 0
+
         Q = 5.6E-6  # ! Q=0.5f/g at station Papa
-        for K in range(2, self.nPress):
+
+        # ToDo: Changed to 1, might be error
+        for K in xrange(1, self.nPress):
             Ipr = self.nPress + 1 - K
             self.Dh[Ipr] = self.Dh[Ipr + 1] + Q * \
                 (self.arSva[Ipr + 1] + self.arSva[Ipr]) * self.stepSize
 
-        for Ipr in range(0, self.nPress):
+        for Ipr in xrange(0, self.nPress):
             qTemp = 0.001 * int(0.5 + 1000 * self.T[Ipr])
             qSal = 0.001 * int(0.5 + 1000 * self.S[Ipr])
             qSigmaT = 0.001 * int(0.5 + 1000 * self.St[Ipr])
@@ -761,7 +884,9 @@ class MainApp(QMainWindow, Ui_MainApp):
                     if qSigmaT >= self.sigRefSigT[Icl] and qSigmaT <= self.sigRefSigT[Icl + 1]:
                         tep, sap = self.foundPair()
                         break
-            # np.append(self.plotT, qTemp)
+            plotTemp[i].append(qTemp)
+            # plotTime.append(self.xCoord)
+                
             xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ',' 
             if self.temp:
                 self.tempCSV.write(xCoAndPc + str(qTemp) + '\n')
@@ -774,7 +899,7 @@ class MainApp(QMainWindow, Ui_MainApp):
             if self.dynamicHeight:
                 self.dynamicHeightCSV.write(xCoAndPc + str(Qdh) + '\n')
         # print "----- nPress is ----- ", self.nPress
-        return
+        return 
 
     def foundPair(self, qSigmaT, Icl):
         # found a pair
@@ -852,7 +977,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # SUBEND
         return Sigma, Svan
 
-    def getSpiciness(self, spice, temp, salt):
+    def getSpiciness(self, temp, salt):
         # Hardcoded by Howard
         B = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
                        [.051665, .002034, -.0002745, -.0000085, .0000136],
@@ -1016,8 +1141,10 @@ class MainApp(QMainWindow, Ui_MainApp):
                                       spicinessPath + '\n' + 
                                       dynamicHeightPath + '\n' + 
                                       hgtPath + '\n' + 
-                                      cLimPath + '\n' + 
-                                      stratPath)
+                                      stratPath + '\n' +
+                                      cLimPath)
+        self.outputLocationLabel.setText("Output Location:\n" + 
+                                         self.outPath)
         writeType = 'a'
         if not self.append:
             writeType = 'w'

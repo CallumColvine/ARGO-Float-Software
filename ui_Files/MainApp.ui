@@ -251,7 +251,7 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="settingsPage">
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1285,7 +1285,7 @@
           <widget class="QWidget" name="calculationsPage">
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_21">
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
               <item>
                <widget class="QLabel" name="outputFilesLabel">
                 <property name="font">
@@ -1311,8 +1311,12 @@
                 </property>
                </spacer>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
               <item>
-               <widget class="QLabel" name="label_19">
+               <widget class="QLabel" name="outputLocationLabel">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -1322,6 +1326,19 @@
                  <string>Output files location</string>
                 </property>
                </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_31">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
