@@ -150,6 +150,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         # 150 Tabrow=11
         self.Closest = 9999.9
         self.Closest_fltnm = ''
+
+        self.Rho_print = -1
         # 240 ! Initialize data matrices with nul values 999.9
         # Should I do the NumPy NULL or just stick with 999.9?
         # Double backslash because in Python you need to escape special
@@ -441,6 +443,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         # print "Split is ", split
         offset = 5
         position = 0
+        if order != ['P', 'T', 'S']:
+            print "----- Order is different -----"
         for data in order:
             twoPos = float(split[2 + (position * 5)])
             zeroPos = float(split[0 + (position * 5)])
@@ -554,7 +558,7 @@ class MainApp(QMainWindow, Ui_MainApp):
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
                 self.checkFloatsFromIndex(floats, cycleJulDate)
-            print "The number of floats inside the box", self.numFloats
+            # print "The number of floats inside the box", self.numFloats
             sTav = 0
             sTavSq = 0
             sTKnt = 0
@@ -564,17 +568,19 @@ class MainApp(QMainWindow, Ui_MainApp):
             for singleFloat in floats:
                 numRecs = self.getProfile(singleFloat, rFlag)
                 self.sanityCheck()
-                sigT = self.getSigmaT(self.S[1], self.T[1])
+                self.Accpt[j] = True
+                sigT = self.getSigmaT(self.S[0], self.T[0])
                 sTav, sTavSq, sTKnt = self.calcStats(
                     sigT, sTav, sTavSq, sTKnt, numRecs, j)
                 j += 1
                 if TESTING:
                     break
+
             Ipr75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
             self.computeDHgt(plotTemp, plotTime, plotDepth, i)
             self.finishUp(Ipr75)
-            self.numFloats = 0
+            # self.numFloats = 0
             i += 1
         # self.plotData()
         # self.plotContour(plotTemp, plotTime, plotDepth)
@@ -676,6 +682,10 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.stratCSV.close()
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
+        
+        print "numFloats is ", self.numFloats
+        print "Lat array is ", self.Lat
+
         if SAVELOCALLY:
             self.lastRun(self.localSoftwarePath, -1)
         else:
@@ -718,17 +728,18 @@ class MainApp(QMainWindow, Ui_MainApp):
     ''' Calculates some statistical analyses on the data provided'''
     def calcStats(self, sigT, sTav, sTavSq, sTKnt, numRecs, Iflt):
         # Copied, not sure why Howard does this
-        sigT = ((.5 + 1000. * sigT)) / 1000
+        sigT = int((0.5 + 1000 * sigT)) / 1000
         if sigT > 5 and sigT < 30:
             sTav += sigT
             sTavSq += np.power(sigT, 2)
             sTKnt += 1
-        if self.P[1] < 20:
-            self.P[1] = 0
+        if self.P[0] < 20:
+            self.P[0] = 0
         # Should be 0 right?
         for Ipr in range(0, self.nPress):
             # Interpolate to pressureCalc
-            pressureCalc = self.stepSize * (Ipr - 1.)
+            # ToDo might not be correct
+            pressureCalc = self.stepSize * (Ipr + 1)
             if (pressureCalc < self.P[0]): 
                 continue
             if (pressureCalc > self.P[numRecs]):
@@ -749,14 +760,16 @@ class MainApp(QMainWindow, Ui_MainApp):
         # Finished interpolation to standard pressures for all floats
         return sTav, sTavSq, sTKnt
 
-    ''' Calculates values and adds them to P, T, S, St, and Sp '''
+    ''' Calculates values and adds them to P, T, S, St, and Sp 
+    Line 814 '''
     def formatResults(self, sTav, sTavSq, sTKnt):
         try:
             sTav = sTav / sTKnt
             sTavSq = sTavSq / sTKnt
-            stdDev = np.power((sTavSq - sTav * sTav), 2)
+            stdDev = np.sqrt(sTavSq - sTav * sTav)
+            # stdDev = 0
         except ZeroDivisionError, e:
-            print "No floats in this day range set match parameters"
+            print "Error: No floats in this day range set match parameters"
         Kdel = 0
         qSal = 0
         qTemp = 0
@@ -764,14 +777,17 @@ class MainApp(QMainWindow, Ui_MainApp):
         Ipr75 = int(1.1 + 75 / self.stepSize)
         weightSumTMax = 0
         for iterPress in xrange(0, self.nPress):
-            pressureCal = self.stepSize * \
-                (iterPress - 1)  # What does this line do
+            # What does this line do?
+            pressureCal = self.stepSize * (iterPress - 1)  
             weightSumS = 0
             weightSumT = 0
             salWeightSumT = 0
             tempWeightSumT = 0
             for iterFloat in xrange(0, self.numFloats):
                 # IF Accpt(Iflt)<0. THEN GOTO 8610
+                if self.Accpt[iterFloat] == False:
+                    continue
+                    # pass
                 Latav = (self.Lat[iterFloat] + self.latitudeDesired) / 2
                 Scx = self.Scy * np.cos(Latav)
                 Dx = Scx * (self.longitudeDesired - self.Lon[iterFloat])
@@ -779,13 +795,6 @@ class MainApp(QMainWindow, Ui_MainApp):
                 Rho = np.sqrt(Dx * Dx + Dy * Dy)
                 Z = Rho / self.Rho0
                 # IF Z>5. THEN GOTO 8610
-                # if iterFloat == 1 and iterPress == 0:
-                #     print "Second run!!!!!!!!"
-                #     # print "weightSumT is ", weightSumT
-                #     # print "tempWeightSumT is ", tempWeightSumT
-                #     print "weight is ", self.weight
-                #     print "Rho is ", Rho
-                #     print "Rho0 is ", self.Rho0
 
                 if not (Z > 5):
                     self.weight = np.exp(-Z * Z)
@@ -800,17 +809,6 @@ class MainApp(QMainWindow, Ui_MainApp):
                         weightSumS = weightSumS + self.weight
                         salWeightSumT = salWeightSumT + \
                             self.weight * self.Sa[iterFloat, iterPress]
-                else:
-                    pass
-                    if iterFloat == 0 and iterPress == 0:
-                        print "Bugger up run"
-                        print "Te array is ", self.Te[iterFloat, iterPress]
-                    #     print "Z is greater than 5!!!!!!!!!"
-                    #     print "weightSumT is ", weightSumT
-                    #     print "tempWeightSumT is ", tempWeightSumT
-                    #     print "weight is ", self.weight
-                    #     print "Rho is ", Rho
-                    #     print "Rho0 is ", self.Rho0
 
             if weightSumT > weightSumTMax:
                 weightSumTMax = weightSumT
@@ -843,11 +841,11 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     ''' Remove entries in P, T, S, St, and Sp that are unusable ''' 
     def removeEmpties(self):
-        if self.St[1] > self.St[2] and np.abs(self.St[1] - self.St[2]) > .05:
-            self.St[1] = self.St[2]
-            self.T[1] = self.T[2]
-            self.S[1] = self.S[2]
-            self.Sp[1] = self.Sp[2]
+        if self.St[0] > self.St[1] and np.abs(self.St[0] - self.St[1]) > .05:
+            self.St[0] = self.St[1]
+            self.T[0] = self.T[1]
+            self.S[0] = self.S[1]
+            self.Sp[0] = self.Sp[1]
         return
 
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
@@ -884,7 +882,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                     if qSigmaT >= self.sigRefSigT[Icl] and qSigmaT <= self.sigRefSigT[Icl + 1]:
                         tep, sap = self.foundPair()
                         break
-            plotTemp[i].append(qTemp)
+            # plotTemp[i].append(qTemp)
             # plotTime.append(self.xCoord)
                 
             xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ',' 
@@ -1013,7 +1011,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                       + str(month).zfill(2)
                       + str(day).zfill(2)
                       + '_index.csv')
-        # print "IN FILE NAME IS ", inFileName
+        print "IN FILE NAME IS ", inFileName
         try:
             with open((inFileName),
                       'rb') as indexCSV:
@@ -1025,41 +1023,47 @@ class MainApp(QMainWindow, Ui_MainApp):
                 for row in reader:
                     # print row
                     # This filters out the ******* lines that are in some index files 
-                    if row[3] != "*******":
-                        lat = float(row[1])
-                        lon = float(row[2])
-                        if lon < 0:
-                            lon += 360
-                        press = float(row[3])
-                        # ToDo: Does not account for users with lat2 < lat1
-                        if(lat > self.firstLatitude and 
-                           lat < self.secondLatitude and 
-                           lon > self.firstLongitude and 
-                           lon < self.secondLongitude and 
-                           press > self.pressureCutOff):
-                            # print "I have a float that passed!!"
-                            if TESTING:
-                                floats.append(self.yearMonthDayPath0 + "20160518_2901481.IOS")
-                            else:
-                                floats.append(self.yearMonthDayPath0 + row[0])
-                            self.passedFloat(row)
-                            self.numFloats += 1
-                            if TESTING:
-                                break
+                    if row[3] == "*******":
+                        continue
+                    lat = float(row[1])
+                    lon = float(row[2])
+                    if lon < 0:
+                        lon += 360
+                    press = float(row[3])
+                    # ToDo: Does not account for users with lat2 < lat1
+                    if(lat > self.firstLatitude and 
+                       lat < self.secondLatitude and 
+                       lon > self.firstLongitude and 
+                       lon < self.secondLongitude and 
+                       press > self.pressureCutOff):
+                        # print "I have a float that passed!!"
+                        floatNum = row[0]
+                        if TESTING:
+                            floats.append(self.yearMonthDayPath0 + "20160518_2901481.IOS")
+                        else:
+                            if SAVELOCALLY:
+                                self.filesInUse.write(self.yearMonthDayPath0 + 
+                                    floatNum + '\n')
+                            floats.append(self.yearMonthDayPath0 + row[0])
+                        self.passedFloat(floatNum, lat, lon)
+                        self.numFloats += 1
+                        if TESTING:
+                            break
         except (OSError, IOError), e:
             print "File was not found: ", inFileName
         return floats
 
-    def passedFloat(self, row):
+    def passedFloat(self, floatNum, lat, lon):
         # print "NumFloats is ", self.numFloats
-        self.Lat[self.numFloats - 1] = float(row[1])
-        self.Lon[self.numFloats - 1] = float(row[2])
-        Dx = self.Scx0 * (float(row[2]) - self.longitudeDesired)
-        Dy = self.Scy * (float(row[1]) - self.latitudeDesired)
+        self.Lat[self.numFloats] = lat
+        self.Lon[self.numFloats] = lon
+        Dx = self.Scx0 * (float(lon) - self.longitudeDesired)
+        Dy = self.Scy * (float(lat) - self.latitudeDesired)
         Rho = np.sqrt(Dx * Dx + Dy * Dy)
         if self.Closest > Rho:
             self.Closest = Rho
-            self.Closest_fltnm = row[0]
+            self.Closest_fltnm = floatNum
+
         # ToDo: A lot left out here, maybe unecessary?
         return
 
@@ -1157,6 +1161,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.cLimCSV = open((cLimPath), writeType)
         self.stratCSV = open((stratPath), writeType)
         # What the heck is hgt? Mercury...t?
+        if SAVELOCALLY:
+            self.filesInUse = open((self.outPath + "IOS_Files_In_Use.txt"), 'w+')
+
 
         # ToDo: Diff between appending and not to files
         # File on sigma-levels
