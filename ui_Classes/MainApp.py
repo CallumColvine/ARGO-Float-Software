@@ -134,9 +134,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Lon[:] = 999.9
         self.Accpt[:] = (-1)
 
-        # self.plotP = np.empty((2000))
-        self.plotT = []
-
         self.sigRefSigT = np.empty((71))
         self.sigRefTemp = np.empty((71))
         self.sigRefSal = np.empty((71))
@@ -537,6 +534,14 @@ class MainApp(QMainWindow, Ui_MainApp):
                               yearDayEnd)
         return julStart, julEnd
 
+    def initPlotArrays(self, julStart, julEnd):
+        plotTemp = np.empty(((np.ceil(julEnd - julStart) / self.dayStepSize), 
+            np.ceil(self.maxInterpDepth / self.stepSize) + 1))
+        plotTime = np.arange(julStart, julEnd, self.dayStepSize)
+        plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
+        # plotDepth = plotDepth0[::-1]
+        return plotTemp, plotTime, plotDepth
+
     ''' This is the main loop for the program. Once the user fills out 
     parameters and hits the Next button, we commence interpolation. The rest of 
     the program is called from commenceInterpolation(). We use *_index.CSV files
@@ -544,14 +549,12 @@ class MainApp(QMainWindow, Ui_MainApp):
     manipulate it.'''
     def commenceInterpolation(self):
         julStart, julEnd = self.getJulianStartAndEnd()
+        plotTemp, plotTime, plotDepth = self.initPlotArrays(julStart, julEnd)
         # julStart = 0
         # julEnd = 0
-        plotTemp = [[] * (self.maxInterpDepth / self.stepSize)] * (((julEnd - julStart) / self.dayStepSize))
-        plotTime = [] * (((julEnd - julStart) / self.dayStepSize) + 1)
-        plotDepth = np.arange(0, self.maxInterpDepth, self.stepSize)
-        i = 0
+        iterDayNum = 0
         for Dc in xrange(julStart, julEnd, self.dayStepSize):
-            plotTime.append(Dc)
+            self.numFloats = 0
             self.xCoord = Dc
             julWindowStart = Dc - self.sampleWindow
             julWindowEnd = Dc + self.sampleWindow
@@ -578,12 +581,11 @@ class MainApp(QMainWindow, Ui_MainApp):
 
             Ipr75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
-            self.computeDHgt(plotTemp, plotTime, plotDepth, i)
+            self.computeDHgt(plotTemp, plotTime, plotDepth, iterDayNum)
             self.finishUp(Ipr75)
-            # self.numFloats = 0
-            i += 1
+            iterDayNum += 1
         # self.plotData()
-        # self.plotContour(plotTemp, plotTime, plotDepth)
+        self.plotContour(plotTemp, plotTime, plotDepth)
         self.cleanUp()
         return
 
@@ -596,8 +598,16 @@ class MainApp(QMainWindow, Ui_MainApp):
         # # arrange depth from surface to lower range
         # depthRange = np.arrange(0, self.maxInterpDepth, self.stepSize)
         # Make meshgrid
-        X, Y = np.meshgrid(plotTime, plotDepth)
-        CS = plt.contourf(X, Y, plotTemp)
+        # X, Y = np.meshgrid(plotTime, plotDepth)
+        origin = 'lower'
+        print "plotTemp dimensions", len(plotTemp), len(plotTemp[0]), plotTemp
+        print "plotTime dimensions", len(plotTime), plotTime
+        print "plotDepth dimensions", len(plotDepth), plotDepth
+        CS = plt.contourf(plotTime, plotDepth, plotTemp.T, 
+            cmap=plt.cm.bone)
+        plt.clabel(CS, fmt='%2.1f', colors='w', fontsize=14)
+        plt.gca().invert_yaxis()
+        
          # 10,
          #                  #[-1, -0.1, 0, 0.1],
          #                  #alpha=0.5,
@@ -660,7 +670,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # # Add the contour line levels to the colorbar
         # cbar.add_lines(CS2)
 
-        plt.figure()
+        # plt.figure()
         plt.show()
         return
 
@@ -682,10 +692,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.stratCSV.close()
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
-        
-        print "numFloats is ", self.numFloats
-        print "Lat array is ", self.Lat
 
+ 
         if SAVELOCALLY:
             self.lastRun(self.localSoftwarePath, -1)
         else:
@@ -783,6 +791,7 @@ class MainApp(QMainWindow, Ui_MainApp):
             weightSumT = 0
             salWeightSumT = 0
             tempWeightSumT = 0
+            # print "Looping for: ", self.numFloats
             for iterFloat in xrange(0, self.numFloats):
                 # IF Accpt(Iflt)<0. THEN GOTO 8610
                 if self.Accpt[iterFloat] == False:
@@ -849,7 +858,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
-    def computeDHgt(self, plotTemp, plotTime, plotDepth, i):
+    def computeDHgt(self, plotTemp, plotTime, plotDepth, iterDayNum):
         # Now compute DHgt relative to Pmax
         self.Dh[self.nPress] = 0
 
@@ -860,7 +869,7 @@ class MainApp(QMainWindow, Ui_MainApp):
             Ipr = self.nPress + 1 - K
             self.Dh[Ipr] = self.Dh[Ipr + 1] + Q * \
                 (self.arSva[Ipr + 1] + self.arSva[Ipr]) * self.stepSize
-
+        iterPressNum = 0
         for Ipr in xrange(0, self.nPress):
             qTemp = 0.001 * int(0.5 + 1000 * self.T[Ipr])
             qSal = 0.001 * int(0.5 + 1000 * self.S[Ipr])
@@ -882,12 +891,11 @@ class MainApp(QMainWindow, Ui_MainApp):
                     if qSigmaT >= self.sigRefSigT[Icl] and qSigmaT <= self.sigRefSigT[Icl + 1]:
                         tep, sap = self.foundPair()
                         break
-            # plotTemp[i].append(qTemp)
-            # plotTime.append(self.xCoord)
-                
+                            
             xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ',' 
             if self.temp:
                 self.tempCSV.write(xCoAndPc + str(qTemp) + '\n')
+                plotTemp[iterDayNum][iterPressNum] = qTemp
             if self.salinity:
                 self.salinityCSV.write(xCoAndPc + str(qSal) + '\n')
             if self.sigmaT:
@@ -896,6 +904,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                 self.spicinessCSV.write(xCoAndPc + str(qSpice) + '\n')
             if self.dynamicHeight:
                 self.dynamicHeightCSV.write(xCoAndPc + str(Qdh) + '\n')
+            iterPressNum += 1
         # print "----- nPress is ----- ", self.nPress
         return 
 
@@ -1011,7 +1020,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                       + str(month).zfill(2)
                       + str(day).zfill(2)
                       + '_index.csv')
-        print "IN FILE NAME IS ", inFileName
+        # print "IN FILE NAME IS ", inFileName
         try:
             with open((inFileName),
                       'rb') as indexCSV:
@@ -1039,11 +1048,13 @@ class MainApp(QMainWindow, Ui_MainApp):
                         # print "I have a float that passed!!"
                         floatNum = row[0]
                         if TESTING:
-                            floats.append(self.yearMonthDayPath0 + "20160518_2901481.IOS")
+                            floats.append(self.yearMonthDayPath0 + 
+                                "20160518_2901481.IOS")
                         else:
                             if SAVELOCALLY:
-                                self.filesInUse.write(self.yearMonthDayPath0 + 
-                                    floatNum + '\n')
+                                # self.filesInUse.write(self.yearMonthDayPath0 + 
+                                #     floatNum + '\n')
+                                pass
                             floats.append(self.yearMonthDayPath0 + row[0])
                         self.passedFloat(floatNum, lat, lon)
                         self.numFloats += 1
