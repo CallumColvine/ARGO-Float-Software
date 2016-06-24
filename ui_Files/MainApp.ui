@@ -251,7 +251,7 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="settingsPage">
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1279,6 +1279,24 @@
                </widget>
               </item>
              </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="pleaseWaitPage">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>Calculations in progress, please do not interrupt</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="calculationProgressBar">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

@@ -33,6 +33,7 @@ import time
 import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
+from math import ceil
 
 
 # TESTING is used to define if the project should limit which files it takes in
@@ -48,7 +49,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         super(MainApp, self).__init__()
         self.setupUi(self)
         self.setupSignals()
-        self.initVars()
         self.initAllClassVariables()
         self.userDefinedSettings()
         return
@@ -107,8 +107,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Pref = 1000  # ! Reference level for dynamic height calculations
         # Pdel never used
         # self.Pdel = np.empty((1000))
-        self.arSva = np.empty((1000))
-        self.Dh = np.empty((1000))
+        self.arSva = np.zeros((1000))
+        self.Dh = np.zeros((1000))
+        # self.Dh[:] = 0
 
         if TESTING:
             self.curDay = 18
@@ -118,10 +119,11 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.curDay = int(time.strftime("%d"))
             self.curMonth = int(time.strftime("%m"))
             self.curYear = int(time.strftime("%Y"))
+        todayInJul = self.todayInJulian()
+        day, month, year = self.todayInDate()
+        self.currentDayDateEdit.setDate(QDate(year, month, day))
         self.numFloats = 0
 
-        # 10 OPTION BASE 1
-        # Te/Sa are temperature and salinity?
         self.Te = np.empty((500, 300))
         self.Sa = np.empty((500, 300))
         self.Lat = np.empty((500))
@@ -153,6 +155,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         # Should I do the NumPy NULL or just stick with 999.9?
         # Double backslash because in Python you need to escape special
         # characters
+
+        # Max is 100, indicating completed
+        self.progress = 0
             
         self.drive = "P:\\"
         self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
@@ -169,7 +174,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # if problems: change this maybe
         csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
         csvF.close()
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        # self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     ''' Methods called by the user interacting with the GUI '''
@@ -353,9 +358,11 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def nextButtonClicked(self):
         # Check to make sure all params have been filled
-        self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
+        self.timeSeriesStackedWidget.setCurrentWidget(self.pleaseWaitPage)
+        # time.sleep(2)
         self.prepareOutputFiles()
         self.commenceInterpolation()
+        self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         return
 
     def updateNPress(self):
@@ -440,8 +447,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         # print "Split is ", split
         offset = 5
         position = 0
-        if order != ['P', 'T', 'S']:
-            print "----- Order is different -----"
+        # if order != ['P', 'T', 'S']:
+        #     print "----- Order is different -----"
         for data in order:
             twoPos = float(split[2 + (position * 5)])
             zeroPos = float(split[0 + (position * 5)])
@@ -534,9 +541,17 @@ class MainApp(QMainWindow, Ui_MainApp):
                               yearDayEnd)
         return julStart, julEnd
 
+    def updateProgress(self, iterDayNum, julStart, julEnd):
+        if iterDayNum != 0:
+            self.progress = (iterDayNum / 
+                float(ceil((julEnd - julStart) / float(self.dayStepSize))))
+            self.calculationProgressBar.setValue(self.progress)
+        return
+
     def initPlotArrays(self, julStart, julEnd):
-        plotTemp = np.empty(((np.ceil(julEnd - julStart) / self.dayStepSize), 
-            np.ceil(self.maxInterpDepth / self.stepSize) + 1))
+        # print "ceiling days is ", ceil((julEnd - julStart) / float(self.dayStepSize))
+        plotTemp = np.empty((ceil((julEnd - julStart) / float(self.dayStepSize)), 
+            ceil(self.maxInterpDepth / float(self.stepSize)) + 1))
         plotTime = np.arange(julStart, julEnd, self.dayStepSize)
         plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
         # plotDepth = plotDepth0[::-1]
@@ -554,6 +569,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # julEnd = 0
         iterDayNum = 0
         for Dc in xrange(julStart, julEnd, self.dayStepSize):
+            self.updateProgress(iterDayNum, julStart, julEnd)
             self.numFloats = 0
             self.xCoord = Dc
             julWindowStart = Dc - self.sampleWindow
@@ -567,7 +583,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTKnt = 0
             rFlag = -1
             j = 0
-            # print "Floats is ", floats
             for singleFloat in floats:
                 numRecs = self.getProfile(singleFloat, rFlag)
                 self.sanityCheck()
@@ -591,91 +606,27 @@ class MainApp(QMainWindow, Ui_MainApp):
 
 
     def plotContour(self, plotTemp, plotTime, plotDepth):
+        if len(plotTime) == 1:
+            print "Error: plotting temperatures. There is only 1 time entry"
+            return
 
-        # # arrange days from start to finish
-        # julStart, julEnd = self.getJulianStartAndEnd()
-        # julDiff = julEnd - julStart
-        # # arrange depth from surface to lower range
-        # depthRange = np.arrange(0, self.maxInterpDepth, self.stepSize)
-        # Make meshgrid
-        # X, Y = np.meshgrid(plotTime, plotDepth)
         origin = 'lower'
-        print "plotTemp dimensions", len(plotTemp), len(plotTemp[0]), plotTemp
-        print "plotTime dimensions", len(plotTime), plotTime
-        print "plotDepth dimensions", len(plotDepth), plotDepth
-        CS = plt.contourf(plotTime, plotDepth, plotTemp.T, 
+        # print "plotTemp dimensions", len(plotTemp), len(plotTemp[0]), plotTemp
+        # print "plotTime dimensions", len(plotTime), plotTime
+        # print "plotDepth dimensions", len(plotDepth), plotDepth
+        CS = plt.contourf(plotTime, 
+            plotDepth, 
+            plotTemp.T, 
+            # [2, 3, 4, 5, 6, 7, 8], 
+            linewidths=(3,),
             cmap=plt.cm.bone)
         plt.clabel(CS, fmt='%2.1f', colors='w', fontsize=14)
         plt.gca().invert_yaxis()
-        
-         # 10,
-         #                  #[-1, -0.1, 0, 0.1],
-         #                  #alpha=0.5,
-         #                  cmap=plt.cm.bone,
-         #                  origin=origin)
 
-        # ----- ----- ----- ----- 
-        # origin = 'lower'
-        # #origin = 'upper'
-
-        # delta = 0.025
-
-        # x = y = np.arange(-3.0, 3.01, delta)
-        # X, Y = np.meshgrid(x, y)
-        # Z1 = plt.mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
-        # Z2 = plt.mlab.bivariate_normal(X, Y, 1.5, 0.5, 1, 1)
-        # Z = 10 * (Z1 - Z2)
-
-        # nr, nc = Z.shape
-
-        # # put NaNs in one corner:
-        # Z[-nr//6:, -nc//6:] = np.nan
-        # # contourf will convert these to masked
-
-        # Z = np.ma.array(Z)
-        # # mask another corner:
-        # Z[:nr//6, :nc//6] = np.ma.masked
-
-        # # mask a circle in the middle:
-        # interior = np.sqrt((X**2) + (Y**2)) < 0.5
-        # Z[interior] = np.ma.masked
-
-
-        # # We are using automatic selection of contour levels;
-        # # this is usually not such a good idea, because they don't
-        # # occur on nice boundaries, but we do it here for purposes
-        # # of illustration.
-        # CS = plt.contourf(X, Y, Z, 10,
-        #                   #[-1, -0.1, 0, 0.1],
-        #                   #alpha=0.5,
-        #                   cmap=plt.cm.bone,
-        #                   origin=origin)
-        # # Note that in the following, we explicitly pass in a subset of
-        # # the contour levels used for the filled contours.  Alternatively,
-        # # We could pass in additional levels to provide extra resolution,
-        # # or leave out the levels kwarg to use all of the original levels.
-
-        # CS2 = plt.contour(CS, levels=CS.levels[::2],
-        #                   colors='r',
-        #                   origin=origin,
-        #                   hold='on')
-
-        # plt.title('Nonsense (3 masked regions)')
-        # plt.xlabel('word length anomaly')
-        # plt.ylabel('sentence length anomaly')
-
-        # # Make a colorbar for the ContourSet returned by the contourf call.
-        # cbar = plt.colorbar(CS)
-        # cbar.ax.set_ylabel('verbosity coefficient')
-        # # Add the contour line levels to the colorbar
-        # cbar.add_lines(CS2)
-
-        # plt.figure()
         plt.show()
         return
 
     def plotData(self):
-        # print "Plotting...", self.plotT
         plt.plot(self.plotT)
         plt.show()                
         return
@@ -692,8 +643,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.stratCSV.close()
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
-
- 
         if SAVELOCALLY:
             self.lastRun(self.localSoftwarePath, -1)
         else:
@@ -704,9 +653,9 @@ class MainApp(QMainWindow, Ui_MainApp):
     was successful '''
     def finishUp(self, Ipr75):
         if self.dynamicHeight:
-            self.dynamicHeightCSV.write(str(self.xCoord) + ',' +
-                                        str(self.Dh[1]) + ',' +
-                                        str(self.weight))
+            self.hgtCSV.write(str(self.xCoord) + ',' +
+                              str(self.Dh[0]) + ',' +
+                              str(self.weight))
         Stdiff = self.St[Ipr75] - self.St[1]
         if Stdiff < -.002:
             Stdiff = 0.
@@ -724,8 +673,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Closest = .1 * int(10. * self.Closest + .5)
         R += R + " | " + str(self.Closest) + "  " + \
             self.Closest_fltnm + " |"
-        # print R
-
         # ToDo: Optimize, open outside of loop
         lstMsge = open((self.outPath + "lstmsge.csv"), 'w+')
         lstMsge.truncate()
@@ -743,10 +690,8 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTKnt += 1
         if self.P[0] < 20:
             self.P[0] = 0
-        # Should be 0 right?
         for Ipr in range(0, self.nPress):
             # Interpolate to pressureCalc
-            # ToDo might not be correct
             pressureCalc = self.stepSize * (Ipr + 1)
             if (pressureCalc < self.P[0]): 
                 continue
@@ -764,7 +709,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                         self.Sa[Iflt, Ipr] = self.S[K - 1] + \
                             Rho * (self.S[K] - self.S[K - 1] + Eps)
                     break
-            # ! Finished interpolation to standard pressures for Float Iflt
+            # Finished interpolation to standard pressures for Float Iflt
         # Finished interpolation to standard pressures for all floats
         return sTav, sTavSq, sTKnt
 
@@ -775,7 +720,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTav = sTav / sTKnt
             sTavSq = sTavSq / sTKnt
             stdDev = np.sqrt(sTavSq - sTav * sTav)
-            # stdDev = 0
         except ZeroDivisionError, e:
             print "Error: No floats in this day range set match parameters"
         Kdel = 0
@@ -785,25 +729,20 @@ class MainApp(QMainWindow, Ui_MainApp):
         Ipr75 = int(1.1 + 75 / self.stepSize)
         weightSumTMax = 0
         for iterPress in xrange(0, self.nPress):
-            # What does this line do?
             pressureCal = self.stepSize * (iterPress - 1)  
             weightSumS = 0
             weightSumT = 0
             salWeightSumT = 0
             tempWeightSumT = 0
-            # print "Looping for: ", self.numFloats
             for iterFloat in xrange(0, self.numFloats):
-                # IF Accpt(Iflt)<0. THEN GOTO 8610
                 if self.Accpt[iterFloat] == False:
                     continue
-                    # pass
                 Latav = (self.Lat[iterFloat] + self.latitudeDesired) / 2
                 Scx = self.Scy * np.cos(Latav)
                 Dx = Scx * (self.longitudeDesired - self.Lon[iterFloat])
                 Dy = self.Scy * (self.latitudeDesired - self.Lat[iterFloat])
                 Rho = np.sqrt(Dx * Dx + Dy * Dy)
                 Z = Rho / self.Rho0
-                # IF Z>5. THEN GOTO 8610
 
                 if not (Z > 5):
                     self.weight = np.exp(-Z * Z)
@@ -825,14 +764,11 @@ class MainApp(QMainWindow, Ui_MainApp):
                 qTemp = tempWeightSumT / weightSumT
             else:
                 qTemp = tempWeightSumT
-                print "no floats usable to calculate qTemp"
-                # pass
+                print "float not usable to calculate qTemp"
             if weightSumS > 0:
                 qSal = salWeightSumT / weightSumS
             else:
-
-                print "no floats usable to calculate qSal"
-                # pass
+                print "float not usable to calculate qSal"
 
             qSigmaT = self.getSigmaT(qSal, qTemp)
             qSpice = self.getSpiciness(qTemp, qSal)
@@ -843,8 +779,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.St[iterPress] = qSigmaT
             self.Sp[iterPress] = qSpice
             Kdel += 1
-            # self.Pdel[Kdel] = pressureCal
-            # print "Svan is ", Svan
             self.arSva[Kdel] = Svan
         return Ipr75
 
@@ -860,35 +794,29 @@ class MainApp(QMainWindow, Ui_MainApp):
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
     def computeDHgt(self, plotTemp, plotTime, plotDepth, iterDayNum):
         # Now compute DHgt relative to Pmax
-        self.Dh[self.nPress] = 0
-
-        Q = 5.6E-6  # ! Q=0.5f/g at station Papa
-
-        # ToDo: Changed to 1, might be error
+        self.Dh[self.nPress - 1] = 0
+        Q = 5.6E-6  # Q=0.5f/g at station Papa
         for K in xrange(1, self.nPress):
-            Ipr = self.nPress + 1 - K
-            self.Dh[Ipr] = self.Dh[Ipr + 1] + Q * \
-                (self.arSva[Ipr + 1] + self.arSva[Ipr]) * self.stepSize
+            Ipr = self.nPress - K - 1
+            self.Dh[Ipr] = ((self.Dh[Ipr + 1]) + Q * 
+                (self.arSva[Ipr + 1] + self.arSva[Ipr]) * self.stepSize)
+
         iterPressNum = 0
         for Ipr in xrange(0, self.nPress):
             qTemp = 0.001 * int(0.5 + 1000 * self.T[Ipr])
             qSal = 0.001 * int(0.5 + 1000 * self.S[Ipr])
             qSigmaT = 0.001 * int(0.5 + 1000 * self.St[Ipr])
             qSpice = 0.001 * int(0.5 + 1000 * self.Sp[Ipr])
-            Qdh = 0.001 * int(0.5 + 1000 * self.Dh[Ipr])
+            qDynamicHeight = 0.001 * int(0.5 + 1000 * self.Dh[Ipr])
 
             Pc = self.stepSize * (Ipr)
 
             Sigref_opt = -1
-            # IF qSigmaT<Sigref_st(1) THEN GOTO 9420
-            # IF qSigmaT>Sigref_st(71) THEN GOTO 9420
-            # Updated indexes from HP references 1 -> 0, 71 -> 70
-            if not (qSigmaT < self.sigRefSigT[0]) and not (qSigmaT > self.sigRefSigT[70]):
-                # for Icl=1 TO 70
-                #     IF qSigmaT>=Sigref_st(Icl) AND qSigmaT<=Sigref_st(Icl+1) THEN GOTO 9300
-                #     NEXT Icl
+            if(not (qSigmaT < self.sigRefSigT[0]) and 
+                not (qSigmaT > self.sigRefSigT[70])):
                 for Icl in range(0, 69):
-                    if qSigmaT >= self.sigRefSigT[Icl] and qSigmaT <= self.sigRefSigT[Icl + 1]:
+                    if (qSigmaT >= self.sigRefSigT[Icl] and 
+                    qSigmaT <= self.sigRefSigT[Icl + 1]):
                         tep, sap = self.foundPair()
                         break
                             
@@ -903,13 +831,11 @@ class MainApp(QMainWindow, Ui_MainApp):
             if self.spiciness:
                 self.spicinessCSV.write(xCoAndPc + str(qSpice) + '\n')
             if self.dynamicHeight:
-                self.dynamicHeightCSV.write(xCoAndPc + str(Qdh) + '\n')
+                self.dynamicHeightCSV.write(xCoAndPc + str(qDynamicHeight) + '\n')
             iterPressNum += 1
-        # print "----- nPress is ----- ", self.nPress
         return 
 
     def foundPair(self, qSigmaT, Icl):
-        # found a pair
         Ra = (qSigmaT - self.sigRefSigT[Icl]) / \
             (self.sigRefSigT[Icl + 1] - self.sigRefSigT[Icl])
         Ter = self.sigRefTemp[Icl] + Ra * \
@@ -920,21 +846,16 @@ class MainApp(QMainWindow, Ui_MainApp):
         Sap = qSal - Sar
         Tep = .001 * int(.5 + 1000. * Tep)
         Sap = .001 * int(.5 + 1000. * Sap)
-        # S$=Xcoord$&","&VAL$(qSigmaT)&","&VAL$(qTemp)&","&VAL$(Tep)&","&VAL$(qSal)&","&VAL$(Sap)
-        # OUTPUT @Psclim;S$
         self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
             ',' + Sap)
-        # print "qSigmaT: ", qSigmaT, " qTemp: ", qTemp, " Tep: ", Tep, " qSal: ", " Sap: ", Sap
         return Tep, Sap
 
     def getSvanom(self, S, T, P0):
-        #! Compute the density anomaly, sigma, in kg/m^3
-        #! Density anomaly is identical with sigma-t without pressure terms
-        #!
-        #! P0 = Pressure in decibars
-        #! T  = Temperature in deg C
-        #! S  = salinity in pss-78
-        #!
+        # Compute the density anomaly, sigma, in kg/m^3
+        # Density anomaly is identical with sigma-t without pressure terms
+        # P0 = Pressure in decibars
+        # T  = Temperature in deg C
+        # S  = salinity in pss-78
         R3500 = 1028.106331
         R4 = 4.8314E-4
         Dr350 = 28.106331
@@ -949,11 +870,10 @@ class MainApp(QMainWindow, Ui_MainApp):
         V350p = 1 / R3500
         Sva = -Sig * V350p / (R3500 + Sig)
         Sigma = Sig + Dr350
-        #! Scale specific volume anomaly to normally reported units
+        # Scale specific volume anomaly to normally reported units
         Svan = Sva * 1.0E+8
         if P == 0:
-                    # THEN GOTO 13710
-            return 0, 0  # ToDo: Might not be correct
+            return Sigma, Svan
         E = (9.1697E-10 * T + 2.0816E-8) * T - 9.9348E-7
         Bw = (5.2787E-8 * T - 6.12293E-6) * T + 3.47718E-5
         B = Bw + E * S
@@ -981,9 +901,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         Dr35p = Gam / V350p
         Dvan = Sva / (V350p * (V350p + Sva))
         Sigma = Dr350 + Dr35p - Dvan
-        # SUBEND
         return Sigma, Svan
-
+    ''' Returns the spiciness of the water. '''
     def getSpiciness(self, temp, salt):
         # Hardcoded by Howard
         B = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
@@ -993,15 +912,12 @@ class MainApp(QMainWindow, Ui_MainApp):
                        [3.949E-7, -3.029E-8, -3.8209E-7, 1.0012E-7, 4.7133E-8],
                        [-6.36E-10, -1.309E-9, 6.048E-9, -1.1409E-9, -6.676E-10]])
         spice = 0
-        Sp = salt - 35
-        Theta = temp
+        sp = salt - 35
+        theta = temp
         # Reversed I and J here, are arrays backwards in HP Basic?
         for I in range(0, 5):
-            Ii = I - 1
             for J in range(0, 4):
-                Jj = J - 1
-                # In Python, ^ is XOR 8 ^ 3 => 1000 ^ 0011 => 1011 = 11
-                spice = spice + B[I, J] * (np.power(Theta, I)) * (np.power(Sp, J))
+                spice = spice + B[I, J] * (np.power(theta, I)) * (np.power(sp, J))
         return spice
 
     def sanityCheck(self):
@@ -1010,28 +926,26 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def checkFloatsFromIndex(self, floats, cycleJulDate):
         day, month, year = julianToDate(cycleJulDate)
-        # print "Day, month, year are ", day, month, year
-        self.yearMonthDayPath0 = self.path0 \
-            + str(year) + '\\' \
-            + str(month).zfill(2) + '\\' \
-            + str(day).zfill(2) + '\\'
-
+        if self.verbose:
+            print "Day, month, year are ", day, month, year
+        self.yearMonthDayPath0 = (self.path0 
+            + str(year) + '\\' 
+            + str(month).zfill(2) + '\\' 
+            + str(day).zfill(2) + '\\')
         inFileName = (self.yearMonthDayPath0 + str(year)
                       + str(month).zfill(2)
                       + str(day).zfill(2)
                       + '_index.csv')
-        # print "IN FILE NAME IS ", inFileName
         try:
             with open((inFileName),
                       'rb') as indexCSV:
-                # print "Opened index ", inFileName
+                if self.verbose:
+                    print "Opened index ", inFileName
                 reader = csv.reader(indexCSV)
-                # print self.firstLatitude, self.secondLatitude, self.firstLongitude, self.secondLongitude
                 # Skip the first entry since it's a header
                 reader.next()
                 for row in reader:
-                    # print row
-                    # This filters out the ******* lines that are in some index files 
+                    # Filer out the ******* lines that are in some index files 
                     if row[3] == "*******":
                         continue
                     lat = float(row[1])
@@ -1039,33 +953,20 @@ class MainApp(QMainWindow, Ui_MainApp):
                     if lon < 0:
                         lon += 360
                     press = float(row[3])
-                    # ToDo: Does not account for users with lat2 < lat1
                     if(lat > self.firstLatitude and 
                        lat < self.secondLatitude and 
                        lon > self.firstLongitude and 
                        lon < self.secondLongitude and 
                        press > self.pressureCutOff):
-                        # print "I have a float that passed!!"
                         floatNum = row[0]
-                        if TESTING:
-                            floats.append(self.yearMonthDayPath0 + 
-                                "20160518_2901481.IOS")
-                        else:
-                            if SAVELOCALLY:
-                                # self.filesInUse.write(self.yearMonthDayPath0 + 
-                                #     floatNum + '\n')
-                                pass
-                            floats.append(self.yearMonthDayPath0 + row[0])
+                        floats.append(self.yearMonthDayPath0 + row[0])
                         self.passedFloat(floatNum, lat, lon)
                         self.numFloats += 1
-                        if TESTING:
-                            break
         except (OSError, IOError), e:
             print "File was not found: ", inFileName
         return floats
 
     def passedFloat(self, floatNum, lat, lon):
-        # print "NumFloats is ", self.numFloats
         self.Lat[self.numFloats] = lat
         self.Lon[self.numFloats] = lon
         Dx = self.Scx0 * (float(lon) - self.longitudeDesired)
@@ -1074,22 +975,13 @@ class MainApp(QMainWindow, Ui_MainApp):
         if self.Closest > Rho:
             self.Closest = Rho
             self.Closest_fltnm = floatNum
-
-        # ToDo: A lot left out here, maybe unecessary?
-        return
-
-    # Line 0-45
-    def initVars(self):
-
+        # ToDo: A few lines left out here, looks completely unnecessary
         return
 
     ''' TODO 
     Pulls settings from an already existing file. INCOMPLETE'''
     def setSettings():
         # Now using a .cfg file to load settings
-        for x in xrange(1, 20):
-            pass
-
         # settingsF = open((self.drive + "argo_programs\\TSlast.txt"), 'r+')
         return
 
@@ -1124,15 +1016,9 @@ class MainApp(QMainWindow, Ui_MainApp):
             pass
         return
 
-    # Line 65-285
     def userDefinedSettings(self):
         self.setEnabledParameters(True)
         # If the user has NOT selected default settings
-        todayInJul = self.todayInJulian()
-        # print todayInJul
-        day, month, year = self.todayInDate()
-        # print day, month, year
-        self.currentDayDateEdit.setDate(QDate(year, month, day))
         self.writeDefinedSettings()
         return
 
@@ -1140,8 +1026,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         # Save settings to .cfg file
         return
 
+    ''' Opens and saves the output destination files in the class scope ''' 
     def prepareOutputFiles(self):
-
         tempPath = self.outPath + "TS_Te.csv"
         salinityPath = self.outPath + "TS_Sa.csv"
         sigmaTPath = self.outPath + "TS_St.csv"
@@ -1171,19 +1057,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.hgtCSV = open((hgtPath), writeType)
         self.cLimCSV = open((cLimPath), writeType)
         self.stratCSV = open((stratPath), writeType)
-        # What the heck is hgt? Mercury...t?
         if SAVELOCALLY:
             self.filesInUse = open((self.outPath + "IOS_Files_In_Use.txt"), 'w+')
-
-
-        # ToDo: Diff between appending and not to files
-        # File on sigma-levels
-        if (self.append):
-            pass
-        else:
-            pass
-            # Maybe not necessary?
-        # Display "Starting interpolation value 1 to value 2"
         return
 
     def todayInDate(self):
@@ -1197,7 +1072,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         todayInJul = dateToJulian(day, month, year, dayOfYear)
         return todayInJul
 
-    # Line 1625-1633
     ''' Lastrun (I think) defines if the program was a success or not. 
     Starts with 2 being written, then writes -1 after "Normal End"-ing'''
 

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainApp.ui'
 #
-# Created: Thu Jun 16 14:35:45 2016
+# Created: Thu Jun 23 11:52:08 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -521,6 +521,18 @@ class Ui_MainApp(object):
         self.horizontalLayout_7.addWidget(self.nextButton)
         self.verticalLayout_5.addLayout(self.horizontalLayout_7)
         self.timeSeriesStackedWidget.addWidget(self.settingsPage)
+        self.pleaseWaitPage = QtGui.QWidget()
+        self.pleaseWaitPage.setObjectName("pleaseWaitPage")
+        self.verticalLayout_8 = QtGui.QVBoxLayout(self.pleaseWaitPage)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.label_18 = QtGui.QLabel(self.pleaseWaitPage)
+        self.label_18.setObjectName("label_18")
+        self.verticalLayout_8.addWidget(self.label_18)
+        self.calculationProgressBar = QtGui.QProgressBar(self.pleaseWaitPage)
+        self.calculationProgressBar.setProperty("value", 24)
+        self.calculationProgressBar.setObjectName("calculationProgressBar")
+        self.verticalLayout_8.addWidget(self.calculationProgressBar)
+        self.timeSeriesStackedWidget.addWidget(self.pleaseWaitPage)
         self.calculationsPage = QtGui.QWidget()
         self.calculationsPage.setObjectName("calculationsPage")
         self.verticalLayout_7 = QtGui.QVBoxLayout(self.calculationsPage)
@@ -610,7 +622,7 @@ class Ui_MainApp(object):
 
         self.retranslateUi(MainApp)
         self.listAllPages.setCurrentIndex(1)
-        self.timeSeriesStackedWidget.setCurrentIndex(1)
+        self.timeSeriesStackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainApp)
 
     def retranslateUi(self, MainApp):
@@ -653,6 +665,7 @@ class Ui_MainApp(object):
         self.verboseCheckBox.setText(QtGui.QApplication.translate("MainApp", "Verbose", None, QtGui.QApplication.UnicodeUTF8))
         self.backButton_2.setText(QtGui.QApplication.translate("MainApp", "Back", None, QtGui.QApplication.UnicodeUTF8))
         self.nextButton.setText(QtGui.QApplication.translate("MainApp", "Next", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_18.setText(QtGui.QApplication.translate("MainApp", "Calculations in progress, please do not interrupt", None, QtGui.QApplication.UnicodeUTF8))
         self.outputFilesLabel.setText(QtGui.QApplication.translate("MainApp", "Output Files:", None, QtGui.QApplication.UnicodeUTF8))
         self.outputLocationLabel.setText(QtGui.QApplication.translate("MainApp", "Output files location", None, QtGui.QApplication.UnicodeUTF8))
         self.label_21.setText(QtGui.QApplication.translate("MainApp", "Write to file as settings for next time", None, QtGui.QApplication.UnicodeUTF8))
