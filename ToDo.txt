@@ -1,0 +1,10 @@
+ToDo for ARGO Time Series Software:
+-	Incorporate the new getProfile() Howard sent in his email
+-	Write the sanityCheck() function
+-	Fix screen switches so user can see the “Loading” screen
+  - Backup: add progress bar to first page
+- Add buttons, maybe a menu for plots, instead of automatically showing
+  - Leave plots themselves as is until meeting with Tetjana 
+-	Test and handle exceptions  from extreme cases
+- Test with actual use paths instead of fake testing paths
+  - Allow user to edit save paths with browse window?
