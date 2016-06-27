@@ -12,6 +12,9 @@ has the functionality from Howard Freeland's TimeSeries written in HT Basic.
 TimeSeries reads ARGO data and outputs interpolated float data into several 
 TS_*.csv files. 
 
+Potential upgrades to TimeSeries if there is time in the futre:
+- Eliminate all the individual data arrays, and use a dictionary instead
+
 '''
 
 # This is to deal with path issues for the sake of project organizaiton
@@ -174,7 +177,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # if problems: change this maybe
         csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
         csvF.close()
-        # self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     ''' Methods called by the user interacting with the GUI '''
@@ -183,9 +186,17 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.timeSeriesButton.clicked.connect(self.timeSeriesButtonClicked)
         # TimeSeries stuff
         self.setupInputParameterSignals()
+        self.setupResultsPageSignals()
         self.backToProgramListButton.clicked.connect(
             self.backToProgramListButtonClicked)
         self.nextButton.clicked.connect(self.nextButtonClicked)
+        return
+
+    def setupResultsPageSignals(self):
+        self.plotTemperatureButton.clicked.connect(self.plotTempButtonClicked)
+        self.plotSalinityButton.clicked.connect(self.plotSalinityButtonClicked)
+        self.plotSigmaTButton.clicked.connect(self.plotSigmaTButtonClicked)
+        self.plotSpicinessButton.clicked.connect(self.plotSpicinessButtonClicked)
         return
 
     def setupInputParameterSignals(self):
@@ -365,16 +376,29 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         return
 
+    def plotTempButtonClicked(self):
+        self.plotContour(self.plotTemp, self.plotTime, self.plotDepth)
+        return
+
+    def plotSalinityButtonClicked(self):
+        self.plotContour(self.plotSalinity, self.plotTime, self.plotDepth)
+        return
+
+    def plotSigmaTButtonClicked(self):
+        self.plotContour(self.plotSigmaT, self.plotTime, self.plotDepth)
+        return
+
+    def plotSpicinessButtonClicked(self):
+        self.plotContour(self.plotSpiciness, self.plotTime, self.plotDepth)
+        return
+
+
     def updateNPress(self):
         self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
         if self.nPress > 300:
             self.nPress = 300
         return
 
-    ''' ToDo: verify integrity of data'''
-    def sanityCheck(self):
-
-        return
 
     ''' Heavy calculations originated from Howard's code. Will not be converted
     to naming standards '''
@@ -409,6 +433,40 @@ class MainApp(QMainWindow, Ui_MainApp):
         if not self.checkIfReturn(numRecs, fileTempQc, filePSalQc):
             print "in getProfile, returning prematurely due to bad values"
             return
+        return numRecs
+
+    def sanityCheck(self, numRecs):
+        numRecs = self.checkOutOfRange(numRecs)
+        numRecs = self.checkPressureMonotonic(numRecs)
+        return numRecs
+
+    def removeIndexFromPTS(self, i, numRecs):
+        np.delete(self.P, i)
+        np.delete(self.T, i)
+        np.delete(self.S, i)
+        numRecs -= 1
+        return numRecs
+
+
+    # ToDo: could be moved to the Utils file
+    ''' Checks if the pressure array is monotonic'''
+    def checkPressureMonotonic(self, numRecs):
+        for i in xrange(1, (numRecs - 2)):
+            if ((self.P[i] > self.P[i - 1] and self.P[i] > self.P[i + 1]) or 
+                (self.P[i] < self.P[i - 1] and self.P[i] < self.P[i + 1])):
+                numRecs = self.removeIndexFromPTS(i, numRecs)
+        return numRecs
+
+    def checkOutOfRange(self, numRecs):
+        # Loop, if out of range, remove and adjust all values to cover up
+        for i in xrange(0, numRecs):
+            if (self.P[i] < -0.5 or
+                self.P[i] > 2200 or
+                self.T[i] < -2.5 or
+                self.T[i] > 30 or
+                self.S[i] < 30 or
+                self.S[i] > 39):
+                numRecs = self.removeIndexFromPTS(i, numRecs)
         return numRecs
 
     ''' Used by getProfile() to determine validity of float data '''
@@ -550,12 +608,25 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def initPlotArrays(self, julStart, julEnd):
         # print "ceiling days is ", ceil((julEnd - julStart) / float(self.dayStepSize))
-        plotTemp = np.empty((ceil((julEnd - julStart) / float(self.dayStepSize)), 
-            ceil(self.maxInterpDepth / float(self.stepSize)) + 1))
-        plotTime = np.arange(julStart, julEnd, self.dayStepSize)
-        plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
-        # plotDepth = plotDepth0[::-1]
-        return plotTemp, plotTime, plotDepth
+        self.plotTemp = np.empty((ceil((julEnd - julStart) / 
+                                    float(self.dayStepSize)), 
+                                ceil(self.maxInterpDepth / 
+                                    float(self.stepSize)) + 1))
+        self.plotSalinity = np.empty((ceil((julEnd - julStart) / 
+                                        float(self.dayStepSize)), 
+                                    ceil(self.maxInterpDepth / 
+                                        float(self.stepSize)) + 1))
+        self.plotSigmaT = np.empty((ceil((julEnd - julStart) / 
+                                        float(self.dayStepSize)), 
+                                    ceil(self.maxInterpDepth / 
+                                        float(self.stepSize)) + 1))
+        self.plotSpiciness = np.empty((ceil((julEnd - julStart) / 
+                                        float(self.dayStepSize)), 
+                                    ceil(self.maxInterpDepth / 
+                                        float(self.stepSize)) + 1))
+        self.plotTime = np.arange(julStart, julEnd, self.dayStepSize)
+        self.plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
+        return
 
     ''' This is the main loop for the program. Once the user fills out 
     parameters and hits the Next button, we commence interpolation. The rest of 
@@ -564,9 +635,7 @@ class MainApp(QMainWindow, Ui_MainApp):
     manipulate it.'''
     def commenceInterpolation(self):
         julStart, julEnd = self.getJulianStartAndEnd()
-        plotTemp, plotTime, plotDepth = self.initPlotArrays(julStart, julEnd)
-        # julStart = 0
-        # julEnd = 0
+        self.initPlotArrays(julStart, julEnd)
         iterDayNum = 0
         for Dc in xrange(julStart, julEnd, self.dayStepSize):
             self.updateProgress(iterDayNum, julStart, julEnd)
@@ -577,7 +646,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
                 self.checkFloatsFromIndex(floats, cycleJulDate)
-            # print "The number of floats inside the box", self.numFloats
             sTav = 0
             sTavSq = 0
             sTKnt = 0
@@ -585,7 +653,7 @@ class MainApp(QMainWindow, Ui_MainApp):
             j = 0
             for singleFloat in floats:
                 numRecs = self.getProfile(singleFloat, rFlag)
-                self.sanityCheck()
+                numRecs = self.sanityCheck(numRecs)
                 self.Accpt[j] = True
                 sigT = self.getSigmaT(self.S[0], self.T[0])
                 sTav, sTavSq, sTKnt = self.calcStats(
@@ -593,21 +661,19 @@ class MainApp(QMainWindow, Ui_MainApp):
                 j += 1
                 if TESTING:
                     break
-
             Ipr75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
-            self.computeDHgt(plotTemp, plotTime, plotDepth, iterDayNum)
+            self.computeDHgt(iterDayNum)
             self.finishUp(Ipr75)
             iterDayNum += 1
         # self.plotData()
-        self.plotContour(plotTemp, plotTime, plotDepth)
         self.cleanUp()
         return
 
 
-    def plotContour(self, plotTemp, plotTime, plotDepth):
+    def plotContour(self, plotInput, plotTime, plotDepth):
         if len(plotTime) == 1:
-            print "Error: plotting temperatures. There is only 1 time entry"
+            print "Error: plotting data. There is only 1 time entry"
             return
 
         origin = 'lower'
@@ -616,7 +682,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         # print "plotDepth dimensions", len(plotDepth), plotDepth
         CS = plt.contourf(plotTime, 
             plotDepth, 
-            plotTemp.T, 
+            plotInput.T, 
             # [2, 3, 4, 5, 6, 7, 8], 
             linewidths=(3,),
             cmap=plt.cm.bone)
@@ -649,32 +715,31 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.lastRun(self.drive, -1)
         return
 
-    ''' Writes to final output files and write to status file that the program 
-    was successful '''
+    ''' Writes to final output files TS_Shgt.csv, Strat.csv, and lstmsge.csv '''
     def finishUp(self, Ipr75):
         if self.dynamicHeight:
             self.hgtCSV.write(str(self.xCoord) + ',' +
                               str(self.Dh[0]) + ',' +
-                              str(self.weight))
-        Stdiff = self.St[Ipr75] - self.St[1]
-        if Stdiff < -.002:
-            Stdiff = 0.
-        self.stratCSV.write(str(self.xCoord) + ',' + str(self.St[1]) + ','
-                            + str(self.St[Ipr75]) + ',' + str(self.weight))
-
-        Stdiff = .001 * int(1000. * Stdiff + .5)
-        if Stdiff < .001:
-            Stdiff = 0.000
-        St1 = .001 * int(.5 + 1000. * self.St[1])
+                              str(self.weight) + '\n')
+        stdDiff = self.St[Ipr75 - 1] - self.St[0]
+        if stdDiff < -0.002:
+            stdDiff = 0.0
+        self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' + 
+                            str(self.St[0]) + ',' + str(self.St[Ipr75]) + ',' + 
+                            str(self.weight) + '\n')
+        stdDiff = 0.001 * int(1000.0 * stdDiff + 0.5)
+        if stdDiff < 0.001:
+            stdDiff = 0.000
+        St1 = 0.001 * int(0.5 + 1000.0 * self.St[0])
         Dayc, Monc, Yearc = julianToDate(self.xCoord)
-        R = "| " + str(self.xCoord) + " " + str(Dayc) + "/" + str(Monc) + \
-            "/" + str(Yearc) + " | " + str(self.weight) + "  " + str(Stdiff) + \
-            "    " + str(St1)
-        self.Closest = .1 * int(10. * self.Closest + .5)
+        R = ("| " + str(self.xCoord) + " " + str(Dayc) + "/" + str(Monc) + 
+            "/" + str(Yearc) + " | " + str(self.weight) + "  " + str(stdDiff) + 
+            "    " + str(St1))
+        self.Closest = 0.1 * int(10.0 * self.Closest + 0.5)
         R += R + " | " + str(self.Closest) + "  " + \
             self.Closest_fltnm + " |"
         # ToDo: Optimize, open outside of loop
-        lstMsge = open((self.outPath + "lstmsge.csv"), 'w+')
+        lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
         lstMsge.truncate()
         lstMsge.write(R)
         lstMsge.close()
@@ -716,12 +781,11 @@ class MainApp(QMainWindow, Ui_MainApp):
     ''' Calculates values and adds them to P, T, S, St, and Sp 
     Line 814 '''
     def formatResults(self, sTav, sTavSq, sTKnt):
-        try:
+        if sTKnt != 0:
             sTav = sTav / sTKnt
             sTavSq = sTavSq / sTKnt
             stdDev = np.sqrt(sTavSq - sTav * sTav)
-        except ZeroDivisionError, e:
-            print "Error: No floats in this day range set match parameters"
+
         Kdel = 0
         qSal = 0
         qTemp = 0
@@ -752,8 +816,8 @@ class MainApp(QMainWindow, Ui_MainApp):
                         tempWeightSumT = tempWeightSumT + \
                             self.weight * self.Te[iterFloat, iterPress]
 
-                    if self.Sa[iterFloat, iterPress] > 20 and \
-                            self.Sa[iterFloat, iterPress] < 40:
+                    if (self.Sa[iterFloat, iterPress] > 20 and 
+                            self.Sa[iterFloat, iterPress] < 40):
                         weightSumS = weightSumS + self.weight
                         salWeightSumT = salWeightSumT + \
                             self.weight * self.Sa[iterFloat, iterPress]
@@ -769,7 +833,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                 qSal = salWeightSumT / weightSumS
             else:
                 print "float not usable to calculate qSal"
-
+            self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
             qSigmaT = self.getSigmaT(qSal, qTemp)
             qSpice = self.getSpiciness(qTemp, qSal)
             Sigma, Svan = self.getSvanom(qSal, qTemp, 0)
@@ -792,7 +856,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
-    def computeDHgt(self, plotTemp, plotTime, plotDepth, iterDayNum):
+    def computeDHgt(self, iterDayNum):
         # Now compute DHgt relative to Pmax
         self.Dh[self.nPress - 1] = 0
         Q = 5.6E-6  # Q=0.5f/g at station Papa
@@ -823,13 +887,16 @@ class MainApp(QMainWindow, Ui_MainApp):
             xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ',' 
             if self.temp:
                 self.tempCSV.write(xCoAndPc + str(qTemp) + '\n')
-                plotTemp[iterDayNum][iterPressNum] = qTemp
+                self.plotTemp[iterDayNum][iterPressNum] = qTemp
             if self.salinity:
                 self.salinityCSV.write(xCoAndPc + str(qSal) + '\n')
+                self.plotSalinity[iterDayNum][iterPressNum] = qSal
             if self.sigmaT:
                 self.sigmaTCSV.write(xCoAndPc + str(qSigmaT) + '\n')
+                self.plotSigmaT[iterDayNum][iterPressNum] = qSigmaT
             if self.spiciness:
                 self.spicinessCSV.write(xCoAndPc + str(qSpice) + '\n')
+                self.plotSpiciness[iterDayNum][iterPressNum] = qSpice
             if self.dynamicHeight:
                 self.dynamicHeightCSV.write(xCoAndPc + str(qDynamicHeight) + '\n')
             iterPressNum += 1
@@ -919,10 +986,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             for J in range(0, 4):
                 spice = spice + B[I, J] * (np.power(theta, I)) * (np.power(sp, J))
         return spice
-
-    def sanityCheck(self):
-        # ToDo
-        return
 
     def checkFloatsFromIndex(self, floats, cycleJulDate):
         day, month, year = julianToDate(cycleJulDate)
