@@ -664,87 +664,87 @@
 		6640 ON END @Pin GOTO 7490
 		6650 ENTER @Pin;S$
 		6660      !
-		6670 ENTER @Pin;S$
-		6680 IF POS(S$,"****")>0 THEN GOTO 6670
-		6690 Pc1=POS(S$,",")
-		6700 S$[Pc1,Pc1]=";"
-		6710 Pc2=POS(S$,",")
-		6720 S$[Pc2,Pc2]=";"
-		6730 Pc3=POS(S$,",")
-		6740 S$[Pc3,Pc3]=";"
-		6750 Ls=LEN(S$)
-		6760 !
-		6770 Fil$=TRIM$(S$[1,Pc1-1])
-		6780 Qlat=VAL(S$[Pc1+1,Pc2-1])
-		6790 Qlon=VAL(S$[Pc2+1,Pc3-1])
-		6800 IF Qlon<0 THEN Qlon=360.+Qlon
-		6810 !
-		6820 Maxdep=VAL(S$[Pc3+1])
-		6830 !
-		6840 IF Qlat<Lat1 THEN GOTO 6670
-		6850 IF Qlat>Lat2 THEN GOTO 6670
-		6860 IF Qlon<Lon1 THEN GOTO 6670
-		6870 IF Qlon>Lon2 THEN GOTO 6670
-		6880 IF Maxdep<Pcutoff THEN GOTO 6670
-		6890 !
-		6900 !
-		6910 ! This one passes, store index information
-		6920 Nfloats=Nfloats+1
-		6930 Fltnm$(Nfloats)=Fil$
-		6940 Lat(Nfloats)=Qlat
-		6950 Lon(Nfloats)=Qlon
-		6960 !
-		6970 Dx=Scx0*(Qlon-Lonc)
-		6980 Dy=Scy*(Qlat-Latc)
-		6990 Rho=SQR(Dx*Dx+Dy*Dy)
-		7000 IF Rho<Closest THEN
-		7010 Closest=Rho
-		7020 Closest_fltnm$=Fltnm$(Nfloats)
-		7030 END IF
-		7040 !
-		7050 IF Rho>Rho_print THEN GOTO 7470
-		7060 Rho=.1*INT(10.*Rho+.5)
-		7070 !
-		7080 Qlat=.01*INT(.5+Qlat*100.)
-		7090 Qlat$=TRIM$(VAL$(Qlat))
-		7100 L0=LEN(Qlat$)
-		7110 IF L0>4.99 THEN GOTO 7150
-		7120 Qlat$=Qlat$&"0"
-		7130 GOTO 7100
-		7140 !
-		7150 Qlon=.01*INT(.5+Qlon*100.)
-		7160 Qlon=Qlon-360.
-		7170 Qlon$=TRIM$(VAL$(Qlon))
-		7180 L0=LEN(Qlon$)
-		7190 IF L0>6.9 THEN GOTO 7230
-		7200 Qlon$=Qlon$&"0"
-		7210 GOTO 7170
-		7220 !
-		7230 Rho$=TRIM$(VAL$(Rho))
-		7240 L0=LEN(Rho$)
-		7250 Pp=POS(Rho$,".")
-		7260 IF Pp>.1 THEN GOTO 7300
-		7270 Rho$=Rho$&".0"
-		7280 GOTO 7240
-		7290 !
-		7300 ! Pp >0
-		7310 IF ABS(Pp-L0)<.1 THEN
-		7320 Rho$=Rho$&"0"
-		7330 END IF
-		7340 !
-		7350 IF Rho<9.9999 THEN Rho$=" "&Rho$
-		7360 IF Rho<99.999 THEN Rho$=" "&Rho$
-		7370 !
-		7380 Nfloats$=TRIM$(VAL$(Nfloats))
-		7390 L0=LEN(Nfloats$)
-		7400 IF L0>2.9 THEN GOTO 7440
-		7410 Nfloats$=" "&Nfloats$
-		7420 GOTO 7390
-		7430 !
-		7440 Pp=POS(Fil$,".")
-		7450 PRINT "                                              ";Nfloats$&" "&Qlat$&" "&Qlon$&" "&Rho$&" "&Fil$[1,Pp-1]
-		7460 !
-		7470 GOTO 6670
+			6670 ENTER @Pin;S$
+			6680 IF POS(S$,"****")>0 THEN GOTO 6670
+			6690 Pc1=POS(S$,",")
+			6700 S$[Pc1,Pc1]=";"
+			6710 Pc2=POS(S$,",")
+			6720 S$[Pc2,Pc2]=";"
+			6730 Pc3=POS(S$,",")
+			6740 S$[Pc3,Pc3]=";"
+			6750 Ls=LEN(S$)
+			6760 !
+			6770 Fil$=TRIM$(S$[1,Pc1-1])
+			6780 Qlat=VAL(S$[Pc1+1,Pc2-1])
+			6790 Qlon=VAL(S$[Pc2+1,Pc3-1])
+			6800 IF Qlon<0 THEN Qlon=360.+Qlon
+			6810 !
+			6820 Maxdep=VAL(S$[Pc3+1])
+			6830 !
+			6840 IF Qlat<Lat1 THEN GOTO 6670
+			6850 IF Qlat>Lat2 THEN GOTO 6670
+			6860 IF Qlon<Lon1 THEN GOTO 6670
+			6870 IF Qlon>Lon2 THEN GOTO 6670
+			6880 IF Maxdep<Pcutoff THEN GOTO 6670
+			6890 !
+			6900 !
+			6910 ! This one passes, store index information
+			6920 Nfloats=Nfloats+1
+			6930 Fltnm$(Nfloats)=Fil$
+			6940 Lat(Nfloats)=Qlat
+			6950 Lon(Nfloats)=Qlon
+			6960 !
+			6970 Dx=Scx0*(Qlon-Lonc)
+			6980 Dy=Scy*(Qlat-Latc)
+			6990 Rho=SQR(Dx*Dx+Dy*Dy)
+			7000 IF Rho<Closest THEN
+			7010 Closest=Rho
+			7020 Closest_fltnm$=Fltnm$(Nfloats)
+			7030 END IF
+			7040 !
+			7050 IF Rho>Rho_print THEN GOTO 7470
+			7060 Rho=.1*INT(10.*Rho+.5)
+			7070 !
+			7080 Qlat=.01*INT(.5+Qlat*100.)
+			7090 Qlat$=TRIM$(VAL$(Qlat))
+			7100 L0=LEN(Qlat$)
+			7110 IF L0>4.99 THEN GOTO 7150
+			7120 Qlat$=Qlat$&"0"
+			7130 GOTO 7100
+			7140 !
+			7150 Qlon=.01*INT(.5+Qlon*100.)
+			7160 Qlon=Qlon-360.
+			7170 Qlon$=TRIM$(VAL$(Qlon))
+			7180 L0=LEN(Qlon$)
+			7190 IF L0>6.9 THEN GOTO 7230
+			7200 Qlon$=Qlon$&"0"
+			7210 GOTO 7170
+			7220 !
+			7230 Rho$=TRIM$(VAL$(Rho))
+			7240 L0=LEN(Rho$)
+			7250 Pp=POS(Rho$,".")
+			7260 IF Pp>.1 THEN GOTO 7300
+			7270 Rho$=Rho$&".0"
+			7280 GOTO 7240
+			7290 !
+			7300 ! Pp >0
+			7310 IF ABS(Pp-L0)<.1 THEN
+			7320 Rho$=Rho$&"0"
+			7330 END IF
+			7340 !
+			7350 IF Rho<9.9999 THEN Rho$=" "&Rho$
+			7360 IF Rho<99.999 THEN Rho$=" "&Rho$
+			7370 !
+			7380 Nfloats$=TRIM$(VAL$(Nfloats))
+			7390 L0=LEN(Nfloats$)
+			7400 IF L0>2.9 THEN GOTO 7440
+			7410 Nfloats$=" "&Nfloats$
+			7420 GOTO 7390
+			7430 !
+			7440 Pp=POS(Fil$,".")
+			7450 PRINT "                                              ";Nfloats$&" "&Qlat$&" "&Qlon$&" "&Rho$&" "&Fil$[1,Pp-1]
+			7460 !
+			7470 GOTO 6670
 		7480 !
 		7490 ASSIGN @Pin TO *
 		7500 !
@@ -798,14 +798,14 @@
 			7980 Eps=1.0E-6
 			7990 FOR K=2 TO Nrecs
 				8000 IF Pc>=P(K-1) AND Pc<=P(K) THEN
-				8010 Del_p=P(K)-P(K-1)
-				8020 IF Del_p<100. THEN
-				8030 Rho=(Pc-P(K-1))/(P(K)-P(K-1)+Eps)
-				8040 Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1)+Eps)
-				8050 Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1)+Eps)
-				8060 END IF
-				8070 GOTO 8110
-				8080 END IF
+					8010 Del_p=P(K)-P(K-1)
+					8020 IF Del_p<100. THEN
+						8030 Rho=(Pc-P(K-1))/(P(K)-P(K-1)+Eps)
+						8040 Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1)+Eps)
+						8050 Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1)+Eps)
+						8060 END IF
+					8070 GOTO 8110
+					8080 END IF
 				8090 NEXT K
 			8100 !
 			8110 NEXT Ipr
@@ -1635,8 +1635,8 @@
 16350 SUB Sanity_check(P(*),T(*),S(*),Nrecs)
 16360 !
 16370 Check_oor: ! Check for out-of range values
-16380 K=-1
-16390 FOR I=1 TO Nrecs
+16380 K=-
+116390 FOR I=1 TO Nrecs
 	16400 IF P(I)<-.5 THEN K=I
 	16410 IF P(I)>2200. THEN K=I
 	16420 IF T(I)<-2.5 THEN K=I

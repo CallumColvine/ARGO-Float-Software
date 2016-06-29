@@ -63,7 +63,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         # Declare input parameter variables
         self.defaultSettings = False
         self.xCoord = 0
-        self.floatRadius = 0
         self.startDate = self.startRangeDateEdit.date().getDate()
         self.endDate = self.endRangeDateEdit.date().getDate()
         self.firstDayTuple = formatToDateTime(self.startDate[0],
@@ -104,15 +103,14 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.cLimCSV = None
 
         self.yearMonthDayPath0 = ''
-        self.Scy = 111.2  # ! Scy = km/degree of latitude
-        self.Scx0 = self.Scy * np.cos(self.latitudeDesired)
-        self.Rho0 = 300  # ! Decay scale of weighting function
-        self.Pref = 1000  # ! Reference level for dynamic height calculations
+        self.sCY = 111.2  # ! sCY = km/degree of latitude
+        self.sCX0 = self.sCY * np.cos(self.latitudeDesired)
+        self.rho0 = 300  # ! Decay scale of weighting function
+
         # Pdel never used
-        # self.Pdel = np.empty((1000))
         self.arSva = np.zeros((1000))
-        self.Dh = np.zeros((1000))
-        # self.Dh[:] = 0
+        self.dynH = np.zeros((1000))
+        # self.dynH[:] = 0
 
         if TESTING:
             self.curDay = 18
@@ -127,17 +125,17 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.currentDayDateEdit.setDate(QDate(year, month, day))
         self.numFloats = 0
 
-        self.Te = np.empty((500, 300))
-        self.Sa = np.empty((500, 300))
+        self.Te = np.empty((500, 500))
+        self.Sa = np.empty((500, 500))
         self.Lat = np.empty((500))
         self.Lon = np.empty((500))
-        self.Accpt = np.empty((500))
-        self.Fltnm = np.empty((500))
+        self.floatUsable = np.empty((500))
+
         self.Te[:] = 999.9
         self.Sa[:] = 999.9
         self.Lat[:] = 999.9
         self.Lon[:] = 999.9
-        self.Accpt[:] = (-1)
+        self.floatUsable[:] = False
 
         self.sigRefSigT = np.empty((71))
         self.sigRefTemp = np.empty((71))
@@ -150,14 +148,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.Sp = np.empty((2000))
         # 140 ! ALPHA PEN 1
         # 150 Tabrow=11
-        self.Closest = 9999.9
-        self.Closest_fltnm = ''
-
-        self.Rho_print = -1
-        # 240 ! Initialize data matrices with nul values 999.9
-        # Should I do the NumPy NULL or just stick with 999.9?
-        # Double backslash because in Python you need to escape special
-        # characters
+        self.closestDist = 9999.9
+        self.closestFloatNum = ''
 
         # Max is 100, indicating completed
         self.progress = 0
@@ -202,8 +194,6 @@ class MainApp(QMainWindow, Ui_MainApp):
     def setupInputParameterSignals(self):
         self.defaultSettingsCheckBox.stateChanged.connect(
             self.defaultSettingsCheckBoxStateChanged)
-        self.floatRadiusBox.editingFinished.connect(
-            self.floatRadiusBoxEditingFinished)
         self.dayStepSizeBox.editingFinished.connect(
             self.dayStepSizeBoxEditingFinished)
         self.sampleWindowBox.editingFinished.connect(
@@ -272,10 +262,6 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.userDefinedSettings()
         return
 
-    def floatRadiusBoxEditingFinished(self):
-        self.floatRadius = self.floatRadiusBox.value()
-        return
-
     def dayRangeBoxEditingFinished(self):
         # self.dayRange = self.dayRangeBox.value()
         return
@@ -305,7 +291,15 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def pressureCutOffBoxEditingFinished(self):
-        self.pressureCutOff = self.pressureCutOffBox.value()
+        newP = self.pressureCutOffBox.value()
+        if newP > 2000:
+            style = "QLabel { color : red; }"
+            self.pressureCutOffWarningLabel.setStyleSheet(style)
+            out = "Warning: unlikely to find many usable floats past -2000m"
+            self.pressureCutOffWarningLabel.setText(out)
+        else:
+            self.pressureCutOffWarningLabel.setText("")
+        self.pressureCutOff = newP
         return
 
     def maxInterpDepthBoxEditingFinished(self):
@@ -340,7 +334,7 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def latitudeDesiredBoxEditingFinished(self):
         self.latitudeDesired = self.latitudeDesiredBox.value()
-        self.Scx0 = self.Scy * np.cos(self.latitudeDesired)
+        self.sCX0 = self.sCY * np.cos(self.latitudeDesired)
         return
 
     def longitudeDesiredBoxEditingFinished(self):
@@ -369,8 +363,11 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def nextButtonClicked(self):
         # Check to make sure all params have been filled
-        self.timeSeriesStackedWidget.setCurrentWidget(self.pleaseWaitPage)
+        # self.timeSeriesStackedWidget.setCurrentWidget(self.pleaseWaitPage)
         # time.sleep(2)
+        print "Next clicked!!"
+        self.progressLabel.setText("Interpolation in progress. Please wait...")
+        print "Label text is set"
         self.prepareOutputFiles()
         self.commenceInterpolation()
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
@@ -395,8 +392,8 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def updateNPress(self):
         self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
-        if self.nPress > 300:
-            self.nPress = 300
+        # if self.nPress > 300:
+        #     self.nPress = 300
         return
 
 
@@ -654,47 +651,38 @@ class MainApp(QMainWindow, Ui_MainApp):
             for singleFloat in floats:
                 numRecs = self.getProfile(singleFloat, rFlag)
                 numRecs = self.sanityCheck(numRecs)
-                self.Accpt[j] = True
+                self.floatUsable[j] = True
                 sigT = self.getSigmaT(self.S[0], self.T[0])
                 sTav, sTavSq, sTKnt = self.calcStats(
                     sigT, sTav, sTavSq, sTKnt, numRecs, j)
                 j += 1
                 if TESTING:
                     break
-            Ipr75 = self.formatResults(sTav, sTavSq, sTKnt)
+            iPres75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
             self.computeDHgt(iterDayNum)
-            self.finishUp(Ipr75)
+            self.finishUp(iPres75)
             iterDayNum += 1
-        # self.plotData()
         self.cleanUp()
         return
 
-
+    ''' Creates a contour plot popup window from the input parameters:
+    plotInput: 2D array with data at correct time/depth related positions
+    plotTime: 1D array '''
     def plotContour(self, plotInput, plotTime, plotDepth):
-        if len(plotTime) == 1:
-            print "Error: plotting data. There is only 1 time entry"
+        if len(plotTime) < 2:
+            print "Error: plotting data. There are too few time entries"
             return
-
         origin = 'lower'
-        # print "plotTemp dimensions", len(plotTemp), len(plotTemp[0]), plotTemp
-        # print "plotTime dimensions", len(plotTime), plotTime
-        # print "plotDepth dimensions", len(plotDepth), plotDepth
         CS = plt.contourf(plotTime, 
             plotDepth, 
             plotInput.T, 
-            # [2, 3, 4, 5, 6, 7, 8], 
             linewidths=(3,),
             cmap=plt.cm.bone)
         plt.clabel(CS, fmt='%2.1f', colors='w', fontsize=14)
         plt.gca().invert_yaxis()
 
         plt.show()
-        return
-
-    def plotData(self):
-        plt.plot(self.plotT)
-        plt.show()                
         return
 
     ''' Closes open files that were used for the TimeSeries app '''
@@ -716,37 +704,38 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     ''' Writes to final output files TS_Shgt.csv, Strat.csv, and lstmsge.csv '''
-    def finishUp(self, Ipr75):
+    def finishUp(self, iPres75):
         if self.dynamicHeight:
             self.hgtCSV.write(str(self.xCoord) + ',' +
-                              str(self.Dh[0]) + ',' +
+                              str(self.dynH[0]) + ',' +
                               str(self.weight) + '\n')
-        stdDiff = self.St[Ipr75 - 1] - self.St[0]
+        stdDiff = self.St[iPres75 - 1] - self.St[0]
         if stdDiff < -0.002:
             stdDiff = 0.0
         self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' + 
-                            str(self.St[0]) + ',' + str(self.St[Ipr75]) + ',' + 
+                            str(self.St[0]) + ',' + str(self.St[iPres75]) + ',' + 
                             str(self.weight) + '\n')
         stdDiff = 0.001 * int(1000.0 * stdDiff + 0.5)
         if stdDiff < 0.001:
             stdDiff = 0.000
         St1 = 0.001 * int(0.5 + 1000.0 * self.St[0])
-        Dayc, Monc, Yearc = julianToDate(self.xCoord)
-        R = ("| " + str(self.xCoord) + " " + str(Dayc) + "/" + str(Monc) + 
-            "/" + str(Yearc) + " | " + str(self.weight) + "  " + str(stdDiff) + 
-            "    " + str(St1))
-        self.Closest = 0.1 * int(10.0 * self.Closest + 0.5)
-        R += R + " | " + str(self.Closest) + "  " + \
-            self.Closest_fltnm + " |"
+        dayOut, monthOut, yearOut = julianToDate(self.xCoord)
+        finalMessage = ("| " + str(self.xCoord) + " " + str(dayOut) + "/" + 
+                        str(monthOut) +  "/" + str(yearOut) + " | " + 
+                        str(self.weight) + "  " + str(stdDiff) + "    " + 
+                        str(St1))
+        self.closestDist = 0.1 * int(10.0 * self.closestDist + 0.5)
+        finalMessage += (" | " + str(self.closestDist) + "  " + 
+                         self.closestFloatNum + " |")
         # ToDo: Optimize, open outside of loop
         lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
-        lstMsge.truncate()
-        lstMsge.write(R)
+        # lstMsge.truncate()
+        lstMsge.write(finalMessage)
         lstMsge.close()
         return
 
     ''' Calculates some statistical analyses on the data provided'''
-    def calcStats(self, sigT, sTav, sTavSq, sTKnt, numRecs, Iflt):
+    def calcStats(self, sigT, sTav, sTavSq, sTKnt, numRecs, iFloat):
         # Copied, not sure why Howard does this
         sigT = int((0.5 + 1000 * sigT)) / 1000
         if sigT > 5 and sigT < 30:
@@ -755,26 +744,26 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTKnt += 1
         if self.P[0] < 20:
             self.P[0] = 0
-        for Ipr in range(0, self.nPress):
+        for iPress in range(0, self.nPress):
             # Interpolate to pressureCalc
-            pressureCalc = self.stepSize * (Ipr + 1)
+            pressureCalc = self.stepSize * (iPress + 1)
             if (pressureCalc < self.P[0]): 
                 continue
             if (pressureCalc > self.P[numRecs]):
                 return sTav, sTavSq, sTKnt
-            Eps = 1.0E-6
-            for K in range(1, numRecs):
-                if pressureCalc >= self.P[K - 1] and pressureCalc <= self.P[K]:
-                    Del_p = self.P[K] - self.P[K - 1]
-                    if Del_p < 100:
-                        Rho = (pressureCalc - self.P[K - 1]) / \
-                            (self.P[K] - self.P[K - 1] + Eps)
-                        self.Te[Iflt, Ipr] = self.T[K - 1] + \
-                            Rho * (self.T[K] - self.T[K - 1] + Eps)
-                        self.Sa[Iflt, Ipr] = self.S[K - 1] + \
-                            Rho * (self.S[K] - self.S[K - 1] + Eps)
+            eps = 1.0E-6
+            for k in range(1, numRecs):
+                if pressureCalc >= self.P[k - 1] and pressureCalc <= self.P[k]:
+                    deltaP = self.P[k] - self.P[k - 1]
+                    if deltaP < 100:
+                        rho = (pressureCalc - self.P[k - 1]) / \
+                            (self.P[k] - self.P[k - 1] + eps)
+                        self.Te[iFloat, iPress] = self.T[k - 1] + \
+                            rho * (self.T[k] - self.T[k - 1] + eps)
+                        self.Sa[iFloat, iPress] = self.S[k - 1] + \
+                            rho * (self.S[k] - self.S[k - 1] + eps)
                     break
-            # Finished interpolation to standard pressures for Float Iflt
+            # Finished interpolation to standard pressures for Float iFloat
         # Finished interpolation to standard pressures for all floats
         return sTav, sTavSq, sTKnt
 
@@ -786,11 +775,11 @@ class MainApp(QMainWindow, Ui_MainApp):
             sTavSq = sTavSq / sTKnt
             stdDev = np.sqrt(sTavSq - sTav * sTav)
 
-        Kdel = 0
+        kDel = 0
         qSal = 0
         qTemp = 0
         qSpice = 0
-        Ipr75 = int(1.1 + 75 / self.stepSize)
+        iPres75 = int(1.1 + 75 / self.stepSize)
         weightSumTMax = 0
         for iterPress in xrange(0, self.nPress):
             pressureCal = self.stepSize * (iterPress - 1)  
@@ -799,17 +788,17 @@ class MainApp(QMainWindow, Ui_MainApp):
             salWeightSumT = 0
             tempWeightSumT = 0
             for iterFloat in xrange(0, self.numFloats):
-                if self.Accpt[iterFloat] == False:
+                if self.floatUsable[iterFloat] == False:
                     continue
-                Latav = (self.Lat[iterFloat] + self.latitudeDesired) / 2
-                Scx = self.Scy * np.cos(Latav)
-                Dx = Scx * (self.longitudeDesired - self.Lon[iterFloat])
-                Dy = self.Scy * (self.latitudeDesired - self.Lat[iterFloat])
-                Rho = np.sqrt(Dx * Dx + Dy * Dy)
-                Z = Rho / self.Rho0
+                avgLat = (self.Lat[iterFloat] + self.latitudeDesired) / 2
+                sCX = self.sCY * np.cos(avgLat)
+                dX = sCX * (self.longitudeDesired - self.Lon[iterFloat])
+                dY = self.sCY * (self.latitudeDesired - self.Lat[iterFloat])
+                rho = np.sqrt(dX * dX + dY * dY)
+                z = rho / self.rho0
 
-                if not (Z > 5):
-                    self.weight = np.exp(-Z * Z)
+                if not (z > 5):
+                    self.weight = np.exp(-z * z)
                     if (self.Te[iterFloat, iterPress] > -1.5 and
                             self.Te[iterFloat, iterPress] < 40):
                         weightSumT = weightSumT + self.weight
@@ -836,15 +825,15 @@ class MainApp(QMainWindow, Ui_MainApp):
             self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
             qSigmaT = self.getSigmaT(qSal, qTemp)
             qSpice = self.getSpiciness(qTemp, qSal)
-            Sigma, Svan = self.getSvanom(qSal, qTemp, 0)
+            sigma, svan = self.getSvanom(qSal, qTemp, 0)
             self.P[iterPress] = self.stepSize * (iterPress - 1)
             self.T[iterPress] = qTemp
             self.S[iterPress] = qSal
             self.St[iterPress] = qSigmaT
             self.Sp[iterPress] = qSpice
-            Kdel += 1
-            self.arSva[Kdel] = Svan
-        return Ipr75
+            kDel += 1
+            self.arSva[kDel] = svan
+        return iPres75
 
     ''' Remove entries in P, T, S, St, and Sp that are unusable ''' 
     def removeEmpties(self):
@@ -858,65 +847,71 @@ class MainApp(QMainWindow, Ui_MainApp):
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
     def computeDHgt(self, iterDayNum):
         # Now compute DHgt relative to Pmax
-        self.Dh[self.nPress - 1] = 0
-        Q = 5.6E-6  # Q=0.5f/g at station Papa
-        for K in xrange(1, self.nPress):
-            Ipr = self.nPress - K - 1
-            self.Dh[Ipr] = ((self.Dh[Ipr + 1]) + Q * 
-                (self.arSva[Ipr + 1] + self.arSva[Ipr]) * self.stepSize)
+        self.dynH[self.nPress - 1] = 0
+        q = 5.6E-6  # q=0.5f/g at station Papa
+        for k in xrange(1, self.nPress):
+            iPress = self.nPress - k - 1
+            self.dynH[iPress] = ((self.dynH[iPress + 1]) + q * 
+                (self.arSva[iPress + 1] + self.arSva[iPress]) * self.stepSize)
 
         iterPressNum = 0
-        for Ipr in xrange(0, self.nPress):
-            qTemp = 0.001 * int(0.5 + 1000 * self.T[Ipr])
-            qSal = 0.001 * int(0.5 + 1000 * self.S[Ipr])
-            qSigmaT = 0.001 * int(0.5 + 1000 * self.St[Ipr])
-            qSpice = 0.001 * int(0.5 + 1000 * self.Sp[Ipr])
-            qDynamicHeight = 0.001 * int(0.5 + 1000 * self.Dh[Ipr])
+        for iPress in xrange(0, self.nPress):
+            qTemp = 0.001 * int(0.5 + 1000 * self.T[iPress])
+            qSal = 0.001 * int(0.5 + 1000 * self.S[iPress])
+            qSigmaT = 0.001 * int(0.5 + 1000 * self.St[iPress])
+            qSpice = 0.001 * int(0.5 + 1000 * self.Sp[iPress])
+            qDynamicHeight = 0.001 * int(0.5 + 1000 * self.dynH[iPress])
 
-            Pc = self.stepSize * (Ipr)
+            pressCount = self.stepSize * (iPress)
 
-            Sigref_opt = -1
             if(not (qSigmaT < self.sigRefSigT[0]) and 
                 not (qSigmaT > self.sigRefSigT[70])):
-                for Icl in range(0, 69):
-                    if (qSigmaT >= self.sigRefSigT[Icl] and 
-                    qSigmaT <= self.sigRefSigT[Icl + 1]):
+                for iCl in range(0, 69):
+                    if (qSigmaT >= self.sigRefSigT[iCl] and 
+                    qSigmaT <= self.sigRefSigT[iCl + 1]):
                         tep, sap = self.foundPair()
                         break
                             
-            xCoAndPc = str(self.xCoord) + ',' + str(-Pc) + ',' 
+            xCoAndpressCount = str(self.xCoord) + ',' + str(-pressCount) + ',' 
             if self.temp:
-                self.tempCSV.write(xCoAndPc + str(qTemp) + '\n')
+                self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
                 self.plotTemp[iterDayNum][iterPressNum] = qTemp
             if self.salinity:
-                self.salinityCSV.write(xCoAndPc + str(qSal) + '\n')
+                self.salinityCSV.write(xCoAndpressCount + str(qSal) + '\n')
                 self.plotSalinity[iterDayNum][iterPressNum] = qSal
             if self.sigmaT:
-                self.sigmaTCSV.write(xCoAndPc + str(qSigmaT) + '\n')
+                self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + '\n')
                 self.plotSigmaT[iterDayNum][iterPressNum] = qSigmaT
             if self.spiciness:
-                self.spicinessCSV.write(xCoAndPc + str(qSpice) + '\n')
+                self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
                 self.plotSpiciness[iterDayNum][iterPressNum] = qSpice
             if self.dynamicHeight:
-                self.dynamicHeightCSV.write(xCoAndPc + str(qDynamicHeight) + '\n')
+                self.dynamicHeightCSV.write(xCoAndpressCount + 
+                    str(qDynamicHeight) + '\n')
             iterPressNum += 1
         return 
 
-    def foundPair(self, qSigmaT, Icl):
-        Ra = (qSigmaT - self.sigRefSigT[Icl]) / \
-            (self.sigRefSigT[Icl + 1] - self.sigRefSigT[Icl])
-        Ter = self.sigRefTemp[Icl] + Ra * \
-            (self.sigRefTemp[Icl + 1] - self.sigRefTemp[Icl])
-        Sar = self.sigRefSal[Icl] + Ra * \
-            (self.sigRefSal[Icl + 1] - self.sigRefSal[Icl])
+    ''' When a pair is found, performs calculations on that pair and writes to 
+    Sigref.csv'''
+    # Variable names conflict with standard due to direct port of code of 
+    # Howard's HT Basic.
+    def foundPair(self, qSigmaT, iCl):
+        Ra = (qSigmaT - self.sigRefSigT[iCl]) / \
+            (self.sigRefSigT[iCl + 1] - self.sigRefSigT[iCl])
+        Ter = self.sigRefTemp[iCl] + Ra * \
+            (self.sigRefTemp[iCl + 1] - self.sigRefTemp[iCl])
+        Sar = self.sigRefSal[iCl] + Ra * \
+            (self.sigRefSal[iCl + 1] - self.sigRefSal[iCl])
         Tep = qTemp - Ter
         Sap = qSal - Sar
-        Tep = .001 * int(.5 + 1000. * Tep)
-        Sap = .001 * int(.5 + 1000. * Sap)
+        Tep = 0.001 * int(0.5 + 1000.0 * Tep)
+        Sap = 0.001 * int(0.5 + 1000.0 * Sap)
         self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
             ',' + Sap)
         return Tep, Sap
 
+    # Variable names conflict with standard due to direct port of code of 
+    # Howard's HT Basic.
     def getSvanom(self, S, T, P0):
         # Compute the density anomaly, sigma, in kg/m^3
         # Density anomaly is identical with sigma-t without pressure terms
@@ -969,10 +964,11 @@ class MainApp(QMainWindow, Ui_MainApp):
         Dvan = Sva / (V350p * (V350p + Sva))
         Sigma = Dr350 + Dr35p - Dvan
         return Sigma, Svan
+
     ''' Returns the spiciness of the water. '''
     def getSpiciness(self, temp, salt):
         # Hardcoded by Howard
-        B = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
+        b = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
                        [.051665, .002034, -.0002745, -.0000085, .0000136],
                        [-6.64783E-3, -2.4681E-4, -1.428E-5, 3.337E-5, 7.894E-6],
                        [-5.4023E-5, 7.326E-6, 7.0036E-6, -3.0412E-6, -1.0853E-6],
@@ -982,9 +978,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         sp = salt - 35
         theta = temp
         # Reversed I and J here, are arrays backwards in HP Basic?
-        for I in range(0, 5):
-            for J in range(0, 4):
-                spice = spice + B[I, J] * (np.power(theta, I)) * (np.power(sp, J))
+        for i in range(0, 5):
+            for j in range(0, 4):
+                spice = spice + b[i, j] * (np.power(theta, i)) * (np.power(sp, j))
         return spice
 
     def checkFloatsFromIndex(self, floats, cycleJulDate):
@@ -992,7 +988,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         if self.verbose:
             print "Day, month, year are ", day, month, year
         self.yearMonthDayPath0 = (self.path0 
-            + str(year) + '\\' 
+            + str(year).zfill(4) + '\\'     # Because why not
             + str(month).zfill(2) + '\\' 
             + str(day).zfill(2) + '\\')
         inFileName = (self.yearMonthDayPath0 + str(year)
@@ -1021,6 +1017,7 @@ class MainApp(QMainWindow, Ui_MainApp):
                        lon > self.firstLongitude and 
                        lon < self.secondLongitude and 
                        press > self.pressureCutOff):
+                        # print "So it passed, press is ", press
                         floatNum = row[0]
                         floats.append(self.yearMonthDayPath0 + row[0])
                         self.passedFloat(floatNum, lat, lon)
@@ -1032,12 +1029,12 @@ class MainApp(QMainWindow, Ui_MainApp):
     def passedFloat(self, floatNum, lat, lon):
         self.Lat[self.numFloats] = lat
         self.Lon[self.numFloats] = lon
-        Dx = self.Scx0 * (float(lon) - self.longitudeDesired)
-        Dy = self.Scy * (float(lat) - self.latitudeDesired)
-        Rho = np.sqrt(Dx * Dx + Dy * Dy)
-        if self.Closest > Rho:
-            self.Closest = Rho
-            self.Closest_fltnm = floatNum
+        dX = self.sCX0 * (float(lon) - self.longitudeDesired)
+        dY = self.sCY * (float(lat) - self.latitudeDesired)
+        rho = np.sqrt(dX * dX + dY * dY)
+        if self.closestDist > rho:
+            self.closestDist = rho
+            self.closestFloatNum = floatNum
         # ToDo: A few lines left out here, looks completely unnecessary
         return
 
@@ -1053,7 +1050,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def setEnabledParameters(self, isEnabled):
-        self.floatRadiusBox.setEnabled(isEnabled)
         self.dayStepSizeBox.setEnabled(isEnabled)
         self.sampleWindowBox.setEnabled(isEnabled)
         self.firstLatitudeBox.setEnabled(isEnabled)
