@@ -60,6 +60,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="settingsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -81,7 +84,7 @@
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="programListPage">
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -281,7 +284,7 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="settingsPage">
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -301,56 +304,6 @@
                <string>Default Settings</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QSpinBox" name="floatRadiusBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="maximum">
-                 <number>9999</number>
-                </property>
-                <property name="value">
-                 <number>50</number>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_3">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>List floats within radius (Km)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
             </item>
             <item>
              <widget class="QLabel" name="label_5">
@@ -398,8 +351,8 @@
                 <property name="date">
                  <date>
                   <year>2016</year>
-                  <month>5</month>
-                  <day>18</day>
+                  <month>1</month>
+                  <day>2</day>
                  </date>
                 </property>
                </widget>
@@ -432,8 +385,8 @@
                 <property name="date">
                  <date>
                   <year>2016</year>
-                  <month>5</month>
-                  <day>23</day>
+                  <month>1</month>
+                  <day>22</day>
                  </date>
                 </property>
                </widget>
@@ -680,8 +633,11 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
                 <property name="maximum">
-                 <number>9999</number>
+                 <number>30</number>
                 </property>
                 <property name="value">
                  <number>10</number>
@@ -696,7 +652,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Sample Window</string>
+                 <string>Sample Window (Max 30)</string>
                 </property>
                </widget>
               </item>
@@ -723,6 +679,9 @@
                  <font>
                   <pointsize>10</pointsize>
                  </font>
+                </property>
+                <property name="minimum">
+                 <number>-9999</number>
                 </property>
                 <property name="maximum">
                  <number>9999</number>
@@ -766,6 +725,9 @@
                  <font>
                   <pointsize>10</pointsize>
                  </font>
+                </property>
+                <property name="minimum">
+                 <number>-9999</number>
                 </property>
                 <property name="maximum">
                  <number>9999</number>
@@ -811,6 +773,9 @@
                   <pointsize>10</pointsize>
                  </font>
                 </property>
+                <property name="minimum">
+                 <number>-9999</number>
+                </property>
                 <property name="maximum">
                  <number>9999</number>
                 </property>
@@ -841,7 +806,7 @@
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
-                  <width>28</width>
+                  <width>30</width>
                   <height>20</height>
                  </size>
                 </property>
@@ -853,6 +818,9 @@
                  <font>
                   <pointsize>10</pointsize>
                  </font>
+                </property>
+                <property name="minimum">
+                 <number>-9999</number>
                 </property>
                 <property name="maximum">
                  <number>9999</number>
@@ -899,7 +867,7 @@
                  </font>
                 </property>
                 <property name="maximum">
-                 <number>99999</number>
+                 <number>2100</number>
                 </property>
                 <property name="value">
                  <number>970</number>
@@ -915,6 +883,13 @@
                 </property>
                 <property name="text">
                  <string>Pressure Cut-Off (m)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="pressureCutOffWarningLabel">
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -1265,6 +1240,30 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <item>
+               <spacer name="horizontalSpacer_32">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="progressLabel">
+                <property name="text">
+                 <string>Waiting for Settings</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_7">

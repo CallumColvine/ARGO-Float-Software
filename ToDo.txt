@@ -1,7 +1,8 @@
 ToDo for ARGO Time Series Software:
-- Incorporate the new getProfile() Howard sent in his email
-- Fix screen switches so user can see the “Loading” screen
-    - Backup: add progress bar to first page
-- Test and handle exceptions  from extreme cases
-- Test with actual use paths instead of fake testing paths
-    - Allow user to edit save paths with browse window?
+
+- Wait for feedback from Tetjana before proceeding on these.
+	- Fix screen switches so user can see the “Loading” screen
+	    - Backup: add progress bar to first page
+	- Test with actual use paths instead of fake testing paths
+	    - Allow user to edit save paths with browse window?
+	- Start using the settings file
