@@ -121,20 +121,20 @@
 1210 ASSIGN @Pin TO Drive$&"\argo_programs\fit_eof.txt";FORMAT ON
 1220 ON END @Pin GOTO 1380
 1230 FOR L=1 TO 20
-1240 ENTER @Pin;S$
-1250 PRINT L;S$
-1260 Pc=POS(S$,",")
-1270 IF POS(S$,"Dc")>.1 THEN Dc$=TRIM$(S$[Pc+1])
-1280 IF POS(S$,"Dt")>.1 THEN Dt$=TRIM$(S$[Pc+1])
-1290 IF POS(S$,"at1&L")>.1 THEN Lat$=TRIM$(S$[Pc+1])
-1300 IF POS(S$,"on1&L")>.1 THEN Lon$=TRIM$(S$[Pc+1])
-1310 IF POS(S$,"cutof")>.1 THEN Pcut$=TRIM$(S$[Pc+1])
-1320 IF POS(S$,"max&Del")>.1 THEN Pmax$=TRIM$(S$[Pc+1])
-1330 IF POS(S$,"emove")>.1 THEN Sort$=TRIM$(S$[Pc+1])
-1340 IF POS(S$,"map")>.1 THEN Pmap$=TRIM$(S$[Pc+1])
-1350 IF POS(S$,"ref")>.1 THEN Pref$=TRIM$(S$[Pc+1])
-1360 IF POS(S$,"mode")>.1 THEN Nmodes$=TRIM$(S$[Pc+1])
-1370 NEXT L
+	1240 ENTER @Pin;S$
+	1250 PRINT L;S$
+	1260 Pc=POS(S$,",")
+	1270 IF POS(S$,"Dc")>.1 THEN Dc$=TRIM$(S$[Pc+1])
+	1280 IF POS(S$,"Dt")>.1 THEN Dt$=TRIM$(S$[Pc+1])
+	1290 IF POS(S$,"at1&L")>.1 THEN Lat$=TRIM$(S$[Pc+1])
+	1300 IF POS(S$,"on1&L")>.1 THEN Lon$=TRIM$(S$[Pc+1])
+	1310 IF POS(S$,"cutof")>.1 THEN Pcut$=TRIM$(S$[Pc+1])
+	1320 IF POS(S$,"max&Del")>.1 THEN Pmax$=TRIM$(S$[Pc+1])
+	1330 IF POS(S$,"emove")>.1 THEN Sort$=TRIM$(S$[Pc+1])
+	1340 IF POS(S$,"map")>.1 THEN Pmap$=TRIM$(S$[Pc+1])
+	1350 IF POS(S$,"ref")>.1 THEN Pref$=TRIM$(S$[Pc+1])
+	1360 IF POS(S$,"mode")>.1 THEN Nmodes$=TRIM$(S$[Pc+1])
+	1370 NEXT L
 1380 ASSIGN @Pin TO *
 1390!
 1400 CLEAR SCREEN
@@ -153,26 +153,26 @@
 1530 CALL Julday(1,Td,Dom,M,Yc)
 1540 !
 1550 FOR Yr=2002 TO Yc
-1560!
-1570 S$="| "&TRIM$(VAL$(Yr))&" |"
-1580 Dom=15
-1590 FOR M=1 TO 12
-1600 CALL Julday(0,Ds,Dom,M,Yr)
-1610 Ds$=TRIM$(VAL$(Ds))
-1620 IF (LEN(Ds$)-2)<.1 THEN Ds$="  "&Ds$
-1630 IF (LEN(Ds$)-3)<.1 THEN Ds$=" "&Ds$
-1640 S$=S$&" "&Ds$
-1650 NEXT M
-1660 WAIT .01
-1670 PRINT S$&" |"
-1680 !
-1690 Yi=Ul_opt*INT((Yr/Ul_opt)+.00001)
-1700 IF ABS(Yi-Yr)<.001 AND ABS(Yr-Yc)>.001 THEN
-1710 WAIT .01
-1720 PRINT "|------+-------------------------------------------------------------|"
-1730 END IF
-1740 !
-1750 NEXT Yr
+	1560!
+	1570 S$="| "&TRIM$(VAL$(Yr))&" |"
+	1580 Dom=15
+	1590 FOR M=1 TO 12
+		1600 CALL Julday(0,Ds,Dom,M,Yr)
+		1610 Ds$=TRIM$(VAL$(Ds))
+		1620 IF (LEN(Ds$)-2)<.1 THEN Ds$="  "&Ds$
+		1630 IF (LEN(Ds$)-3)<.1 THEN Ds$=" "&Ds$
+		1640 S$=S$&" "&Ds$
+		1650 NEXT M
+	1660 WAIT .01
+	1670 PRINT S$&" |"
+	1680 !
+	1690 Yi=Ul_opt*INT((Yr/Ul_opt)+.00001)
+	1700 IF ABS(Yi-Yr)<.001 AND ABS(Yr-Yc)>.001 THEN
+	1710 WAIT .01
+	1720 PRINT "|------+-------------------------------------------------------------|"
+	1730 END IF
+	1740 !
+	1750 NEXT Yr
 1760 WAIT .01
 1770 PRINT "|------+-------------------------------------------------------------|"
 1780 WAIT .01
@@ -365,35 +365,35 @@
 3650 !Path$=Drive$&"\data\Modes\hjf_modes.31"
 3660 !ASSIGN @Pin TO Path$&File$;FORMAT ON
 3670 !FOR Eof=1 TO 20
-3680 !DISP "Reading mode ";Eof
-3690 !ENTER @Pin;S$
-3700 !FOR K=1 TO 4310
-3710 !ENTER @Pin;S$
-3720 !T$=S$
-3730 !Pp1=POS(T$,".")
-3740 !T$[Pp1,Pp1]=";"
-3750 !Pp2=POS(T$,".")
-3760 !T$[Pp2,Pp2]=";"
-3770 !Pp3=POS(T$,".")
-3780 !Lt=LEN(T$)
-3790 !
-3800 !Lonk=VAL(S$[Pp1-3,Pp1+3])
-3810 !Latk=VAL(S$[Pp2-2,Pp2+3])
-3820 !Valk=VAL(S$[Pp3-2,Lt])
-3830 !
-3840 !I=INT(1.002+1.*(Lonk-180.))
-3850 !J=INT(1.002+3.*(Latk-30.))
-3860 !
-3870 !E(I,J,Eof)=Valk
-3880 !IF Latk<51.7 THEN GOTO Line_nextk
-3890 !IF Lonk>200. THEN GOTO Line_nextk
-3900 !Y=51.7+.033*(Lonk-180.)*(Lonk-180.)
-3910 !IF Latk>Y THEN E(I,J,Eof)=99.99
-3920 !
-3930 ! Line_nextk:!
-3940 !NEXT K
-3950 !
-3960 !NEXT Eof
+	3680 !DISP "Reading mode ";Eof
+	3690 !ENTER @Pin;S$
+	3700 !FOR K=1 TO 4310
+		3710 !ENTER @Pin;S$
+		3720 !T$=S$
+		3730 !Pp1=POS(T$,".")
+		3740 !T$[Pp1,Pp1]=";"
+		3750 !Pp2=POS(T$,".")
+		3760 !T$[Pp2,Pp2]=";"
+		3770 !Pp3=POS(T$,".")
+		3780 !Lt=LEN(T$)
+		3790 !
+		3800 !Lonk=VAL(S$[Pp1-3,Pp1+3])
+		3810 !Latk=VAL(S$[Pp2-2,Pp2+3])
+		3820 !Valk=VAL(S$[Pp3-2,Lt])
+		3830 !
+		3840 !I=INT(1.002+1.*(Lonk-180.))
+		3850 !J=INT(1.002+3.*(Latk-30.))
+		3860 !
+		3870 !E(I,J,Eof)=Valk
+		3880 !IF Latk<51.7 THEN GOTO Line_nextk
+		3890 !IF Lonk>200. THEN GOTO Line_nextk
+		3900 !Y=51.7+.033*(Lonk-180.)*(Lonk-180.)
+		3910 !IF Latk>Y THEN E(I,J,Eof)=99.99
+		3920 !
+		3930 ! Line_nextk:!
+		3940 !NEXT K
+	3950 !
+	3960 !NEXT Eof
 3970 ! Continue
 3980 !
 3990 DISP
@@ -402,65 +402,65 @@
 4020 Nfloats=0
 4030 !
 4040 FOR Jd=Jd1 TO Jd2
-4050 ! Find directories
-4060 CALL Julday(1,Jd,Day,Mon,Year)
-4070 Path$=Path0$&TRIM$(VAL$(Year))
-4080 !
-4090 IF Mon<9.5 THEN Path$=Path$&"\0"&TRIM$(VAL$(Mon))
-4100 IF Mon>9.5 THEN Path$=Path$&"\"&TRIM$(VAL$(Mon))
-4110 IF Day<9.5 THEN Path$=Path$&"\0"&TRIM$(VAL$(Day))&"\"
-4120 IF Day>9.5 THEN Path$=Path$&"\"&TRIM$(VAL$(Day))&"\"
-4130 !
-4140 ON ERROR GOTO 4620
-4150 !
-4160 Qdt$=TRIM$(VAL$(Year))
-4170 IF Mon<9.5 THEN Qdt$=Qdt$&"0"&TRIM$(VAL$(Mon))
-4180 IF Mon>9.5 THEN Qdt$=Qdt$&TRIM$(VAL$(Mon))
-4190 IF Day<9.5 THEN Qdt$=Qdt$&"0"&TRIM$(VAL$(Day))
-4200 IF Day>9.5 THEN Qdt$=Qdt$&TRIM$(VAL$(Day))
-4210 !
-4220 ASSIGN @Pin TO Path$&Qdt$&"_index.csv";FORMAT ON
-4230 ENTER @Pin;S$
-4240 OFF ERROR
-4250 ON END @Pin GOTO 4600
-4260 ENTER @Pin;S$
-4270 !
-4280 ENTER @Pin;S$
-4290 IF POS(S$,"****")>0 THEN GOTO 4280
-4300 Pc1=POS(S$,",")
-4310 S$[Pc1,Pc1]=";"
-4320 Pc2=POS(S$,",")
-4330 S$[Pc2,Pc2]=";"
-4340 Pc3=POS(S$,",")
-4350 S$[Pc3,Pc3]=";"
-4360 Ls=LEN(S$)
-4370 !
-4380 Fil$=TRIM$(S$[1,Pc1-1])
-4390 Qlat=VAL(S$[Pc1+1,Pc2-1])
-4400 Qlon=VAL(S$[Pc2+1,Pc3-1])
-4410 IF Qlon<0 THEN Qlon=360.+Qlon
-4420 Maxdep=VAL(S$[Pc3+1])
-4430 !
-4440 IF Qlat<Lat1 THEN GOTO 4280
-4450 IF Qlat>Lat2 THEN GOTO 4280
-4460 IF Qlon<Lon1 THEN GOTO 4280
-4470 IF Qlon>Lon2 THEN GOTO 4280
-4480 IF Maxdep<Pcutoff THEN GOTO 4280
-4490 !
-4500 ! Exclusions
-4510 IF POS(S$,"20090406_5901076")>.5 THEN GOTO 4280
-4520 !
-4530 ! This one passes, store index information
-4540 Nfloats=Nfloats+1
-4550 Fltnm$(Nfloats)=Fil$
-4560 Lat(Nfloats)=Qlat
-4570 Lon(Nfloats)=Qlon
-4580 GOTO 4280
-4590 !
-4600 ASSIGN @Pin TO *
-4610 !
-4620 OFF ERROR
-4630 NEXT Jd
+	4050 ! Find directories
+	4060 CALL Julday(1,Jd,Day,Mon,Year)
+	4070 Path$=Path0$&TRIM$(VAL$(Year))
+	4080 !
+	4090 IF Mon<9.5 THEN Path$=Path$&"\0"&TRIM$(VAL$(Mon))
+	4100 IF Mon>9.5 THEN Path$=Path$&"\"&TRIM$(VAL$(Mon))
+	4110 IF Day<9.5 THEN Path$=Path$&"\0"&TRIM$(VAL$(Day))&"\"
+	4120 IF Day>9.5 THEN Path$=Path$&"\"&TRIM$(VAL$(Day))&"\"
+	4130 !
+	4140 ON ERROR GOTO 4620
+	4150 !
+	4160 Qdt$=TRIM$(VAL$(Year))
+	4170 IF Mon<9.5 THEN Qdt$=Qdt$&"0"&TRIM$(VAL$(Mon))
+	4180 IF Mon>9.5 THEN Qdt$=Qdt$&TRIM$(VAL$(Mon))
+	4190 IF Day<9.5 THEN Qdt$=Qdt$&"0"&TRIM$(VAL$(Day))
+	4200 IF Day>9.5 THEN Qdt$=Qdt$&TRIM$(VAL$(Day))
+	4210 !
+	4220 ASSIGN @Pin TO Path$&Qdt$&"_index.csv";FORMAT ON
+	4230 ENTER @Pin;S$
+	4240 OFF ERROR
+	4250 ON END @Pin GOTO 4600
+	4260 ENTER @Pin;S$
+	4270 !
+	4280 ENTER @Pin;S$
+	4290 IF POS(S$,"****")>0 THEN GOTO 4280
+	4300 Pc1=POS(S$,",")
+	4310 S$[Pc1,Pc1]=";"
+	4320 Pc2=POS(S$,",")
+	4330 S$[Pc2,Pc2]=";"
+	4340 Pc3=POS(S$,",")
+	4350 S$[Pc3,Pc3]=";"
+	4360 Ls=LEN(S$)
+	4370 !
+	4380 Fil$=TRIM$(S$[1,Pc1-1])
+	4390 Qlat=VAL(S$[Pc1+1,Pc2-1])
+	4400 Qlon=VAL(S$[Pc2+1,Pc3-1])
+	4410 IF Qlon<0 THEN Qlon=360.+Qlon
+	4420 Maxdep=VAL(S$[Pc3+1])
+	4430 !
+	4440 IF Qlat<Lat1 THEN GOTO 4280
+	4450 IF Qlat>Lat2 THEN GOTO 4280
+	4460 IF Qlon<Lon1 THEN GOTO 4280
+	4470 IF Qlon>Lon2 THEN GOTO 4280
+	4480 IF Maxdep<Pcutoff THEN GOTO 4280
+	4490 !
+	4500 ! Exclusions
+	4510 IF POS(S$,"20090406_5901076")>.5 THEN GOTO 4280
+	4520 !
+	4530 ! This one passes, store index information
+	4540 Nfloats=Nfloats+1
+	4550 Fltnm$(Nfloats)=Fil$
+	4560 Lat(Nfloats)=Qlat
+	4570 Lon(Nfloats)=Qlon
+	4580 GOTO 4280
+	4590 !
+	4600 ASSIGN @Pin TO *
+	4610 !
+	4620 OFF ERROR
+	4630 NEXT Jd
 4640 !
 4650 PRINT "Total number of profiles reported inside box = ";Nfloats
 4660 Line1$=Line1$&TRIM$(VAL$(Nfloats))&"/"
@@ -473,64 +473,64 @@
 4730 ! Now read data files, put Pressure, Temp and Salt into P(i), T(i) and S(i)
 4740 DISP "Reading data files"
 4750 FOR Iflt=1 TO Nfloats
-4760 IF Verb_opt>.5 THEN PRINT Iflt;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt)
-4770 !
-4780 IF ABS(Iflt-10*INT(Iflt/10.))<.1 THEN
-4790 DISP "Reading Iflt/Nfloats = "&TRIM$(VAL$(Iflt))&"/"&TRIM$(VAL$(Nfloats))&"  (N.B. Max is 800)"
-4800 END IF
-4810 !
-4820 CALL Getprofile(Fltnm$(Iflt),Path0$,P(*),T(*),S(*),Nrecs,Rflag,Verb_opt)
-4830 IF Rflag<-.1 THEN GOTO 5330
-4840 Ifirst=0
-4850 Ifirst=Ifirst+1
-4860 IF Ifirst>20 THEN GOTO 5330
-4870 IF P(Ifirst)<.01 THEN GOTO 4850
-4880 IF P(Ifirst)>9000. THEN GOTO 4850
-4890 IF P(Ifirst)>18. THEN GOTO 5330
-4900 !
-4910 IF Rflag<0 THEN GOTO 5330
-4920 !
-4930 ! Have read in data for Float # Iflt data are in P, T and S(i)
-4940 !
-4950 ! If the sample is "near-surface" then force it to be surface
-4960 IF P(1)<20. THEN P(1)=0.
-4970 !
-4980 ! If the sample is almost deep enough, force it to be deep enough
-4990 IF P(Nrecs)<Pmax THEN
-5000 Dtdp=(T(Nrecs)-T(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
-5010 Dsdp=(S(Nrecs)-S(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
-5020 Text=T(Nrecs)+Dtdp*(Pmax-P(Nrecs))
-5030 Sext=S(Nrecs)+Dsdp*(Pmax-P(Nrecs))
-5040 S(Nrecs)=Sext
-5050 T(Nrecs)=Text
-5060 P(Nrecs)=Pmax
-5070 END IF
-5080 !
-5090 FOR Ipr=1 TO Npress
-5100 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
-5110 IF Pc<P(1) THEN GOTO 5310
-5120 IF Pc>P(Nrecs) THEN GOTO 5320
-5130 !
-5140 ! Somewhere in P(Ipr) there is data at pressure Pc
-5150 FOR K=2 TO Nrecs
-5160 IF Pc>=P(K-1) AND Pc<=P(K) THEN
-5170 !
-5180 Rho=0.
-5190 IF ABS(P(K)-P(K-1))>1.0E-2 THEN Rho=(Pc-P(K-1))/(P(K)-P(K-1))
-5200 !
-5210 Te(Iflt,Ipr)=999.9
-5220 IF ABS(T(K-1))<50. AND ABS(T(K))<50. THEN Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1))
-5230 !
-5240 Sa(Iflt,Ipr)=999.9
-5250 IF ABS(S(K-1))<50. AND ABS(S(K))<50. THEN Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1))
-5260 !
-5270 GOTO 5310
-5280 END IF
-5290 NEXT K
-5300 !
-5310 NEXT Ipr
-5320 ! Finished interpolation to standard pressures for Float Iflt
-5330 NEXT Iflt
+	4760 IF Verb_opt>.5 THEN PRINT Iflt;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt)
+	4770 !
+	4780 IF ABS(Iflt-10*INT(Iflt/10.))<.1 THEN
+	4790 DISP "Reading Iflt/Nfloats = "&TRIM$(VAL$(Iflt))&"/"&TRIM$(VAL$(Nfloats))&"  (N.B. Max is 800)"
+	4800 END IF
+	4810 !
+	4820 CALL Getprofile(Fltnm$(Iflt),Path0$,P(*),T(*),S(*),Nrecs,Rflag,Verb_opt)
+	4830 IF Rflag<-.1 THEN GOTO 5330
+	4840 Ifirst=0
+	4850 Ifirst=Ifirst+1
+	4860 IF Ifirst>20 THEN GOTO 5330
+	4870 IF P(Ifirst)<.01 THEN GOTO 4850
+	4880 IF P(Ifirst)>9000. THEN GOTO 4850
+	4890 IF P(Ifirst)>18. THEN GOTO 5330
+	4900 !
+	4910 IF Rflag<0 THEN GOTO 5330
+	4920 !
+	4930 ! Have read in data for Float # Iflt data are in P, T and S(i)
+	4940 !
+	4950 ! If the sample is "near-surface" then force it to be surface
+	4960 IF P(1)<20. THEN P(1)=0.
+	4970 !
+	4980 ! If the sample is almost deep enough, force it to be deep enough
+	4990 IF P(Nrecs)<Pmax THEN
+	5000 Dtdp=(T(Nrecs)-T(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
+	5010 Dsdp=(S(Nrecs)-S(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
+	5020 Text=T(Nrecs)+Dtdp*(Pmax-P(Nrecs))
+	5030 Sext=S(Nrecs)+Dsdp*(Pmax-P(Nrecs))
+	5040 S(Nrecs)=Sext
+	5050 T(Nrecs)=Text
+	5060 P(Nrecs)=Pmax
+	5070 END IF
+	5080 !
+	5090 FOR Ipr=1 TO Npress
+		5100 Pc=Deltap*(Ipr-1.) ! Interpolate to Pc
+		5110 IF Pc<P(1) THEN GOTO 5310
+		5120 IF Pc>P(Nrecs) THEN GOTO 5320
+		5130 !
+		5140 ! Somewhere in P(Ipr) there is data at pressure Pc
+		5150 FOR K=2 TO Nrecs
+			5160 IF Pc>=P(K-1) AND Pc<=P(K) THEN
+			5170 !
+			5180 Rho=0.
+			5190 IF ABS(P(K)-P(K-1))>1.0E-2 THEN Rho=(Pc-P(K-1))/(P(K)-P(K-1))
+			5200 !
+			5210 Te(Iflt,Ipr)=999.9
+			5220 IF ABS(T(K-1))<50. AND ABS(T(K))<50. THEN Te(Iflt,Ipr)=T(K-1)+Rho*(T(K)-T(K-1))
+			5230 !
+			5240 Sa(Iflt,Ipr)=999.9
+			5250 IF ABS(S(K-1))<50. AND ABS(S(K))<50. THEN Sa(Iflt,Ipr)=S(K-1)+Rho*(S(K)-S(K-1))
+			5260 !
+			5270 GOTO 5310
+			5280 END IF
+			5290 NEXT K
+		5300 !
+		5310 NEXT Ipr
+	5320 ! Finished interpolation to standard pressures for Float Iflt
+	5330 NEXT Iflt
 5340 ! Finished interpolation to standard pressures for all floats
 5350 DISP
 5360 !
@@ -541,51 +541,51 @@
 5410 Ipref=1+Pref/Deltap
 5420 !
 5430 FOR Iflt=1 TO Nfloats
-5440 FOR Ipr=1 TO 500
-5450 Pc=Deltap*(Ipr-1.)
-5460 Qte=Te(Iflt,Ipr)
-5470 Qsa=Sa(Iflt,Ipr)
-5480 IF Qsa>900. THEN GOTO 5530
-5490 IF Qte>900. THEN GOTO 5530
-5500 CALL Sigma_t(Qsa,Qte,Qst)
-5510 CALL Svanom(Qsa,Qte,0.,Sigma,Svan)
-5520 Sa(Iflt,Ipr)=Svan
-5530 NEXT Ipr
-5540 ! Sa(Iflt,*) now contains SVAs
-5550 !
-5560 ! Compute dynamic height at surface P = Pmap relative to 1000
-5570 Dhi=0.
-5580 Q=.5*1.0E-5  ! = 0.5f/g
-5590 Ipr0=INT(1.01+Pmap/Deltap)
-5600 Ipr1=Ipr0+1
-5610 !
-5620 FOR Ipr=Ipr1 TO Ipref
-5630 Dhi=Dhi+Q*(Sa(Iflt,Ipr)+Sa(Iflt,Ipr-1))*Deltap
-5640 NEXT Ipr
-5650 Dh(Iflt)=Dhi
-5660 !
-5670 IF Verb_opt>.5 THEN
-5680 !
-5690 H$=""
-5700 IF Nhlt<.5 THEN GOTO 5750
-5710 FOR Ii=1 TO Nhlt
-5720 IF POS(Fltnm$(Iflt),Hlt$(Ii))>.5 THEN H$="<<<<<<<<<"
-5730 NEXT Ii
-5740 !
-5750 IF Verb_opt>.5 THEN PRINT Iflt;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt);Dh(Iflt);H$
-5760 END IF
-5770 !
-5780 !
-5790 OUTPUT @Plist;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt);Dh(Iflt)
-5800 !
-5810 !
-5820 Fflt=20*INT(Iflt/20.)
-5830 IF Pause_opt>.5 AND (ABS(Fflt-Iflt)<.1 OR ABS(Iflt-Nfloats)<.1) THEN
-5840 DISP "System paused, hit continue"
-5850 PAUSE
-5860 END IF
-5870 !
-5880 NEXT Iflt
+	5440 FOR Ipr=1 TO 500
+		5450 Pc=Deltap*(Ipr-1.)
+		5460 Qte=Te(Iflt,Ipr)
+		5470 Qsa=Sa(Iflt,Ipr)
+		5480 IF Qsa>900. THEN GOTO 5530
+		5490 IF Qte>900. THEN GOTO 5530
+		5500 CALL Sigma_t(Qsa,Qte,Qst)
+		5510 CALL Svanom(Qsa,Qte,0.,Sigma,Svan)
+		5520 Sa(Iflt,Ipr)=Svan
+		5530 NEXT Ipr
+	5540 ! Sa(Iflt,*) now contains SVAs
+	5550 !
+	5560 ! Compute dynamic height at surface P = Pmap relative to 1000
+	5570 Dhi=0.
+	5580 Q=.5*1.0E-5  ! = 0.5f/g
+	5590 Ipr0=INT(1.01+Pmap/Deltap)
+	5600 Ipr1=Ipr0+1
+	5610 !
+	5620 FOR Ipr=Ipr1 TO Ipref
+		5630 Dhi=Dhi+Q*(Sa(Iflt,Ipr)+Sa(Iflt,Ipr-1))*Deltap
+		5640 NEXT Ipr
+	5650 Dh(Iflt)=Dhi
+	5660 !
+	5670 IF Verb_opt>.5 THEN
+	5680 !
+	5690 H$=""
+	5700 IF Nhlt<.5 THEN GOTO 5750
+	5710 FOR Ii=1 TO Nhlt
+		5720 IF POS(Fltnm$(Iflt),Hlt$(Ii))>.5 THEN H$="<<<<<<<<<"
+		5730 NEXT Ii
+	5740 !
+	5750 IF Verb_opt>.5 THEN PRINT Iflt;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt);Dh(Iflt);H$
+	5760 END IF
+	5770 !
+	5780 !
+	5790 OUTPUT @Plist;Fltnm$(Iflt);Lat(Iflt);Lon(Iflt);Dh(Iflt)
+	5800 !
+	5810 !
+	5820 Fflt=20*INT(Iflt/20.)
+	5830 IF Pause_opt>.5 AND (ABS(Fflt-Iflt)<.1 OR ABS(Iflt-Nfloats)<.1) THEN
+	5840 DISP "System paused, hit continue"
+	5850 PAUSE
+	5860 END IF
+	5870 !
+	5880 NEXT Iflt
 5890 !
 5900 ASSIGN @Plist TO *
 5910 !
@@ -593,39 +593,39 @@
 5930 PRINT "Computing mean and standard deviation"
 5940 MAT Accpt=(1)
 5950 FOR Iter=1 TO 10
-5960 IF Verb_opt>.5 THEN PRINT "Iteration #";Iter
-5970 Dhbar=0.
-5980 Dhvar=0.
-5990 Mfloats=0
-6000 Nrej=0
-6010 FOR Iflt=1 TO Nfloats
-6020 IF Accpt(Iflt)>0 THEN
-6030 Dhbar=Dhbar+Dh(Iflt)
-6040 Dhvar=Dhvar+Dh(Iflt)*Dh(Iflt)
-6050 Mfloats=Mfloats+1
-6060 END IF
-6070 NEXT Iflt
-6080 Dhbar=Dhbar/Mfloats
-6090 Dhvar=Dhvar/Mfloats
-6100 Dhvar=Dhvar-Dhbar*Dhbar
-6110 !
-6120 Stdev=SQR(Dhvar)
-6130 Devmax=0.
-6140 FOR Iflt=1 TO Nfloats
-6150 IF Accpt(Iflt)>0 THEN
-6160 Devn=ABS((Dh(Iflt)-Dhbar)/Stdev)
-6170 IF Devn>Devmax THEN Devmax=Devn
-6180 IF Devn>3. THEN
-6190 Accpt(Iflt)=-1
-6200 IF Verb_opt>.5 THEN PRINT "Rejecting float # ";Iflt
-6210 Nrej=Nrej+1
-6220 END IF
-6230 END IF
-6240 NEXT Iflt
-6250 !
-6260 IF Verb_opt>.5 THEN PRINT "Maximum deviation = ";Devmax;" standard deviations."
-6270 IF Nrej<.5 THEN GOTO 6290
-6280 NEXT Iter
+	5960 IF Verb_opt>.5 THEN PRINT "Iteration #";Iter
+	5970 Dhbar=0.
+	5980 Dhvar=0.
+	5990 Mfloats=0
+	6000 Nrej=0
+	6010 FOR Iflt=1 TO Nfloats
+		6020 IF Accpt(Iflt)>0 THEN
+		6030 Dhbar=Dhbar+Dh(Iflt)
+		6040 Dhvar=Dhvar+Dh(Iflt)*Dh(Iflt)
+		6050 Mfloats=Mfloats+1
+		6060 END IF
+		6070 NEXT Iflt
+	6080 Dhbar=Dhbar/Mfloats
+	6090 Dhvar=Dhvar/Mfloats
+	6100 Dhvar=Dhvar-Dhbar*Dhbar
+	6110 !
+	6120 Stdev=SQR(Dhvar)
+	6130 Devmax=0.
+	6140 FOR Iflt=1 TO Nfloats
+		6150 IF Accpt(Iflt)>0 THEN
+		6160 Devn=ABS((Dh(Iflt)-Dhbar)/Stdev)
+		6170 IF Devn>Devmax THEN Devmax=Devn
+		6180 IF Devn>3. THEN
+		6190 Accpt(Iflt)=-1
+		6200 IF Verb_opt>.5 THEN PRINT "Rejecting float # ";Iflt
+		6210 Nrej=Nrej+1
+		6220 END IF
+		6230 END IF
+		6240 NEXT Iflt
+	6250 !
+	6260 IF Verb_opt>.5 THEN PRINT "Maximum deviation = ";Devmax;" standard deviations."
+	6270 IF Nrej<.5 THEN GOTO 6290
+	6280 NEXT Iter
 6290 ! Continuing
 6300 !
 6310 ! Now have a list of good float observations, bad ones have Accpt(i)=-1
@@ -635,17 +635,17 @@
 6350 !
 6360 ! First see if there are any duplicates
 6370 FOR Iflt=1 TO Nfloats-1
-6380 Dflt=Iflt
-6390 IF Accpt(Iflt)<0 THEN GOTO 6480
-6400 S$=Fltnm$(Iflt)
-6410 P1=POS(S$,"_")
-6420 P2=POS(S$,".")
-6430 Q$=Fltnm$(Iflt)[P1+1,P2-1]
-6440 FOR Jflt=Dflt+1 TO Nfloats
-6450 IF Accpt(Jflt)<0 THEN GOTO 6470
-6460 IF POS(Fltnm$(Jflt),Q$)>0 THEN GOTO 6530
-6470 NEXT Jflt
-6480 NEXT Iflt
+	6380 Dflt=Iflt
+	6390 IF Accpt(Iflt)<0 THEN GOTO 6480
+	6400 S$=Fltnm$(Iflt)
+	6410 P1=POS(S$,"_")
+	6420 P2=POS(S$,".")
+	6430 Q$=Fltnm$(Iflt)[P1+1,P2-1]
+	6440 FOR Jflt=Dflt+1 TO Nfloats
+		6450 IF Accpt(Jflt)<0 THEN GOTO 6470
+		6460 IF POS(Fltnm$(Jflt),Q$)>0 THEN GOTO 6530
+		6470 NEXT Jflt
+	6480 NEXT Iflt
 6490 ! No duplicates present
 6500 IF Verb_opt>.5 THEN PRINT "No more duplicates present"
 6510 GOTO 6800
@@ -656,14 +656,14 @@
 6560 Lonav=0.
 6570 Nav=0
 6580 FOR Jflt=Dflt TO Nfloats
-6590 IF POS(Fltnm$(Jflt),Q$)<1 THEN GOTO 6660
-6600 IF Dh(Jflt)<0 OR Dh(Jflt)>5. THEN Accpt(Jflt)=-1
-6610 IF Accpt(Jflt)<0 THEN GOTO 6660
-6620 Dhbar=Dhbar+Dh(Jflt)
-6630 Latav=Latav+Lat(Jflt)
-6640 Lonav=Lonav+Lon(Jflt)
-6650 Nav=Nav+1
-6660 NEXT Jflt
+	6590 IF POS(Fltnm$(Jflt),Q$)<1 THEN GOTO 6660
+	6600 IF Dh(Jflt)<0 OR Dh(Jflt)>5. THEN Accpt(Jflt)=-1
+	6610 IF Accpt(Jflt)<0 THEN GOTO 6660
+	6620 Dhbar=Dhbar+Dh(Jflt)
+	6630 Latav=Latav+Lat(Jflt)
+	6640 Lonav=Lonav+Lon(Jflt)
+	6650 Nav=Nav+1
+	6660 NEXT Jflt
 6670 IF Nav>.5 THEN
 6680 Dh(Dflt)=Dhbar/Nav
 6690 Lat(Dflt)=Latav/Nav
@@ -672,8 +672,8 @@
 6720 IF Verb_opt>.5 THEN PRINT "Eliminating duplicate entries of "&Q$;Nav;" of them."
 6730 !
 6740 FOR Jflt=Dflt+1 TO Nfloats
-6750 IF POS(Fltnm$(Jflt),Q$)>.5 THEN Accpt(Jflt)=-1
-6760 NEXT Jflt
+	6750 IF POS(Fltnm$(Jflt),Q$)>.5 THEN Accpt(Jflt)=-1
+	6760 NEXT Jflt
 6770 GOTO 6340
 6780 !
 6790 ! End of duplicate entry sort
@@ -693,11 +693,11 @@
 6930 ASSIGN @Pden TO Drive$&"\Projects\Argo\Density\Flts"&Dc$&".csv";FORMAT ON
 6940 !
 6950 FOR Iflt=1 TO Nfloats
-6960 IF Accpt(Iflt)>0 THEN
-6970 S$=VAL$(Lon(Iflt))&","&VAL$(Lat(Iflt))
-6980 OUTPUT @Pden;S$
-6990 END IF
-7000 NEXT Iflt
+	6960 IF Accpt(Iflt)>0 THEN
+	6970 S$=VAL$(Lon(Iflt))&","&VAL$(Lat(Iflt))
+	6980 OUTPUT @Pden;S$
+	6990 END IF
+	7000 NEXT Iflt
 7010 !
 7020 ASSIGN @Pden TO *
 7030 PRINT "Density file created at "&Drive$&"\Projects\Argo\Flts"&Dc$&".csv"
@@ -708,12 +708,12 @@
 7080 Dhvar=0.
 7090 Mfloats=0
 7100 FOR Iflt=1 TO Nfloats
-7110 IF Accpt(Iflt)>0 THEN
-7120 Dhbar=Dhbar+Dh(Iflt)
-7130 Dhvar=Dhvar+Dh(Iflt)*Dh(Iflt)
-7140 Mfloats=Mfloats+1
-7150 END IF
-7160 NEXT Iflt
+	7110 IF Accpt(Iflt)>0 THEN
+	7120 Dhbar=Dhbar+Dh(Iflt)
+	7130 Dhvar=Dhvar+Dh(Iflt)*Dh(Iflt)
+	7140 Mfloats=Mfloats+1
+	7150 END IF
+	7160 NEXT Iflt
 7170 Dhbar=Dhbar/Mfloats
 7180 Dhvar=Dhvar/Mfloats
 7190 Dhvar=Dhvar-Dhbar*Dhbar
@@ -722,8 +722,8 @@
 7220 MAT Dhsave=Dh
 7230 !
 7240 FOR Iflt=1 TO Nfloats
-7250 IF Accpt(Iflt)>0 THEN Dh(Iflt)=Dh(Iflt)-Dhbar
-7260 NEXT Iflt
+	7250 IF Accpt(Iflt)>0 THEN Dh(Iflt)=Dh(Iflt)-Dhbar
+	7260 NEXT Iflt
 7270 !
 7280 MAT Dhk=Dh
 7290 !
@@ -737,44 +737,44 @@
 7370 OUTPUT @Pvar;"0,1.00,0"
 7380 Frvarlast=1.
 7390 FOR Mq=1 TO Nmodes
-7400 IF Mq>3.5 THEN M=Mq
-7410 IF Mq<3.5 THEN M=4-Mq
-7420 M=Mq
-7430 !
-7440 ! Find best fit between Mode M and the data
-7450 Nent=0
-7460 FOR Iflt=1 TO Nfloats
-7470 IF Accpt(Iflt)>0 THEN
-7480 CALL Interp(E(*),M,65,91,Lat(Iflt),Lon(Iflt),Ef)
-7490 Dhf(Iflt)=Ef
-7500 Nent=Nent+1
-7510 END IF
-7520 NEXT Iflt
-7530 Q1=0.
-7540 Q2=0.
-7550 Ntemp=0
-7560 FOR Iflt=1 TO Nfloats
-7570 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
-7580 Q1=Q1+Dh(Iflt)*Dhf(Iflt)
-7590 Q2=Q2+Dhf(Iflt)*Dhf(Iflt)
-7600 Ntemp=Ntemp+1
-7610 END IF
-7620 NEXT Iflt
-7630 Evals(M)=Q1/Q2
-7640 Rvar=0.
-7650 FOR Iflt=1 TO Nfloats
-7660 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
-7670 Dh(Iflt)=Dh(Iflt)-Evals(M)*Dhf(Iflt)
-7680 Rvar=Rvar+Dh(Iflt)*Dh(Iflt)
-7690 END IF
-7700 NEXT Iflt
-7710 Rvar=Rvar/Ntemp
-7720 Frvar=Rvar/Dhvar
-7730 IF Verb_opt>.5 THEN PRINT "After fitting mode #";M;" residual variance = ";Frvar
-7740 Contvar=Frvarlast-Frvar
-7750 Frvarlast=Frvar
-7760 OUTPUT @Pvar;VAL$(M)&","&VAL$(Frvar)&","&VAL$(Contvar)
-7770 NEXT Mq
+	7400 IF Mq>3.5 THEN M=Mq
+	7410 IF Mq<3.5 THEN M=4-Mq
+	7420 M=Mq
+	7430 !
+	7440 ! Find best fit between Mode M and the data
+	7450 Nent=0
+	7460 FOR Iflt=1 TO Nfloats
+		7470 IF Accpt(Iflt)>0 THEN
+		7480 CALL Interp(E(*),M,65,91,Lat(Iflt),Lon(Iflt),Ef)
+		7490 Dhf(Iflt)=Ef
+		7500 Nent=Nent+1
+		7510 END IF
+		7520 NEXT Iflt
+	7530 Q1=0.
+	7540 Q2=0.
+	7550 Ntemp=0
+	7560 FOR Iflt=1 TO Nfloats
+		7570 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
+		7580 Q1=Q1+Dh(Iflt)*Dhf(Iflt)
+		7590 Q2=Q2+Dhf(Iflt)*Dhf(Iflt)
+		7600 Ntemp=Ntemp+1
+		7610 END IF
+		7620 NEXT Iflt
+	7630 Evals(M)=Q1/Q2
+	7640 Rvar=0.
+	7650 FOR Iflt=1 TO Nfloats
+		7660 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
+		7670 Dh(Iflt)=Dh(Iflt)-Evals(M)*Dhf(Iflt)
+		7680 Rvar=Rvar+Dh(Iflt)*Dh(Iflt)
+		7690 END IF
+		7700 NEXT Iflt
+	7710 Rvar=Rvar/Ntemp
+	7720 Frvar=Rvar/Dhvar
+	7730 IF Verb_opt>.5 THEN PRINT "After fitting mode #";M;" residual variance = ";Frvar
+	7740 Contvar=Frvarlast-Frvar
+	7750 Frvarlast=Frvar
+	7760 OUTPUT @Pvar;VAL$(M)&","&VAL$(Frvar)&","&VAL$(Contvar)
+	7770 NEXT Mq
 7780 !
 7790 ASSIGN @Pvar TO *
 7800 !
@@ -792,28 +792,28 @@
 7920 Dhbar_ub=0.
 7930 Knt=0
 7940 FOR Iflt=1 TO Nfloats
-7950 IF Dhf(Iflt)>90. THEN GOTO 8160
-7960 IF Accpt(Iflt)<0 THEN GOTO 8160
-7970 Aj=1.0+3.*(Lat(Iflt)-30.)
-7980 J1=INT(Aj)
-7990 Rj=Aj-J1
-8000 Ai=1.0+(Lon(Iflt)-180.)
-8010 I1=INT(Ai)
-8020 Ri=Ai-I1
-8030 IF I1>Nx-1.01 THEN GOTO 8160
-8040 IF J1>Ny-1.01 THEN GOTO 8160
-8050 X1=Dhfit(I1,J1)
-8060 X2=Dhfit(I1,J1+1)
-8070 X3=Dhfit(I1+1,J1)
-8080 X4=Dhfit(I1+1,J1)
-8090 Xmax=MAX(X1,X2,X3,X4)
-8100 IF Xmax>90. THEN GOTO 8160
-8110 X14=X1+Ri*(X4-X1)
-8120 X23=X2+Ri*(X3-X2)
-8130 Xi=X14+Rj*(X23-X14)
-8140 Dhbar_ub=Dhbar_ub+Dhsave(Iflt)-Xi
-8150 Knt=Knt+1.0
-8160 NEXT Iflt
+	7950 IF Dhf(Iflt)>90. THEN GOTO 8160
+	7960 IF Accpt(Iflt)<0 THEN GOTO 8160
+	7970 Aj=1.0+3.*(Lat(Iflt)-30.)
+	7980 J1=INT(Aj)
+	7990 Rj=Aj-J1
+	8000 Ai=1.0+(Lon(Iflt)-180.)
+	8010 I1=INT(Ai)
+	8020 Ri=Ai-I1
+	8030 IF I1>Nx-1.01 THEN GOTO 8160
+	8040 IF J1>Ny-1.01 THEN GOTO 8160
+	8050 X1=Dhfit(I1,J1)
+	8060 X2=Dhfit(I1,J1+1)
+	8070 X3=Dhfit(I1+1,J1)
+	8080 X4=Dhfit(I1+1,J1)
+	8090 Xmax=MAX(X1,X2,X3,X4)
+	8100 IF Xmax>90. THEN GOTO 8160
+	8110 X14=X1+Ri*(X4-X1)
+	8120 X23=X2+Ri*(X3-X2)
+	8130 Xi=X14+Rj*(X23-X14)
+	8140 Dhbar_ub=Dhbar_ub+Dhsave(Iflt)-Xi
+	8150 Knt=Knt+1.0
+	8160 NEXT Iflt
 8170 Dhbar_ub=Dhbar_ub/Knt
 8180 PRINT "Unbiassed mean value = ";Dhbar_ub
 8190 !
@@ -821,12 +821,12 @@
 8210 Var_ub=0.
 8220 Knt=0.
 8230 FOR Iflt=1 TO Nfloats
-8240 IF Dhf(Iflt)>90. THEN GOTO 8290
-8250 IF Accpt(Iflt)<0 THEN GOTO 8290
-8260 Dhp=Dhsave(Iflt)-Dhbar_ub
-8270 Var_ub=Var_ub+Dhp*Dhp
-8280 Knt=Knt+1.
-8290 NEXT Iflt
+	8240 IF Dhf(Iflt)>90. THEN GOTO 8290
+	8250 IF Accpt(Iflt)<0 THEN GOTO 8290
+	8260 Dhp=Dhsave(Iflt)-Dhbar_ub
+	8270 Var_ub=Var_ub+Dhp*Dhp
+	8280 Knt=Knt+1.
+	8290 NEXT Iflt
 8300 Var_ub=Var_ub/Knt
 8310 Sd_ub=SQR(Var_ub)
 8320 Frvar_ub=Rvar/Var_ub
@@ -835,16 +835,16 @@
 8350 ! Now add mean and modes
 8360 MAT Dhfit=(Dhbar_ub)
 8370 FOR I=1 TO Nx
-8380 FOR J=1 TO Ny
-8390 IF E(I,J,1)<99. THEN
-8400 FOR M=1 TO Nmodes
-8410 Dhfit(I,J)=Dhfit(I,J)+Evals(M)*E(I,J,M)
-8420 NEXT M
-8430 ELSE
-8440 Dhfit(I,J)=99.99
-8450 END IF
-8460 NEXT J
-8470 NEXT I
+	8380 FOR J=1 TO Ny
+		8390 IF E(I,J,1)<99. THEN
+		8400 FOR M=1 TO Nmodes
+			8410 Dhfit(I,J)=Dhfit(I,J)+Evals(M)*E(I,J,M)
+			8420 NEXT M
+		8430 ELSE
+		8440 Dhfit(I,J)=99.99
+		8450 END IF
+		8460 NEXT J
+	8470 NEXT I
 8480 !
 8490 ON ERROR GOTO 8510
 8500 PURGE Drive$&"\list.csv"
@@ -852,30 +852,30 @@
 8520 CREATE Drive$&"\list.csv",1
 8530 ASSIGN @Pout TO Drive$&"\list.csv";FORMAT ON
 8540 FOR Iflt=1 TO Nfloats
-8550 IF Accpt(Iflt)<0. THEN GOTO 8780
-8560 !
-8570 Jfp=1+3.*(Lat(Iflt)-30.)
-8580 J0=INT(Jfp+1.0E-5)
-8590 Jr=Jfp-J0
-8600 !
-8610 Ifp=ABS(Lon(Iflt))-179.
-8620 I0=INT(Ifp+1.0E-5)
-8630 Ir=Ifp=I0
-8640 !
-8650 Dh1=Dhfit(I0,J0)
-8660 Dh2=Dhfit(I0,J0+1)
-8670 Dh3=Dhfit(I0+1,J0+1)
-8680 Dh4=Dhfit(I0+1,J0)
-8690 Dhmax=MAX(Dh1,Dh2,Dh3,Dh4)
-8700 IF Dhmax>90. THEN GOTO 8780
-8710 Dha=Dh2+(Dh3-Dh2)*Ir
-8720 Dhb=Dh1+(Dh4-Dh1)*Ir
-8730 Dhc=Dhb+(Dha-Dhb)*Jr
-8740 !
-8750 S$=VAL$(Dhsave(Iflt))&","&VAL$(Dhc)&","&VAL$(Dhsave(Iflt)-Dhc)&","&VAL$(Lon(Iflt))&","&VAL$(Lat(Iflt))
-8760 OUTPUT @Pout;S$
-8770 !
-8780 NEXT Iflt
+	8550 IF Accpt(Iflt)<0. THEN GOTO 8780
+	8560 !
+	8570 Jfp=1+3.*(Lat(Iflt)-30.)
+	8580 J0=INT(Jfp+1.0E-5)
+	8590 Jr=Jfp-J0
+	8600 !
+	8610 Ifp=ABS(Lon(Iflt))-179.
+	8620 I0=INT(Ifp+1.0E-5)
+	8630 Ir=Ifp=I0
+	8640 !
+	8650 Dh1=Dhfit(I0,J0)
+	8660 Dh2=Dhfit(I0,J0+1)
+	8670 Dh3=Dhfit(I0+1,J0+1)
+	8680 Dh4=Dhfit(I0+1,J0)
+	8690 Dhmax=MAX(Dh1,Dh2,Dh3,Dh4)
+	8700 IF Dhmax>90. THEN GOTO 8780
+	8710 Dha=Dh2+(Dh3-Dh2)*Ir
+	8720 Dhb=Dh1+(Dh4-Dh1)*Ir
+	8730 Dhc=Dhb+(Dha-Dhb)*Jr
+	8740 !
+	8750 S$=VAL$(Dhsave(Iflt))&","&VAL$(Dhc)&","&VAL$(Dhsave(Iflt)-Dhc)&","&VAL$(Lon(Iflt))&","&VAL$(Lat(Iflt))
+	8760 OUTPUT @Pout;S$
+	8770 !
+	8780 NEXT Iflt
 8790 ASSIGN @Pout TO *
 8800 PRINT "Completed Drive$&\list.csv, list of fitted and observed Dyn Hgts"
 8810 !
@@ -919,73 +919,73 @@
 9190 Divsl=0.
 9200 Knt=0
 9210 FOR Latd=40 TO 58 STEP 1
-9220 J=INT(1.01+3.*(Latd-30.))
-9230 FOR Im=1 TO 60
-9240 I=66-Im
-9250 IF Dhfit(I,J)>90. THEN GOTO 9280
-9260 Dh1=Dhfit(I,J)
-9270 GOTO 9290
-9280 NEXT Im
-9290  ! Have Dh1
-9300 Divsl=Divsl+Dh1
-9310 Knt=Knt+1
-9320 NEXT Latd
+	9220 J=INT(1.01+3.*(Latd-30.))
+	9230 FOR Im=1 TO 60
+		9240 I=66-Im
+		9250 IF Dhfit(I,J)>90. THEN GOTO 9280
+		9260 Dh1=Dhfit(I,J)
+		9270 GOTO 9290
+		9280 NEXT Im
+	9290  ! Have Dh1
+	9300 Divsl=Divsl+Dh1
+	9310 Knt=Knt+1
+	9320 NEXT Latd
 9330 Divsl=Divsl/Knt
 9340  !
 9350 PEN 2
 9360 FOR Idiv=1 TO 64
-9370 X0=Dx*(Idiv-1.)
-9380 FOR Jdiv=1 TO 90
-9390 Y0=Dy*(Jdiv-1.)
-9400 X1=Dhfit(Idiv,Jdiv)
-9410 X2=Dhfit(Idiv,Jdiv+1)
-9420 X3=Dhfit(Idiv+1,Jdiv+1)
-9430 X4=Dhfit(Idiv+1,Jdiv)
-9440 Xmax=MAX(X1,X2,X3,X4)
-9450 Xmin=MIN(X1,X2,X3,X4)
-9460 IF Xmax>90. THEN GOTO 9870
-9470 IF Xmax<Divsl THEN GOTO 9870
-9480 IF Xmin>Divsl THEN GOTO 9870
-9490  !
-9500  ! Contour passes through the box
-9510 Ip=0
-9520  !
-9530 Xmax=MAX(X1,X2)
-9540 Xmin=MIN(X1,X2)
-9550 IF Divsl>=Xmin AND Divsl<=Xmax THEN
-9560 Ip=Ip+1
-9570 Xp(Ip)=X0
-9580 Yp(Ip)=Y0+Dy*(Divsl-X1)/(X2-X1)
-9590 END IF
-9600  !
-9610 Xmax=MAX(X2,X3)
-9620 Xmin=MIN(X2,X3)
-9630 IF Divsl>=Xmin AND Divsl<=Xmax THEN
-9640 Ip=Ip+1
-9650 Xp(Ip)=X0+Dx*(Divsl-X2)/(X3-X2)
-9660 Yp(Ip)=Y0+Dy
-9670 END IF
-9680  !
-9690 Xmax=MAX(X3,X4)
-9700 Xmin=MIN(X3,X4)
-9710 IF Divsl>=Xmin AND Divsl<=Xmax THEN
-9720 Ip=Ip+1
-9730 Xp(Ip)=X0+Dx
-9740 Yp(Ip)=Y0+Dy*(Divsl-X4)/(X3-X4)
-9750 END IF
-9760  !
-9770 Xmax=MAX(X1,X4)
-9780 Xmin=MIN(X1,X4)
-9790 IF Divsl>=Xmin AND Divsl<=Xmax THEN
-9800 Ip=Ip+1
-9810 Xp(Ip)=X0+Dx*(Divsl-X1)/(X4-X1)
-9820 Yp(Ip)=Y0
-9830 END IF
-9840 MOVE Xp(1),Yp(1)
-9850 DRAW Xp(2),Yp(2)
-9860  !
-9870 NEXT Jdiv
-9880 NEXT Idiv
+	9370 X0=Dx*(Idiv-1.)
+	9380 FOR Jdiv=1 TO 90
+		9390 Y0=Dy*(Jdiv-1.)
+		9400 X1=Dhfit(Idiv,Jdiv)
+		9410 X2=Dhfit(Idiv,Jdiv+1)
+		9420 X3=Dhfit(Idiv+1,Jdiv+1)
+		9430 X4=Dhfit(Idiv+1,Jdiv)
+		9440 Xmax=MAX(X1,X2,X3,X4)
+		9450 Xmin=MIN(X1,X2,X3,X4)
+		9460 IF Xmax>90. THEN GOTO 9870
+		9470 IF Xmax<Divsl THEN GOTO 9870
+		9480 IF Xmin>Divsl THEN GOTO 9870
+		9490  !
+		9500  ! Contour passes through the box
+		9510 Ip=0
+		9520  !
+		9530 Xmax=MAX(X1,X2)
+		9540 Xmin=MIN(X1,X2)
+		9550 IF Divsl>=Xmin AND Divsl<=Xmax THEN
+		9560 Ip=Ip+1
+		9570 Xp(Ip)=X0
+		9580 Yp(Ip)=Y0+Dy*(Divsl-X1)/(X2-X1)
+		9590 END IF
+		9600  !
+		9610 Xmax=MAX(X2,X3)
+		9620 Xmin=MIN(X2,X3)
+		9630 IF Divsl>=Xmin AND Divsl<=Xmax THEN
+		9640 Ip=Ip+1
+		9650 Xp(Ip)=X0+Dx*(Divsl-X2)/(X3-X2)
+		9660 Yp(Ip)=Y0+Dy
+		9670 END IF
+		9680  !
+		9690 Xmax=MAX(X3,X4)
+		9700 Xmin=MIN(X3,X4)
+		9710 IF Divsl>=Xmin AND Divsl<=Xmax THEN
+		9720 Ip=Ip+1
+		9730 Xp(Ip)=X0+Dx
+		9740 Yp(Ip)=Y0+Dy*(Divsl-X4)/(X3-X4)
+		9750 END IF
+		9760  !
+		9770 Xmax=MAX(X1,X4)
+		9780 Xmin=MIN(X1,X4)
+		9790 IF Divsl>=Xmin AND Divsl<=Xmax THEN
+		9800 Ip=Ip+1
+		9810 Xp(Ip)=X0+Dx*(Divsl-X1)/(X4-X1)
+		9820 Yp(Ip)=Y0
+		9830 END IF
+		9840 MOVE Xp(1),Yp(1)
+		9850 DRAW Xp(2),Yp(2)
+		9860  !
+		9870 NEXT Jdiv
+	9880 NEXT Idiv
 9890  !
 9900 PEN 6
 9910 MOVE Scx*(180.-145.),Scy*(50.-30.)
@@ -999,50 +999,50 @@
 9990 DRAW 0,0
 10000!
 10010 FOR Lonm=-180 TO -116 STEP 1
-10020 Xm=(180+Lonm)*Dx
-10030 MOVE Xm,0
-10040 IDRAW 0,Dy
-10050 MOVE Xm,Yl
-10060 IDRAW 0,-Dy
-10070 NEXT Lonm
+	10020 Xm=(180+Lonm)*Dx
+	10030 MOVE Xm,0
+	10040 IDRAW 0,Dy
+	10050 MOVE Xm,Yl
+	10060 IDRAW 0,-Dy
+	10070 NEXT Lonm
 10080!
 10090 FOR Lonm=-180 TO -116 STEP 10
-10100 Xm=(180+Lonm)*Dx
-10110 MOVE Xm,0
-10120 IDRAW 0,Dy*2.
-10130 MOVE Xm,Yl
-10140 IDRAW 0,-Dy*2.
-10150 NEXT Lonm
+	10100 Xm=(180+Lonm)*Dx
+	10110 MOVE Xm,0
+	10120 IDRAW 0,Dy*2.
+	10130 MOVE Xm,Yl
+	10140 IDRAW 0,-Dy*2.
+	10150 NEXT Lonm
 10160!
 10170 LORG 6
 10180 CSIZE 3
 10190 FOR Lonm=-180 TO -116 STEP 20
-10200 Xm=(180+Lonm)*Dx
-10210 MOVE Xm,-Dy
-10220 Lonq=ABS(Lonm)
-10230 Lonq$=VAL$(Lonq)&"°W"
-10240 LABEL "  "&Lonq$
-10250 NEXT Lonm
+	10200 Xm=(180+Lonm)*Dx
+	10210 MOVE Xm,-Dy
+	10220 Lonq=ABS(Lonm)
+	10230 Lonq$=VAL$(Lonq)&"°W"
+	10240 LABEL "  "&Lonq$
+	10250 NEXT Lonm
 10260!
 10270 FOR Latm=30 TO 60 STEP 1
-10280 Ym=(Latm-30.)*Dy*3.
-10290 MOVE 0,Ym
-10300 IDRAW Dy,0
-10310 MOVE Xl,Ym
-10320 IDRAW -Dy,0
-10330 NEXT Latm
+	10280 Ym=(Latm-30.)*Dy*3.
+	10290 MOVE 0,Ym
+	10300 IDRAW Dy,0
+	10310 MOVE Xl,Ym
+	10320 IDRAW -Dy,0
+	10330 NEXT Latm
 10340!
 10350 LORG 8
 10360 FOR Latm=30 TO 60 STEP 10
-10370 Ym=(Latm-30.)*Dy*3.
-10380 MOVE 0,Ym
-10390 IDRAW Dy*2.,0
-10400 MOVE Xl,Ym
-10410 IDRAW -Dy*2.,0
-10420!
-10430 MOVE -Dy,Ym
-10440 LABEL VAL$(Latm)&"°N"
-10450 NEXT Latm
+	10370 Ym=(Latm-30.)*Dy*3.
+	10380 MOVE 0,Ym
+	10390 IDRAW Dy*2.,0
+	10400 MOVE Xl,Ym
+	10410 IDRAW -Dy*2.,0
+	10420!
+	10430 MOVE -Dy,Ym
+	10440 LABEL VAL$(Latm)&"°N"
+	10450 NEXT Latm
 10460!
 10470 Conned=1.
 10480 !
@@ -1061,32 +1061,32 @@
 10610 Iminmin=0
 10620 Jminmin=0
 10630 FOR I=3 TO 4
-10640 ! Find first non-trivial value
-10650 Jfirst=92
-10660 Jfirst=Jfirst-1
-10670 IF Dhfit(I,Jfirst)>90. THEN GOTO 10660
-10680 !
-10690 FOR L=1 TO 18
-10700 J=Jfirst-L
-10710 IF Dhfit(I,J)<Dhfit(I,J+1) AND Dhfit(I,J)<Dhfit(I,J-1) THEN
-10720 Dhmin=Dhfit(I,J)
-10730 Imin=I
-10740 Jmin=J
-10750 GOTO 10820
-10760 END IF
-10770 !
-10780 NEXT L
-10790 ! Drop through, go to next I value, no min found
-10800 GOTO 10890
-10810 !
-10820 ! Found a local minimum
-10830 IF Dhmin<Dhminmin THEN
-10840 Dhminmin=Dhmin
-10850 Iminmin=Imin
-10860 Jminmin=Jmin
-10870 END IF
-10880 !
-10890 NEXT I
+	10640 ! Find first non-trivial value
+	10650 Jfirst=92
+	10660 Jfirst=Jfirst-1
+	10670 IF Dhfit(I,Jfirst)>90. THEN GOTO 10660
+	10680 !
+	10690 FOR L=1 TO 18
+		10700 J=Jfirst-L
+		10710 IF Dhfit(I,J)<Dhfit(I,J+1) AND Dhfit(I,J)<Dhfit(I,J-1) THEN
+		10720 Dhmin=Dhfit(I,J)
+		10730 Imin=I
+		10740 Jmin=J
+		10750 GOTO 10820
+		10760 END IF
+		10770 !
+		10780 NEXT L
+	10790 ! Drop through, go to next I value, no min found
+	10800 GOTO 10890
+	10810 !
+	10820 ! Found a local minimum
+	10830 IF Dhmin<Dhminmin THEN
+	10840 Dhminmin=Dhmin
+	10850 Iminmin=Imin
+	10860 Jminmin=Jmin
+	10870 END IF
+	10880 !
+	10890 NEXT I
 10900 !
 10910 ! Found a trio of suitable numbers
 10920 !D_alaska=D2
@@ -1095,80 +1095,80 @@
 10950 ! Continue to contouring of D_alaska
 10960 Dc=D_alaska
 10970 FOR I=1 TO 64
-10980 X0=Dx*(I-1.)
-10990 FOR J=1 TO 90
-11000 Y0=Dy*(J-1.)
-11010 D1=Dhfit(I,J)
-11020 D2=Dhfit(I,J+1)
-11030 D3=Dhfit(I+1,J+1)
-11040 D4=Dhfit(I+1,J)
-11050 Dmax=MAX(D1,D2,D3,D4)
-11060 Dmin=MIN(D1,D2,D3,D4)
-11070 IF Dmax>90. THEN GOTO 11700
-11080 IF Dmax<Dc THEN GOTO 11700
-11090 IF Dmin>Dc THEN GOTO 11700
-11100 !
-11110 Ip=0
-11120 Dmin=MIN(D1,D2)
-11130 Dmax=MAX(D1,D2)
-11140 IF Dc>=Dmin AND Dc<=Dmax THEN
-11150 Ip=1
-11160 Xp(Ip)=X0
-11170 Yp(Ip)=Y0+Dy*(Dc-D1)/(D2-D1)
-11180 END IF
-11190 !
-11200 Dmin=MIN(D2,D3)
-11210 Dmax=MAX(D2,D3)
-11220 IF Dc>=Dmin AND Dc<=Dmax THEN
-11230 Ip=Ip+1
-11240 Xp(Ip)=X0+Dx*(Dc-D2)/(D3-D2)
-11250 Yp(Ip)=Y0+Dy
-11260 END IF
-11270 !
-11280 Dmin=MIN(D3,D4)
-11290 Dmax=MAX(D3,D4)
-11300 IF Dc>=Dmin AND Dc<=Dmax THEN
-11310 Ip=Ip+1
-11320 Xp(Ip)=X0+Dx
-11330 Yp(Ip)=Y0+Dy*(Dc-D4)/(D3-D4)
-11340 END IF
-11350 !
-11360 Dmin=MIN(D4,D1)
-11370 Dmax=MAX(D4,D1)
-11380 IF Dc>=Dmin AND Dc<=Dmax THEN
-11390 Ip=Ip+1
-11400 Xp(Ip)=X0+Dx*(Dc-D1)/(D4-D1)
-11410 Yp(Ip)=Y0
-11420 END IF
-11430 IF Ip<3.5 THEN
-11440 MOVE Xp(1),Yp(1)
-11450 DRAW Xp(2),Yp(2)
-11460 END IF
-11470 !
-11480 IF Ip>3.5 THEN
-11490 Dcen=.25*(D1+D2+D3+D4)
-11500 Opt=2
-11510 IF D1>=Dc AND Dc>=Dcen THEN Opt=1
-11520 IF D1<=Dc AND Dc<=Dcen THEN Opt=1
-11530 !
-11540 IF ABS(Opt-1.)<.1 THEN
-11550 MOVE Xp(1),Yp(1)
-11560 DRAW Xp(4),Yp(4)
-11570 MOVE Xp(2),Yp(2)
-11580 DRAW Xp(3),Yp(3)
-11590 END IF
-11600 !
-11610 IF ABS(Opt-2.)<.1 THEN
-11620 MOVE Xp(1),Yp(1)
-11630 DRAW Xp(2),Yp(2)
-11640 MOVE Xp(3),Yp(3)
-11650 DRAW Xp(4),Yp(4)
-11660 END IF
-11670 !
-11680 END IF
-11690 !
-11700 NEXT J
-11710 NEXT I
+	10980 X0=Dx*(I-1.)
+	10990 FOR J=1 TO 90
+		11000 Y0=Dy*(J-1.)
+		11010 D1=Dhfit(I,J)
+		11020 D2=Dhfit(I,J+1)
+		11030 D3=Dhfit(I+1,J+1)
+		11040 D4=Dhfit(I+1,J)
+		11050 Dmax=MAX(D1,D2,D3,D4)
+		11060 Dmin=MIN(D1,D2,D3,D4)
+		11070 IF Dmax>90. THEN GOTO 11700
+		11080 IF Dmax<Dc THEN GOTO 11700
+		11090 IF Dmin>Dc THEN GOTO 11700
+		11100 !
+		11110 Ip=0
+		11120 Dmin=MIN(D1,D2)
+		11130 Dmax=MAX(D1,D2)
+		11140 IF Dc>=Dmin AND Dc<=Dmax THEN
+		11150 Ip=1
+		11160 Xp(Ip)=X0
+		11170 Yp(Ip)=Y0+Dy*(Dc-D1)/(D2-D1)
+		11180 END IF
+		11190 !
+		11200 Dmin=MIN(D2,D3)
+		11210 Dmax=MAX(D2,D3)
+		11220 IF Dc>=Dmin AND Dc<=Dmax THEN
+		11230 Ip=Ip+1
+		11240 Xp(Ip)=X0+Dx*(Dc-D2)/(D3-D2)
+		11250 Yp(Ip)=Y0+Dy
+		11260 END IF
+		11270 !
+		11280 Dmin=MIN(D3,D4)
+		11290 Dmax=MAX(D3,D4)
+		11300 IF Dc>=Dmin AND Dc<=Dmax THEN
+		11310 Ip=Ip+1
+		11320 Xp(Ip)=X0+Dx
+		11330 Yp(Ip)=Y0+Dy*(Dc-D4)/(D3-D4)
+		11340 END IF
+		11350 !
+		11360 Dmin=MIN(D4,D1)
+		11370 Dmax=MAX(D4,D1)
+		11380 IF Dc>=Dmin AND Dc<=Dmax THEN
+		11390 Ip=Ip+1
+		11400 Xp(Ip)=X0+Dx*(Dc-D1)/(D4-D1)
+		11410 Yp(Ip)=Y0
+		11420 END IF
+		11430 IF Ip<3.5 THEN
+		11440 MOVE Xp(1),Yp(1)
+		11450 DRAW Xp(2),Yp(2)
+		11460 END IF
+		11470 !
+		11480 IF Ip>3.5 THEN
+		11490 Dcen=.25*(D1+D2+D3+D4)
+		11500 Opt=2
+		11510 IF D1>=Dc AND Dc>=Dcen THEN Opt=1
+		11520 IF D1<=Dc AND Dc<=Dcen THEN Opt=1
+		11530 !
+		11540 IF ABS(Opt-1.)<.1 THEN
+		11550 MOVE Xp(1),Yp(1)
+		11560 DRAW Xp(4),Yp(4)
+		11570 MOVE Xp(2),Yp(2)
+		11580 DRAW Xp(3),Yp(3)
+		11590 END IF
+		11600 !
+		11610 IF ABS(Opt-2.)<.1 THEN
+		11620 MOVE Xp(1),Yp(1)
+		11630 DRAW Xp(2),Yp(2)
+		11640 MOVE Xp(3),Yp(3)
+		11650 DRAW Xp(4),Yp(4)
+		11660 END IF
+		11670 !
+		11680 END IF
+		11690 !
+		11700 NEXT J
+	11710 NEXT I
 11720 !
 11730 PEN 1
 11740 ! End of Alaska gyre contouring
@@ -1223,11 +1223,11 @@
 12230 Isad=28
 12240 Sad=-1
 12250 FOR J=2 TO 30
-12260 Dc=Dhfit(Isad,J)
-12270 IF Dc>=Dhfit(Isad,J-1.) AND Dc>=Dhfit(Isad,J+1) THEN Sad=1
-12280 IF Sad>.1 THEN GOTO 12330
-12290 !
-12300 NEXT J
+	12260 Dc=Dhfit(Isad,J)
+	12270 IF Dc>=Dhfit(Isad,J-1.) AND Dc>=Dhfit(Isad,J+1) THEN Sad=1
+	12280 IF Sad>.1 THEN GOTO 12330
+	12290 !
+	12300 NEXT J
 12310 GOTO 12340
 12320 !
 12330 D_ccur=Dc
@@ -1239,80 +1239,80 @@
 12390 GLOAD Scrn(*)
 12400 !
 12410 FOR I=1 TO 64
-12420 X0=Dx*(I-1.)
-12430 FOR J=1 TO 90
-12440 Y0=Dy*(J-1.)
-12450 D1=Dhfit(I,J)
-12460 D2=Dhfit(I,J+1)
-12470 D3=Dhfit(I+1,J+1)
-12480 D4=Dhfit(I+1,J)
-12490 Dmax=MAX(D1,D2,D3,D4)
-12500 Dmin=MIN(D1,D2,D3,D4)
-12510 IF Dmax>90. THEN GOTO 13140
-12520 IF Dmax<Dc THEN GOTO 13140
-12530 IF Dmin>Dc THEN GOTO 13140
-12540 !
-12550 Ip=0
-12560 Dmin=MIN(D1,D2)
-12570 Dmax=MAX(D1,D2)
-12580 IF Dc>=Dmin AND Dc<=Dmax THEN
-12590 Ip=1
-12600 Xp(Ip)=X0
-12610 Yp(Ip)=Y0+Dy*(Dc-D1)/(D2-D1)
-12620 END IF
-12630 !
-12640 Dmin=MIN(D2,D3)
-12650 Dmax=MAX(D2,D3)
-12660 IF Dc>=Dmin AND Dc<=Dmax THEN
-12670 Ip=Ip+1
-12680 Xp(Ip)=X0+Dx*(Dc-D2)/(D3-D2)
-12690 Yp(Ip)=Y0+Dy
-12700 END IF
-12710 !
-12720 Dmin=MIN(D3,D4)
-12730 Dmax=MAX(D3,D4)
-12740 IF Dc>=Dmin AND Dc<=Dmax THEN
-12750 Ip=Ip+1
-12760 Xp(Ip)=X0+Dx
-12770 Yp(Ip)=Y0+Dy*(Dc-D4)/(D3-D4)
-12780 END IF
-12790 !
-12800 Dmin=MIN(D4,D1)
-12810 Dmax=MAX(D4,D1)
-12820 IF Dc>=Dmin AND Dc<=Dmax THEN
-12830 Ip=Ip+1
-12840 Xp(Ip)=X0+Dx*(Dc-D1)/(D4-D1)
-12850 Yp(Ip)=Y0
-12860 END IF
-12870 IF Ip<3.5 THEN
-12880 MOVE Xp(1),Yp(1)
-12890 DRAW Xp(2),Yp(2)
-12900 END IF
-12910 !
-12920 IF Ip>3.5 THEN
-12930 Dcen=.25*(D1+D2+D3+D4)
-12940 Opt=2
-12950 IF D1>=Dc AND Dc>=Dcen THEN Opt=1
-12960 IF D1<=Dc AND Dc<=Dcen THEN Opt=1
-12970 !
-12980 IF ABS(Opt-1.)<.1 THEN
-12990 MOVE Xp(1),Yp(1)
-13000 DRAW Xp(4),Yp(4)
-13010 MOVE Xp(2),Yp(2)
-13020 DRAW Xp(3),Yp(3)
-13030 END IF
-13040 !
-13050 IF ABS(Opt-2.)<.1 THEN
-13060 MOVE Xp(1),Yp(1)
-13070 DRAW Xp(2),Yp(2)
-13080 MOVE Xp(3),Yp(3)
-13090 DRAW Xp(4),Yp(4)
-13100 END IF
-13110 !
-13120 END IF
-13130 !
-13140 NEXT J
-13150 NEXT I
+	12420 X0=Dx*(I-1.)
+		12430 FOR J=1 TO 90
+		12440 Y0=Dy*(J-1.)
+		12450 D1=Dhfit(I,J)
+		12460 D2=Dhfit(I,J+1)
+		12470 D3=Dhfit(I+1,J+1)
+		12480 D4=Dhfit(I+1,J)
+		12490 Dmax=MAX(D1,D2,D3,D4)
+		12500 Dmin=MIN(D1,D2,D3,D4)
+		12510 IF Dmax>90. THEN GOTO 13140
+		12520 IF Dmax<Dc THEN GOTO 13140
+		12530 IF Dmin>Dc THEN GOTO 13140
+		12540 !
+		12550 Ip=0
+		12560 Dmin=MIN(D1,D2)
+		12570 Dmax=MAX(D1,D2)
+		12580 IF Dc>=Dmin AND Dc<=Dmax THEN
+		12590 Ip=1
+		12600 Xp(Ip)=X0
+		12610 Yp(Ip)=Y0+Dy*(Dc-D1)/(D2-D1)
+		12620 END IF
+		12630 !
+		12640 Dmin=MIN(D2,D3)
+		12650 Dmax=MAX(D2,D3)
+		12660 IF Dc>=Dmin AND Dc<=Dmax THEN
+		12670 Ip=Ip+1
+		12680 Xp(Ip)=X0+Dx*(Dc-D2)/(D3-D2)
+		12690 Yp(Ip)=Y0+Dy
+		12700 END IF
+		12710 !
+		12720 Dmin=MIN(D3,D4)
+		12730 Dmax=MAX(D3,D4)
+		12740 IF Dc>=Dmin AND Dc<=Dmax THEN
+		12750 Ip=Ip+1
+		12760 Xp(Ip)=X0+Dx
+		12770 Yp(Ip)=Y0+Dy*(Dc-D4)/(D3-D4)
+		12780 END IF
+		12790 !
+		12800 Dmin=MIN(D4,D1)
+		12810 Dmax=MAX(D4,D1)
+		12820 IF Dc>=Dmin AND Dc<=Dmax THEN
+		12830 Ip=Ip+1
+		12840 Xp(Ip)=X0+Dx*(Dc-D1)/(D4-D1)
+		12850 Yp(Ip)=Y0
+		12860 END IF
+		12870 IF Ip<3.5 THEN
+		12880 MOVE Xp(1),Yp(1)
+		12890 DRAW Xp(2),Yp(2)
+		12900 END IF
+		12910 !
+		12920 IF Ip>3.5 THEN
+		12930 Dcen=.25*(D1+D2+D3+D4)
+		12940 Opt=2
+		12950 IF D1>=Dc AND Dc>=Dcen THEN Opt=1
+		12960 IF D1<=Dc AND Dc<=Dcen THEN Opt=1
+		12970 !
+		12980 IF ABS(Opt-1.)<.1 THEN
+		12990 MOVE Xp(1),Yp(1)
+		13000 DRAW Xp(4),Yp(4)
+		13010 MOVE Xp(2),Yp(2)
+		13020 DRAW Xp(3),Yp(3)
+		13030 END IF
+		13040 !
+		13050 IF ABS(Opt-2.)<.1 THEN
+		13060 MOVE Xp(1),Yp(1)
+		13070 DRAW Xp(2),Yp(2)
+		13080 MOVE Xp(3),Yp(3)
+		13090 DRAW Xp(4),Yp(4)
+		13100 END IF
+		13110 !
+		13120 END IF
+		13130 !
+		13140 NEXT J
+	13150 NEXT I
 13160 !
 13170 PEN 1
 13180 ! End of contouring
@@ -1372,84 +1372,84 @@
 13720 Dlon=Istep/12.
 13730 Lat00=Lat0-Dlat
 13740 FOR Lon0=180 TO 240 STEP 30
-13750 Lon00=Lon0-Dlon
-13760 ASSIGN @Pin TO Drive$&"\programs\maps\etopo5\"&Pref$&VAL$(ABS(Lat0))&VAL$(Lon0)&".bd"
-13770 ENTER @Pin;Depi(*)
-13780 ASSIGN @Pin TO *
-13790!
-13800 FOR I=1 TO 360 STEP Istep
-13810 Ln1=Lon00+I/12.
-13820 IF Ln1-Dlon>244. THEN GOTO 14520
-13830 FOR J=1 TO 360 STEP Istep
-13840 Lt1=Lat00+J/12.
-13850 X1=Depi(I,J)+RND/50.
-13860 X2=Depi(I,J+Istep)+RND/50.
-13870 X3=Depi(I+Istep,J+Istep)+RND/50.
-13880 X4=Depi(I+Istep,J)+RND/50.
-13890 Xmin=MIN(X1,X2,X3,X4)
-13900 Xmax=MAX(X1,X2,X3,X4)
-13910!
-13920 FOR Icon=1 TO 2
-13930 Con=-2000.*(2.-Icon)
-13940!
-13950 IF Xmin<=Con AND Xmax<=Con THEN GOTO 14480
-13960 IF Xmin>=Con AND Xmax>=Con THEN GOTO 14480
-13970!
-13980! There is a contour crossing
-13990 Ip=0
-14000!
-14010 Xa=MIN(X1,X2)
-14020 Xb=MAX(X1,X2)
-14030 IF Xa<=Con AND Xb>=Con THEN
-14040 Ip=1
-14050 Xp(1)=Ln1
-14060 Yp(1)=Lt1+Dlat*(Con-X1)/(X2-X1)
-14070 END IF
-14080!
-14090 Xa=MIN(X2,X3)
-14100 Xb=MAX(X2,X3)
-14110 IF Xa<=Con AND Xb>=Con THEN
-14120 Ip=Ip+1
-14130 Xp(Ip)=Ln1+Dlon*(Con-X2)/(X3-X2)
-14140 Yp(Ip)=Lt1+Dlat
-14150 IF Ip>1.9 THEN GOTO 14350
-14160 END IF
-14170!
-14180 Xa=MIN(X3,X4)
-14190 Xb=MAX(X3,X4)
-14200 IF Xa<=Con AND Xb>=Con THEN
-14210 Ip=Ip+1
-14220 Xp(Ip)=Ln1+Dlon
-14230 Yp(Ip)=Lt1+Dlat*(Con-X4)/(X3-X4)
-14240 IF Ip>1.9 THEN GOTO 14350
-14250 END IF
-14260!
-14270 Xa=MIN(X1,X4)
-14280 Xb=MAX(X1,X4)
-14290 IF Xa<=Con AND Xb>=Con THEN
-14300 Ip=Ip+1
-14310 Xp(Ip)=Ln1+Dlon*(Con-X1)/(X4-X1)
-14320 Yp(Ip)=Lt1
-14330 END IF
-14340!
-14350 IF Ip<2 THEN GOTO 14480
-14360 Xp(1)=Scx*(Xp(1)-180.)
-14370 Xp(2)=Scx*(Xp(2)-180.)
-14380 Yp(1)=Yl*(Yp(1)-30.)/30.
-14390 Yp(2)=Yl*(Yp(2)-30.)/30.
-14400!
-14410 IF Ip>3 THEN PRINT "Ip = ";Ip
-14420!
-14430 IF ABS(Con)>1. THEN PEN 3
-14440 MOVE Xp(1),Yp(1)
-14450 DRAW Xp(2),Yp(2)
-14460 PEN 1
-14470!
-14480 NEXT Icon
-14490 NEXT J
-14500 NEXT I
-14510!
-14520 NEXT Lon0
+	13750 Lon00=Lon0-Dlon
+	13760 ASSIGN @Pin TO Drive$&"\programs\maps\etopo5\"&Pref$&VAL$(ABS(Lat0))&VAL$(Lon0)&".bd"
+	13770 ENTER @Pin;Depi(*)
+	13780 ASSIGN @Pin TO *
+	13790!
+	13800 FOR I=1 TO 360 STEP Istep
+		13810 Ln1=Lon00+I/12.
+		13820 IF Ln1-Dlon>244. THEN GOTO 14520
+		13830 FOR J=1 TO 360 STEP Istep
+			13840 Lt1=Lat00+J/12.
+			13850 X1=Depi(I,J)+RND/50.
+			13860 X2=Depi(I,J+Istep)+RND/50.
+			13870 X3=Depi(I+Istep,J+Istep)+RND/50.
+			13880 X4=Depi(I+Istep,J)+RND/50.
+			13890 Xmin=MIN(X1,X2,X3,X4)
+			13900 Xmax=MAX(X1,X2,X3,X4)
+			13910!
+			13920 FOR Icon=1 TO 2
+				13930 Con=-2000.*(2.-Icon)
+				13940!
+				13950 IF Xmin<=Con AND Xmax<=Con THEN GOTO 14480
+				13960 IF Xmin>=Con AND Xmax>=Con THEN GOTO 14480
+				13970!
+				13980! There is a contour crossing
+				13990 Ip=0
+				14000!
+				14010 Xa=MIN(X1,X2)
+				14020 Xb=MAX(X1,X2)
+				14030 IF Xa<=Con AND Xb>=Con THEN
+				14040 Ip=1
+				14050 Xp(1)=Ln1
+				14060 Yp(1)=Lt1+Dlat*(Con-X1)/(X2-X1)
+				14070 END IF
+				14080!
+				14090 Xa=MIN(X2,X3)
+				14100 Xb=MAX(X2,X3)
+				14110 IF Xa<=Con AND Xb>=Con THEN
+				14120 Ip=Ip+1
+				14130 Xp(Ip)=Ln1+Dlon*(Con-X2)/(X3-X2)
+				14140 Yp(Ip)=Lt1+Dlat
+				14150 IF Ip>1.9 THEN GOTO 14350
+				14160 END IF
+				14170!
+				14180 Xa=MIN(X3,X4)
+				14190 Xb=MAX(X3,X4)
+				14200 IF Xa<=Con AND Xb>=Con THEN
+				14210 Ip=Ip+1
+				14220 Xp(Ip)=Ln1+Dlon
+				14230 Yp(Ip)=Lt1+Dlat*(Con-X4)/(X3-X4)
+				14240 IF Ip>1.9 THEN GOTO 14350
+				14250 END IF
+				14260!
+				14270 Xa=MIN(X1,X4)
+				14280 Xb=MAX(X1,X4)
+				14290 IF Xa<=Con AND Xb>=Con THEN
+				14300 Ip=Ip+1
+				14310 Xp(Ip)=Ln1+Dlon*(Con-X1)/(X4-X1)
+				14320 Yp(Ip)=Lt1
+				14330 END IF
+				14340!
+				14350 IF Ip<2 THEN GOTO 14480
+				14360 Xp(1)=Scx*(Xp(1)-180.)
+				14370 Xp(2)=Scx*(Xp(2)-180.)
+				14380 Yp(1)=Yl*(Yp(1)-30.)/30.
+				14390 Yp(2)=Yl*(Yp(2)-30.)/30.
+				14400!
+				14410 IF Ip>3 THEN PRINT "Ip = ";Ip
+				14420!
+				14430 IF ABS(Con)>1. THEN PEN 3
+				14440 MOVE Xp(1),Yp(1)
+				14450 DRAW Xp(2),Yp(2)
+				14460 PEN 1
+				14470!
+				14480 NEXT Icon
+			14490 NEXT J
+		14500 NEXT I
+	14510!
+	14520 NEXT Lon0
 14530! Continue
 14540 PEN 1
 14550 Time2=TIMEDATE
@@ -1463,12 +1463,12 @@
 14630 Nr=10
 14640 DEG
 14650 FOR Iflt=1 TO Nfloats
-14660 IF Accpt(Iflt)<0 THEN GOTO 14710
-14670 Xc=Dx*(Lon(Iflt)-180.)
-14680 Yc=3.*Dy*(Lat(Iflt)-30.)
-14690 MOVE Xc,Yc
-14700 POLYGON Rmax,FILL,EDGE
-14710 NEXT Iflt
+	14660 IF Accpt(Iflt)<0 THEN GOTO 14710
+	14670 Xc=Dx*(Lon(Iflt)-180.)
+	14680 Yc=3.*Dy*(Lat(Iflt)-30.)
+	14690 MOVE Xc,Yc
+	14700 POLYGON Rmax,FILL,EDGE
+	14710 NEXT Iflt
 14720!
 14730 IF ABS(Rept_opt)>.9 AND Verb_opt<.5 THEN
 14740 OUTPUT KBD;"0ÿH";
@@ -1487,58 +1487,58 @@
 14870 !
 14880 Lknt=0
 14890 FOR Iflt=1 TO Nfloats
-14900 !
-14910 PEN 5
-14920 LDIR Ltheta
-14930 LORG Lorigin
-14940 CSIZE Csz
-14950 Tolerance=50.
-14960 !
-14970 IF G_opt>2.5 THEN CSIZE 1.5
-14980 IF G_opt<2.5 THEN CSIZE 2
-14990 !
-15000 IF Accpt(Iflt)<0 THEN GOTO 15410
-15010 Xc=Dx*(Lon(Iflt)-180.)
-15020 Yc=3.*Dy*(Lat(Iflt)-30.)
-15030 MOVE Xc+Rmax,Yc
-15040 S$=Fltnm$(Iflt)
-15050 Pu=POS(S$,"_")
-15060 Pp=POS(S$,".")
-15070 Cf=VAL(S$[Pu+1,Pp-1])
-15080 IF Lknt<.1 THEN GOTO 15340
-15090 !
-15100 ! Find out if float name has been written before
-15110 L_opt=-1
-15120 FOR I=1 TO Lknt
-15130 IF ABS(Cf-Dlist(I))<.1 THEN L_opt=1
-15140 NEXT I
-15150 IF L_opt>.5 THEN GOTO 15410
-15160 !
-15170 ! Find out if this float is really close to another already labelled
-15180 Close_opt=-1
-15190 Rhomin=9.99E+9
-15200 FOR I=1 TO Lknt
-15210 Delx=Dlist_x(I)-Xc
-15220 Dely=Dlist_y(I)-Yc
-15230 Rho2=Delx*Delx+Dely*Dely
-15240 Rho=SQR(Rho2)
-15250 IF Rho<Rhomin THEN Rhomin=Rho
-15260 NEXT I
-15270 !
-15280 IF Rhomin<=Tolerance THEN
-15290 PEN 3
-15300 MOVE Xc,Yc-Rmax
-15310 END IF
-15320 !
-15330 ! write the label
-15340 LABEL S$[Pu+1,Pp-1]
-15350 Lknt=Lknt+1
-15360 Dlist(Lknt)=Cf
-15370 Dlist_x(Lknt)=Xc
-15380 Dlist_y(Lknt)=Yc
-15390 PEN 5
-15400 !
-15410 NEXT Iflt
+	14900 !
+	14910 PEN 5
+	14920 LDIR Ltheta
+	14930 LORG Lorigin
+	14940 CSIZE Csz
+	14950 Tolerance=50.
+	14960 !
+	14970 IF G_opt>2.5 THEN CSIZE 1.5
+	14980 IF G_opt<2.5 THEN CSIZE 2
+	14990 !
+	15000 IF Accpt(Iflt)<0 THEN GOTO 15410
+	15010 Xc=Dx*(Lon(Iflt)-180.)
+	15020 Yc=3.*Dy*(Lat(Iflt)-30.)
+	15030 MOVE Xc+Rmax,Yc
+	15040 S$=Fltnm$(Iflt)
+	15050 Pu=POS(S$,"_")
+	15060 Pp=POS(S$,".")
+	15070 Cf=VAL(S$[Pu+1,Pp-1])
+	15080 IF Lknt<.1 THEN GOTO 15340
+	15090 !
+	15100 ! Find out if float name has been written before
+	15110 L_opt=-1
+	15120 FOR I=1 TO Lknt
+		15130 IF ABS(Cf-Dlist(I))<.1 THEN L_opt=1
+		15140 NEXT I
+	15150 IF L_opt>.5 THEN GOTO 15410
+	15160 !
+	15170 ! Find out if this float is really close to another already labelled
+	15180 Close_opt=-1
+	15190 Rhomin=9.99E+9
+	15200 FOR I=1 TO Lknt
+		15210 Delx=Dlist_x(I)-Xc
+		15220 Dely=Dlist_y(I)-Yc
+		15230 Rho2=Delx*Delx+Dely*Dely
+		15240 Rho=SQR(Rho2)
+		15250 IF Rho<Rhomin THEN Rhomin=Rho
+		15260 NEXT I
+	15270 !
+	15280 IF Rhomin<=Tolerance THEN
+	15290 PEN 3
+	15300 MOVE Xc,Yc-Rmax
+	15310 END IF
+	15320 !
+	15330 ! write the label
+	15340 LABEL S$[Pu+1,Pp-1]
+	15350 Lknt=Lknt+1
+	15360 Dlist(Lknt)=Cf
+	15370 Dlist_x(Lknt)=Xc
+	15380 Dlist_y(Lknt)=Yc
+	15390 PEN 5
+	15400 !
+	15410 NEXT Iflt
 15420 LDIR 0
 15430 END IF
 15440!
@@ -1571,119 +1571,119 @@
 15710 Line4val=999.9
 15720 !
 15730 FOR I=3 TO Nx-2
-15740 FOR J=3 TO Ny-2
-15750 IF Dhfit(I,J)>90. THEN GOTO 16740
-15760 !
-15770 Dhmax=-90.
-15780 Dhmin=90.
-15790 FOR Lj=-2 TO 2
-15800 FOR Li=-2 TO 2
-15810 IF Dhfit(I+Li,J+Lj)>90. THEN GOTO 16740
-15820 IF ABS(Lj)<.1 AND ABS(Li)<.1 THEN GOTO 15850
-15830 IF Dhfit(I+Li,J+Lj)>Dhmax THEN Dhmax=Dhfit(I+Li,J+Lj)
-15840 IF Dhfit(I+Li,J+Lj)<Dhmin THEN Dhmin=Dhfit(I+Li,J+Lj)
-15850 NEXT Li
-15860 NEXT Lj
-15870 !
-15880 IF Dhfit(I,J)<Dhmin OR Dhfit(I,J)>Dhmax THEN
-15890 ! Have an extremum at (i,j)
-15900 !
-15910 M$="Mx"
-15920 Ma=1
-15930 IF Dhfit(I,J)<Dhmin THEN
-15940 M$="Mn"
-15950 Ma=-1
-15960 END IF
-15970 !
-15980 Late=30.+(J-1.)/3.
-15990 Late=.01*INT(.5+Late*100.)
-16000 Lone=-181.+I
-16010 Lone=.01*INT(.5+Lone*100.)
-16020 !
-16030 IF Ma<0. THEN
-16040 Distx=Scx*(Lonlowref-Lone)
-16050 Disty=Scy*(Latlowref-Late)
-16060 Distr=SQR(Distx*Distx+Disty*Disty)
-16070 IF Distr<Distlow THEN
-16080 Distlow=Distr
-16090 Lv=Dhfit(I,J)
-16100 END IF
-16110 END IF
-16120 !
-16130 IF Ma>0. THEN
-16140 Distx=Scx*(Lonhighref-Lone)
-16150 Disty=Scy*(Lathighref-Late)
-16160 Distr=SQR(Distx*Distx+Disty*Disty)
-16170 IF Distr<Disthigh THEN
-16180 Disthigh=Distr
-16190 Hv=Dhfit(I,J)
-16200 END IF
-16210 END IF
-16220 !
-16230 Nextrem=Nextrem+1
-16240 IF Nextrem>26 THEN Nextrem=Nextrem-26
-16250 Dhext=1.0E-4*INT(10000.*Dhfit(I,J)+.5)
-16260 Dhext$=TRIM$(VAL$(Dhext))
-16270 IF Dhext<.9999999 THEN Dhext$="0"&Dhext$
-16280 !
-16290 Late$=TRIM$(VAL$(INT(Late+.01)))
-16300 Remainder=ABS(Late-VAL(Late$))
-16310 IF Remainder<.1 THEN Late$=Late$&".00"
-16320 IF Remainder>.1 AND Remainder<.4 THEN Late$=Late$&".33"
-16330 IF Remainder>.4 AND Remainder<.7 THEN Late$=Late$&".67"
-16340 !
-16350 Slon=1.
-16360 IF Lone<-.000001 THEN Slon=-1.
-16370 Lone=ABS(Lone)
-16380 Lone$=TRIM$(VAL$(INT(Lone+.01)))
-16390 !
-16400 IF Lone>=145 AND Lone<=155 AND Late>=50 AND Late<=57 AND Dhext<Line4val THEN
-16410 Line4val=Dhext
-16420 Line4$="L "&Dhext$
-16430 END IF
-16440 !
-16450 IF Lone>=144 AND Lone<=156 AND Late>=32 AND Late<=38 AND Dhext>Line2vala THEN
-16460 Line2vala=Dhext
-16470 Line2a$="H "&Dhext$
-16480 END IF
-16490 !
-16500 IF Lone>=141 AND Lone<=165 AND Late>=32 AND Late<=38 AND Dhext>Line2valb THEN
-16510 Line2valb=Dhext
-16520 Line2b$="H "&Dhext$
-16530 END IF
-16540 !
-16550 IF Lone>=141 AND Lone<=179 AND Late>=31 AND Late<=39 AND Dhext>Line2valc THEN
-16560 Line2valc=Dhext
-16570 Line2c$="H "&Dhext$
-16580 END IF
-16590 !
-16600 PRINT CHR$(64+Nextrem)&" "&M$&" "&Late$&" "&Lone$&" "&Dhext$
-16610 Xm=(I-1.)*Dx
-16620 Ym=(J-1.)*Dy
-16630 LORG 5
-16640 PEN 1
-16650 MOVE Xm,Ym
-16660 !
-16670 IF Ma>.01 THEN PEN 3
-16680 IF Ma<.01 THEN PEN 7
-16690 LABEL CHR$(64+Nextrem)
-16700 PEN 1
-16710 !
-16720 END IF
-16730 !
-16740 NEXT J
-16750 NEXT I
+	15740 FOR J=3 TO Ny-2
+		15750 IF Dhfit(I,J)>90. THEN GOTO 16740
+		15760 !
+		15770 Dhmax=-90.
+		15780 Dhmin=90.
+		15790 FOR Lj=-2 TO 2
+			15800 FOR Li=-2 TO 2
+				15810 IF Dhfit(I+Li,J+Lj)>90. THEN GOTO 16740
+				15820 IF ABS(Lj)<.1 AND ABS(Li)<.1 THEN GOTO 15850
+				15830 IF Dhfit(I+Li,J+Lj)>Dhmax THEN Dhmax=Dhfit(I+Li,J+Lj)
+				15840 IF Dhfit(I+Li,J+Lj)<Dhmin THEN Dhmin=Dhfit(I+Li,J+Lj)
+				15850 NEXT Li
+			15860 NEXT Lj
+		15870 !
+		15880 IF Dhfit(I,J)<Dhmin OR Dhfit(I,J)>Dhmax THEN
+		15890 ! Have an extremum at (i,j)
+		15900 !
+		15910 M$="Mx"
+		15920 Ma=1
+		15930 IF Dhfit(I,J)<Dhmin THEN
+		15940 M$="Mn"
+		15950 Ma=-1
+		15960 END IF
+		15970 !
+		15980 Late=30.+(J-1.)/3.
+		15990 Late=.01*INT(.5+Late*100.)
+		16000 Lone=-181.+I
+		16010 Lone=.01*INT(.5+Lone*100.)
+		16020 !
+		16030 IF Ma<0. THEN
+		16040 Distx=Scx*(Lonlowref-Lone)
+		16050 Disty=Scy*(Latlowref-Late)
+		16060 Distr=SQR(Distx*Distx+Disty*Disty)
+		16070 IF Distr<Distlow THEN
+		16080 Distlow=Distr
+		16090 Lv=Dhfit(I,J)
+		16100 END IF
+		16110 END IF
+		16120 !
+		16130 IF Ma>0. THEN
+		16140 Distx=Scx*(Lonhighref-Lone)
+		16150 Disty=Scy*(Lathighref-Late)
+		16160 Distr=SQR(Distx*Distx+Disty*Disty)
+		16170 IF Distr<Disthigh THEN
+		16180 Disthigh=Distr
+		16190 Hv=Dhfit(I,J)
+		16200 END IF
+		16210 END IF
+		16220 !
+		16230 Nextrem=Nextrem+1
+		16240 IF Nextrem>26 THEN Nextrem=Nextrem-26
+		16250 Dhext=1.0E-4*INT(10000.*Dhfit(I,J)+.5)
+		16260 Dhext$=TRIM$(VAL$(Dhext))
+		16270 IF Dhext<.9999999 THEN Dhext$="0"&Dhext$
+		16280 !
+		16290 Late$=TRIM$(VAL$(INT(Late+.01)))
+		16300 Remainder=ABS(Late-VAL(Late$))
+		16310 IF Remainder<.1 THEN Late$=Late$&".00"
+		16320 IF Remainder>.1 AND Remainder<.4 THEN Late$=Late$&".33"
+		16330 IF Remainder>.4 AND Remainder<.7 THEN Late$=Late$&".67"
+		16340 !
+		16350 Slon=1.
+		16360 IF Lone<-.000001 THEN Slon=-1.
+		16370 Lone=ABS(Lone)
+		16380 Lone$=TRIM$(VAL$(INT(Lone+.01)))
+		16390 !
+		16400 IF Lone>=145 AND Lone<=155 AND Late>=50 AND Late<=57 AND Dhext<Line4val THEN
+		16410 Line4val=Dhext
+		16420 Line4$="L "&Dhext$
+		16430 END IF
+		16440 !
+		16450 IF Lone>=144 AND Lone<=156 AND Late>=32 AND Late<=38 AND Dhext>Line2vala THEN
+		16460 Line2vala=Dhext
+		16470 Line2a$="H "&Dhext$
+		16480 END IF
+		16490 !
+		16500 IF Lone>=141 AND Lone<=165 AND Late>=32 AND Late<=38 AND Dhext>Line2valb THEN
+		16510 Line2valb=Dhext
+		16520 Line2b$="H "&Dhext$
+		16530 END IF
+		16540 !
+		16550 IF Lone>=141 AND Lone<=179 AND Late>=31 AND Late<=39 AND Dhext>Line2valc THEN
+		16560 Line2valc=Dhext
+		16570 Line2c$="H "&Dhext$
+		16580 END IF
+		16590 !
+		16600 PRINT CHR$(64+Nextrem)&" "&M$&" "&Late$&" "&Lone$&" "&Dhext$
+		16610 Xm=(I-1.)*Dx
+		16620 Ym=(J-1.)*Dy
+		16630 LORG 5
+		16640 PEN 1
+		16650 MOVE Xm,Ym
+		16660 !
+		16670 IF Ma>.01 THEN PEN 3
+		16680 IF Ma<.01 THEN PEN 7
+		16690 LABEL CHR$(64+Nextrem)
+		16700 PEN 1
+		16710 !
+		16720 END IF
+		16730 !
+		16740 NEXT J
+	16750 NEXT I
 16760 !
 16770 PRINT
 16780 PRINT "Dividing streamline = ";.0001*INT(10000.*Divsl+.5)
 16790 I145=181-145
 16800 J145=-1
 16810 FOR J=5 TO 85
-16820 IF Dhfit(I145,J)>=Divsl AND Dhfit(I145,J+1)<=Divsl THEN
-16830 J145=J
-16840 GOTO 16880
-16850 END IF
-16860 NEXT J
+	16820 IF Dhfit(I145,J)>=Divsl AND Dhfit(I145,J+1)<=Divsl THEN
+	16830 J145=J
+	16840 GOTO 16880
+	16850 END IF
+	16860 NEXT J
 16870 !
 16880 Latdivsl=30.+(J145-1.+(Divsl-Dhfit(I145,J145))/(Dhfit(I145,J145+1)-Dhfit(I145,J145)+1.0E-10))/3.
 16890 Latdivsl=.01*INT(100.*Latdivsl+.5)
@@ -1700,118 +1700,118 @@
 17000 END IF
 17010 !
 17020 FOR Klonc=2 TO 2
-17030 IF Klonc<1.5 THEN Lonc=-145
-17040 IF Klonc>1.5 THEN Lonc=-150
-17050 PRINT
-17060 PRINT "Search along longitude "&TRIM$(VAL$(ABS(Lonc)))&"°W"
-17070 !
-17080 D2extreme=9999.9
-17090!
-17100 I=Lonc+181
-17110 Nym1=Ny-1
-17120 Dhmax=0.
-17130 Jmin=0
-17140 MAT Deld=(0.)
-17150 FOR J=1 TO Nym1
-17160 Deld(J)=Dhfit(I,J+1)-Dhfit(I,J)
-17170 NEXT J
-17180!
-17190 Nym2=Ny-2
-17200 Mknt=0
-17210 FOR J=2 TO Nym2
-17220 Extrm=-1
-17230 IF Deld(J)<Deld(J-1) AND Deld(J)<Deld(J+1) THEN Extrm=1
-17240! IF Deld(J)>Deld(J-1) AND Deld(J)>Deld(J+1) THEN Extrm=1
-17250 IF Extrm>.1 THEN
-17260 D1=Deld(J-1)
-17270 D2=Deld(J)
-17280 D3=Deld(J+1)
-17290 Lat0=30.+(J-1.)/3.
-17300 Lat2=Lat0+1./6.
-17310 Lat1=Lat2-.333333
-17320 Lat3=Lat2+.333333
-17330 Q1=D2-D1
-17340 Q2=Lat2-Lat1
-17350 Q3=Lat2*Lat2-Lat1*Lat1
-17360 Q4=D3-D2
-17370 Q5=Lat3-Lat2
-17380 Q6=Lat3*Lat3-Lat2*Lat2
-17390 Cr=(Q4*Q2-Q1*Q5)/(Q6*Q2-Q3*Q5)
-17400 Br=(Q4-Cr*Q6)/Q5
-17410 Ar=D1-Br*Lat1-Cr*Lat1*Lat1
-17420 Phi0=-Br/(2.*Cr)
-17430 D0=Ar+Br*Phi0+Cr*Phi0*Phi0
-17440 Mknt=Mknt+1
-17450!
-17460 Maxlat(Mknt)=Phi0
-17470 Maxval(Mknt)=D0
-17480 D4=D2
-17490!
-17500 IF Mknt>1.1 THEN
-17510 D4=(Maxlat(Mknt)*Maxval(Mknt)+Maxlat(Mknt-1)*Maxval(Mknt-1))/(Maxval(Mknt)+Maxval(Mknt-1))
-17520 END IF
-17530!
-17540 D1=.0001*INT(10000.*D1+.5)
-17550 D2=.0001*INT(10000.*D2+.5)
-17560 D3=.0001*INT(10000.*D3+.5)
-17570 D4=.01*INT(100.*D4+.5)
-17580 Phi0=.01*INT(100.*Phi0+.5)
-17590!
-17600 S$=TRIM$(VAL$(Mknt-1))&TRIM$(VAL$(Mknt))&" "&TRIM$(VAL$(D4))
-17610 PRINT Mknt;Phi0;D1;D2;D3;S$
-17620!
-17630 IF D2<D2extreme AND Phi0>=38. AND Phi0<=45. THEN Line6$="150/"&TRIM$(VAL$(Phi0))
-17640 !
-17650 Xm=(I-1.)*Dx
-17660 Ym=(Phi0-30.)*Dy*3.0
-17670 CSIZE 2
-17680 Csiz=20.
-17690 IF ABS(Klonc-1.)<.1 THEN PEN 7
-17700 IF ABS(Klonc-2.)<.1 THEN PEN 5
-17710 MOVE Xm+Csiz,Ym+Csiz
-17720 DRAW Xm-Csiz,Ym-Csiz
-17730 MOVE Xm-Csiz,Ym+Csiz
-17740 DRAW Xm+Csiz,Ym-Csiz
-17750 LORG 2
-17760 MOVE Xm+Csiz,Ym
-17770 LABEL "-"&TRIM$(VAL$(Mknt))
-17780!
-17790 END IF
-17800 NEXT J
-17810!
-17820 FOR Phi=30 TO 60 STEP .5
-17830 Ym=(Phi-30.)*Dy*3.0
-17840 MOVE Xm,Ym
-17850 IDRAW 0,0
-17860 NEXT Phi
-17870!
-17880 PRINT
-17890 NEXT Klonc
+	17030 IF Klonc<1.5 THEN Lonc=-145
+	17040 IF Klonc>1.5 THEN Lonc=-150
+	17050 PRINT
+	17060 PRINT "Search along longitude "&TRIM$(VAL$(ABS(Lonc)))&"°W"
+	17070 !
+	17080 D2extreme=9999.9
+	17090!
+	17100 I=Lonc+181
+	17110 Nym1=Ny-1
+	17120 Dhmax=0.
+	17130 Jmin=0
+	17140 MAT Deld=(0.)
+	17150 FOR J=1 TO Nym1
+		17160 Deld(J)=Dhfit(I,J+1)-Dhfit(I,J)
+		17170 NEXT J
+	17180!
+	17190 Nym2=Ny-2
+	17200 Mknt=0
+	17210 FOR J=2 TO Nym2
+		17220 Extrm=-1
+		17230 IF Deld(J)<Deld(J-1) AND Deld(J)<Deld(J+1) THEN Extrm=1
+		17240! IF Deld(J)>Deld(J-1) AND Deld(J)>Deld(J+1) THEN Extrm=1
+		17250 IF Extrm>.1 THEN
+		17260 D1=Deld(J-1)
+		17270 D2=Deld(J)
+		17280 D3=Deld(J+1)
+		17290 Lat0=30.+(J-1.)/3.
+		17300 Lat2=Lat0+1./6.
+		17310 Lat1=Lat2-.333333
+		17320 Lat3=Lat2+.333333
+		17330 Q1=D2-D1
+		17340 Q2=Lat2-Lat1
+		17350 Q3=Lat2*Lat2-Lat1*Lat1
+		17360 Q4=D3-D2
+		17370 Q5=Lat3-Lat2
+		17380 Q6=Lat3*Lat3-Lat2*Lat2
+		17390 Cr=(Q4*Q2-Q1*Q5)/(Q6*Q2-Q3*Q5)
+		17400 Br=(Q4-Cr*Q6)/Q5
+		17410 Ar=D1-Br*Lat1-Cr*Lat1*Lat1
+		17420 Phi0=-Br/(2.*Cr)
+		17430 D0=Ar+Br*Phi0+Cr*Phi0*Phi0
+		17440 Mknt=Mknt+1
+		17450!
+		17460 Maxlat(Mknt)=Phi0
+		17470 Maxval(Mknt)=D0
+		17480 D4=D2
+		17490!
+		17500 IF Mknt>1.1 THEN
+		17510 D4=(Maxlat(Mknt)*Maxval(Mknt)+Maxlat(Mknt-1)*Maxval(Mknt-1))/(Maxval(Mknt)+Maxval(Mknt-1))
+		17520 END IF
+		17530!
+		17540 D1=.0001*INT(10000.*D1+.5)
+		17550 D2=.0001*INT(10000.*D2+.5)
+		17560 D3=.0001*INT(10000.*D3+.5)
+		17570 D4=.01*INT(100.*D4+.5)
+		17580 Phi0=.01*INT(100.*Phi0+.5)
+		17590!
+		17600 S$=TRIM$(VAL$(Mknt-1))&TRIM$(VAL$(Mknt))&" "&TRIM$(VAL$(D4))
+		17610 PRINT Mknt;Phi0;D1;D2;D3;S$
+		17620!
+		17630 IF D2<D2extreme AND Phi0>=38. AND Phi0<=45. THEN Line6$="150/"&TRIM$(VAL$(Phi0))
+		17640 !
+		17650 Xm=(I-1.)*Dx
+		17660 Ym=(Phi0-30.)*Dy*3.0
+		17670 CSIZE 2
+		17680 Csiz=20.
+		17690 IF ABS(Klonc-1.)<.1 THEN PEN 7
+		17700 IF ABS(Klonc-2.)<.1 THEN PEN 5
+		17710 MOVE Xm+Csiz,Ym+Csiz
+		17720 DRAW Xm-Csiz,Ym-Csiz
+		17730 MOVE Xm-Csiz,Ym+Csiz
+		17740 DRAW Xm+Csiz,Ym-Csiz
+		17750 LORG 2
+		17760 MOVE Xm+Csiz,Ym
+		17770 LABEL "-"&TRIM$(VAL$(Mknt))
+		17780!
+		17790 END IF
+		17800 NEXT J
+	17810!
+	17820 FOR Phi=30 TO 60 STEP .5
+		17830 Ym=(Phi-30.)*Dy*3.0
+		17840 MOVE Xm,Ym
+		17850 IDRAW 0,0
+		17860 NEXT Phi
+	17870!
+	17880 PRINT
+	17890 NEXT Klonc
 17900 PEN 1
 17910 !
 17920! Plot Dhgt along 145°W and 150°W
 17930 FOR Klonc=2 TO 2
-17940!
-17950 IF ABS(Klonc-1.)<.1 THEN
-17960 Iplot=181-145
-17970 PEN 7
-17980 END IF
-17990!
-18000 IF ABS(Klonc-2.)<.1 THEN
-18010 Iplot=181-150
-18020 PEN 5
-18030 END IF
-18040!
-18050 Scl=-20000.
-18060 Xm=(Iplot-1.)*Dx
-18070!
-18080 MOVE Xm+Scl*(Dhfit(Iplot,2)-Dhfit(Iplot,1)),.5*Dy
-18090 FOR J=1 TO Ny
-18100 IF Dhfit(Iplot,J)>90. OR Dhfit(Iplot,J+1)>90. THEN GOTO 18140
-18110 DRAW Xm+Scl*(Dhfit(Iplot,J+1)-Dhfit(Iplot,J)),(J-.5)*Dy
-18120 NEXT J
-18130!
-18140 NEXT Klonc
+	17940!
+	17950 IF ABS(Klonc-1.)<.1 THEN
+	17960 Iplot=181-145
+	17970 PEN 7
+	17980 END IF
+	17990!
+	18000 IF ABS(Klonc-2.)<.1 THEN
+	18010 Iplot=181-150
+	18020 PEN 5
+	18030 END IF
+	18040!
+	18050 Scl=-20000.
+	18060 Xm=(Iplot-1.)*Dx
+	18070!
+	18080 MOVE Xm+Scl*(Dhfit(Iplot,2)-Dhfit(Iplot,1)),.5*Dy
+	18090 FOR J=1 TO Ny
+		18100 IF Dhfit(Iplot,J)>90. OR Dhfit(Iplot,J+1)>90. THEN GOTO 18140
+		18110 DRAW Xm+Scl*(Dhfit(Iplot,J+1)-Dhfit(Iplot,J)),(J-.5)*Dy
+		18120 NEXT J
+	18130!
+	18140 NEXT Klonc
 18150 PEN 1
 18160 !
 18170 CALL Julday(1,Dc,Domc,Monc,Yearc)
@@ -1855,15 +1855,15 @@
 18550 CREATE Drive$&"\Argo_gak\Dhgts\Dh"&Dc$&Press$&".csv",1
 18560 ASSIGN @Pout TO Drive$&"\Argo_gak\Dhgts\Dh"&Dc$&Press$&".csv";FORMAT ON
 18570 FOR I=1 TO Nx
-18580 Lonc=I-181.
-18590 FOR J=1 TO Ny
-18600 IF Dhfit(I,J)<90. THEN
-18610 Latc=30.+(J-1.)/3.
-18620 S$=VAL$(Lonc)&","&VAL$(Latc)&","&VAL$(Dhfit(I,J))
-18630 OUTPUT @Pout;S$
-18640 END IF
-18650 NEXT J
-18660 NEXT I
+	18580 Lonc=I-181.
+	18590 FOR J=1 TO Ny
+		18600 IF Dhfit(I,J)<90. THEN
+		18610 Latc=30.+(J-1.)/3.
+		18620 S$=VAL$(Lonc)&","&VAL$(Latc)&","&VAL$(Dhfit(I,J))
+		18630 OUTPUT @Pout;S$
+		18640 END IF
+		18650 NEXT J
+	18660 NEXT I
 18670 OUTPUT @Pout;"-116.0,60.0,"&VAL$(Dhbar)
 18680 ASSIGN @Pout TO *
 18690 !
@@ -1878,34 +1878,34 @@
 18780 Scx=Scy*COS(49.)
 18790 !
 18800 FOR I=1 TO Nsub
-18810 Latp=Latp26+(I-1.)*(Latp1-Latp26)/(Nsub-1.)
-18820 Lonp=Lonp26+(I-1.)*(Lonp1-Lonp26)/(Nsub-1.)
-18830 Delx=(Lonp-Lonp1)*Scx
-18840 Dely=(Latp-Latp1)*Scy
-18850 Rhokm=SQR(Delx*Delx+Dely*Dely)
-18860 Rhokm=.1*INT(10.*Rhokm)
-18870 !
-18880 ! Now interpolate to find value of Dhfit at Latp, Lonp
-18890 ! MAT Dhpa=(99.99)
-18900 OFF ERROR
-18910 Jp=3.*Latp-89.0
-18920 Ip=Lonp+181.0
-18930 I1=INT(Ip)
-18940 J1=INT(Jp)
-18950 Dmax=MAX(Dhfit(I1,J1),Dhfit(I1+1,J1),Dhfit(I1,J1+1),Dhfit(I1+1,J1+1))
-18960 IF Dmax>90. THEN
-18970 Dhpa(I)=99.9
-18980 GOTO 19080
-18990 ELSE
-19000 Ri=Ip-I1
-19010 Rj=Jp-J1
-19020 Dha=Dhfit(I1,J1)+Ri*(Dhfit(I1+1,J1)-Dhfit(I1,J1))
-19030 Dhb=Dhfit(I1,J1+1)+Ri*(Dhfit(I1+1,J1+1)-Dhfit(I1,J1+1))
-19040 Dhp=Dha+Rj*(Dhb-Dha)
-19050 Dhpa(I)=Dhp
-19060 Xkma(I)=Rhokm
-19070 END IF
-19080 NEXT I
+	18810 Latp=Latp26+(I-1.)*(Latp1-Latp26)/(Nsub-1.)
+	18820 Lonp=Lonp26+(I-1.)*(Lonp1-Lonp26)/(Nsub-1.)
+	18830 Delx=(Lonp-Lonp1)*Scx
+	18840 Dely=(Latp-Latp1)*Scy
+	18850 Rhokm=SQR(Delx*Delx+Dely*Dely)
+	18860 Rhokm=.1*INT(10.*Rhokm)
+	18870 !
+	18880 ! Now interpolate to find value of Dhfit at Latp, Lonp
+	18890 ! MAT Dhpa=(99.99)
+	18900 OFF ERROR
+	18910 Jp=3.*Latp-89.0
+	18920 Ip=Lonp+181.0
+	18930 I1=INT(Ip)
+	18940 J1=INT(Jp)
+	18950 Dmax=MAX(Dhfit(I1,J1),Dhfit(I1+1,J1),Dhfit(I1,J1+1),Dhfit(I1+1,J1+1))
+	18960 IF Dmax>90. THEN
+	18970 Dhpa(I)=99.9
+	18980 GOTO 19080
+	18990 ELSE
+	19000 Ri=Ip-I1
+	19010 Rj=Jp-J1
+	19020 Dha=Dhfit(I1,J1)+Ri*(Dhfit(I1+1,J1)-Dhfit(I1,J1))
+	19030 Dhb=Dhfit(I1,J1+1)+Ri*(Dhfit(I1+1,J1+1)-Dhfit(I1,J1+1))
+	19040 Dhp=Dha+Rj*(Dhb-Dha)
+	19050 Dhpa(I)=Dhp
+	19060 Xkma(I)=Rhokm
+	19070 END IF
+	19080 NEXT I
 19090!
 19100 ON ERROR GOTO 19120
 19110 PURGE Drive$&"\Argo_gak\Dhgts\Pvel"&Dc$&".csv"
@@ -1914,14 +1914,14 @@
 19140 !
 19150 F=1.097E-4
 19160 FOR I=1 TO Nsub-1
-19170 IF Dhpa(I)>90. OR Dhpa(I+1)>90. THEN GOTO 19240
-19180 Deltadh=Dhpa(I+1)-Dhpa(I)
-19190 Deltax=Xkma(I+1)-Xkma(I)
-19200 Vc=-100.*Deltadh*1000.0/(F*Deltax*1.0E+5)
-19210 Xv=-.5*(Xkma(I)+Xkma(I+1))
-19220 ! PRINT Xv,Vc
-19230 OUTPUT @Pout;Xv,Vc
-19240 NEXT I
+	19170 IF Dhpa(I)>90. OR Dhpa(I+1)>90. THEN GOTO 19240
+	19180 Deltadh=Dhpa(I+1)-Dhpa(I)
+	19190 Deltax=Xkma(I+1)-Xkma(I)
+	19200 Vc=-100.*Deltadh*1000.0/(F*Deltax*1.0E+5)
+	19210 Xv=-.5*(Xkma(I)+Xkma(I+1))
+	19220 ! PRINT Xv,Vc
+	19230 OUTPUT @Pout;Xv,Vc
+	19240 NEXT I
 19250 !
 19260 ASSIGN @Pout TO *
 19270 !
@@ -1930,17 +1930,17 @@
 19300 CREATE Drive$&"\Argo_gak\Dhgts\Flts"&Dc$&".csv",1
 19310 ASSIGN @Pout TO Drive$&"\Argo_gak\Dhgts\Flts"&Dc$&".csv";FORMAT ON
 19320 FOR Iflt=1 TO Nfloats
-19330 Lonc=Lon(Iflt)
-19340 IF Lonc<180. OR Lonc>244. THEN GOTO 19430
-19350 IF Lat(Iflt)<30. OR Lat(Iflt)>60. THEN GOTO 19430
-19360 S$=VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))
-19370 T$=S$
-19380 IF ABS(Iflt-1.)<.1 THEN T$="-180., 30."
-19390 IF ABS(Iflt-2.)<.1 THEN T$="-116.,60."
-19400 OUTPUT @Pout;S$
-19410 OUTPUT @Pout;T$
-19420!
-19430 NEXT Iflt
+	19330 Lonc=Lon(Iflt)
+	19340 IF Lonc<180. OR Lonc>244. THEN GOTO 19430
+	19350 IF Lat(Iflt)<30. OR Lat(Iflt)>60. THEN GOTO 19430
+	19360 S$=VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))
+	19370 T$=S$
+	19380 IF ABS(Iflt-1.)<.1 THEN T$="-180., 30."
+	19390 IF ABS(Iflt-2.)<.1 THEN T$="-116.,60."
+	19400 OUTPUT @Pout;S$
+	19410 OUTPUT @Pout;T$
+	19420!
+	19430 NEXT Iflt
 19440 ASSIGN @Pout TO *
 19450!
 19460! Print list of floats used in analysis
@@ -1950,11 +1950,11 @@
 19500 ASSIGN @Pout TO Drive$&"\Argo_gak\Dhgts\FList_"&Dc$&".txt";FORMAT ON
 19510 OUTPUT @Pout;VAL$(Nent)
 19520 FOR Iflt=1 TO Nfloats
-19530 IF Accpt(Iflt)<.1 THEN GOTO 19570
-19540 Pu=POS(Fltnm$(Iflt),"_")
-19550 Pp=POS(Fltnm$(Iflt),".")
-19560 OUTPUT @Pout;Fltnm$(Iflt)[Pu+1,Pp-1]
-19570 NEXT Iflt
+	19530 IF Accpt(Iflt)<.1 THEN GOTO 19570
+	19540 Pu=POS(Fltnm$(Iflt),"_")
+	19550 Pp=POS(Fltnm$(Iflt),".")
+	19560 OUTPUT @Pout;Fltnm$(Iflt)[Pu+1,Pp-1]
+	19570 NEXT Iflt
 19580 ASSIGN @Pout TO *
 19590!
 19600 ! Compute and print error map and scatter map
@@ -1976,41 +1976,41 @@
 19760 !
 19770 PRINT "High residual variance cases:-"
 19780 FOR Iflt=1 TO Nfloats
-19790 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
-19800 Lonc=Lon(Iflt)
-19810 Fresvar=Dh(Iflt)/Dhstddev
-19820 S$=VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))&","&VAL$(Fresvar)
-19830 OUTPUT @Pout;S$
-19840 !
-19850 OUTPUT @Pout_dim;VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))&","&VAL$(Dh(Iflt))
-19860!
-19870 S$=VAL$(Dhk(Iflt))&","&VAL$(Dhk(Iflt)-Dh(Iflt))
-19880 OUTPUT @Pscat;S$
-19890 !
-19900 IF ABS(Fresvar)>.8 THEN
-19910 Pc=POS(Fltnm$(Iflt),".")
-19920 Lati=.01*INT(100.*Lat(Iflt)+.5)
-19930 Loni=.01*INT(100.*Lon(Iflt)+.5)
-19940 Loni=Loni-360
-19950 Fresvar=.001*INT(1000.*Fresvar)
-19960 Fr$=TRIM$(VAL$(Fresvar))
-19970 IF Fresvar>0. AND Fresvar<.999999 THEN Fr$="0"&Fr$
-19980 IF Fresvar>0. THEN Fr$=" "&Fr$
-19990 Lf=LEN(Fr$)
-20000 IF Lf<4.9 THEN Fr$=Fr$&"0"
-20010 Lf=LEN(Fr$)
-20020 IF Lf<5.9 THEN Fr$=Fr$&" "
-20030 Lati$=TRIM$(VAL$(Lati))
-20040 IF LEN(Lati$)<4.9 THEN Lati$=Lati$&"0"
-20050 Loni$=TRIM$(VAL$(Loni))
-20060 IF LEN(Loni$)<6.9999 THEN Loni$=Loni$&"0"
-20070 !
-20080 PRINT Fr$&" "&Lati$&" "&Loni$&" "&Fltnm$(Iflt)[1,Pc-1]
-20090 !PRINT "High resid. var. ";.0001*INT(10000.*Fresvar);Lati$;Loni$;Fltnm$(Iflt)
-20100 END IF
-20110!
-20120 END IF
-20130 NEXT Iflt
+	19790 IF Dhf(Iflt)<90. AND Accpt(Iflt)>0 THEN
+	19800 Lonc=Lon(Iflt)
+	19810 Fresvar=Dh(Iflt)/Dhstddev
+	19820 S$=VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))&","&VAL$(Fresvar)
+	19830 OUTPUT @Pout;S$
+	19840 !
+	19850 OUTPUT @Pout_dim;VAL$(Lonc-360.)&","&VAL$(Lat(Iflt))&","&VAL$(Dh(Iflt))
+	19860!
+	19870 S$=VAL$(Dhk(Iflt))&","&VAL$(Dhk(Iflt)-Dh(Iflt))
+	19880 OUTPUT @Pscat;S$
+	19890 !
+	19900 IF ABS(Fresvar)>.8 THEN
+	19910 Pc=POS(Fltnm$(Iflt),".")
+	19920 Lati=.01*INT(100.*Lat(Iflt)+.5)
+	19930 Loni=.01*INT(100.*Lon(Iflt)+.5)
+	19940 Loni=Loni-360
+	19950 Fresvar=.001*INT(1000.*Fresvar)
+	19960 Fr$=TRIM$(VAL$(Fresvar))
+	19970 IF Fresvar>0. AND Fresvar<.999999 THEN Fr$="0"&Fr$
+	19980 IF Fresvar>0. THEN Fr$=" "&Fr$
+	19990 Lf=LEN(Fr$)
+	20000 IF Lf<4.9 THEN Fr$=Fr$&"0"
+	20010 Lf=LEN(Fr$)
+	20020 IF Lf<5.9 THEN Fr$=Fr$&" "
+	20030 Lati$=TRIM$(VAL$(Lati))
+	20040 IF LEN(Lati$)<4.9 THEN Lati$=Lati$&"0"
+	20050 Loni$=TRIM$(VAL$(Loni))
+	20060 IF LEN(Loni$)<6.9999 THEN Loni$=Loni$&"0"
+	20070 !
+	20080 PRINT Fr$&" "&Lati$&" "&Loni$&" "&Fltnm$(Iflt)[1,Pc-1]
+	20090 !PRINT "High resid. var. ";.0001*INT(10000.*Fresvar);Lati$;Loni$;Fltnm$(Iflt)
+	20100 END IF
+	20110!
+	20120 END IF
+	20130 NEXT Iflt
 20140 ASSIGN @Pout TO *
 20150 ASSIGN @Pout_dim TO *
 20160 ASSIGN @Pscat TO *
@@ -2107,293 +2107,293 @@
 21070 END IF
 21080!
 21090 FOR J=1 TO Nym1
-21100 Y0=(J-1.)*Dy
-21110 FOR I=1 TO Nxm1
-21120 X0=(I-1.)*Dx
-21130 X1=E(I,J)+(RND-.5)/1.0E+5
-21140 X2=E(I,J+1)+(RND-.5)/1.0E+5
-21150 X3=E(I+1,J+1)+(RND-.5)/1.0E+5
-21160 X4=E(I+1,J)+(RND-.5)/1.0E+5
-21170!
-21180 Xmax=MAX(X1,X2,X3,X4)
-21190 Xmin=MIN(X1,X2,X3,X4)
-21200 IF Xmax<99. THEN
-21210! Four numbers available
-21220 FOR Con=Con1 TO Con2 STEP Conin
-21230 IF Con>Xmax THEN GOTO 23950
-21240 IF Con<Xmin THEN GOTO 21970
-21250! Get here, con>Xmin and Con<Xmax so contour passes through box
-21260 Ip=0
-21270 Zmin=MIN(X1,X2)
-21280 Zmax=MAX(X1,X2)
-21290 IF Con>=Zmin AND Con<=Zmax THEN
-21300 Ip=Ip+1
-21310 Xp(Ip)=X0
-21320 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
-21330 END IF
-21340!
-21350 Zmin=MIN(X3,X2)
-21360 Zmax=MAX(X3,X2)
-21370 IF Con>=Zmin AND Con<=Zmax THEN
-21380 Ip=Ip+1
-21390 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
-21400 Yp(Ip)=Y0+Dy
-21410 END IF
-21420!
-21430 Zmin=MIN(X3,X4)
-21440 Zmax=MAX(X3,X4)
-21450 IF Con>=Zmin AND Con<=Zmax THEN
-21460 Ip=Ip+1
-21470 Xp(Ip)=X0+Dx
-21480 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
-21490 END IF
-21500!
-21510 Zmin=MIN(X1,X4)
-21520 Zmax=MAX(X1,X4)
-21530 IF Con>=Zmin AND Con<=Zmax THEN
-21540 Ip=Ip+1
-21550 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
-21560 Yp(Ip)=Y0
-21570 END IF
-21580!
-21590 IF Con<-.5*Conin THEN PEN 2
-21600 IF ABS(Con)<.5*Conin THEN PEN 3
-21610 IF Con>.5*Conin THEN PEN 4
-21620!
-21630 IF Ip<3.1 THEN
-21640 MOVE Xp(1),Yp(1)
-21650 DRAW Xp(2),Yp(2)
-21660 ELSE
-21670 !
-21680 Xc=.25*(X1+X2+X3+X4)
-21690 Dir_opt=3
-21700 IF X4<=Con AND Con<=Xc THEN Dir_opt=1
-21710 IF X4>=Con AND Con>=Xc THEN Dir_opt=1
-21720 IF X2<=Con AND Con<=Xc THEN Dir_opt=1
-21730 IF X2>=Con AND Con>=Xc THEN Dir_opt=1
-21740 !
-21750 IF X1<=Con AND Con<=Xc THEN Dir_opt=2
-21760 IF X1>=Con AND Con>=Xc THEN Dir_opt=2
-21770 IF Xc>=Con AND Con>=X3 THEN Dir_opt=2
-21780 IF Xc<=Con AND Con<=X3 THEN Dir_opt=2
-21790 !
-21800 IF ABS(Dir_opt-1.)<.1 THEN
-21810 MOVE Xp(1),Yp(1)
-21820 DRAW Xp(2),Yp(2)
-21830 MOVE Xp(3),Yp(3)
-21840 DRAW Xp(4),Yp(4)
-21850 END IF
-21860 !
-21870 IF ABS(Dir_opt-2.)<.1 THEN
-21880 MOVE Xp(1),Yp(1)
-21890 DRAW Xp(4),Yp(4)
-21900 MOVE Xp(3),Yp(3)
-21910 DRAW Xp(2),Yp(2)
-21920 END IF
-21930!
-21940 END IF
-21950!
-21960 PEN 1
-21970 NEXT Con
-21980!
-21990 ELSE
-22000!
-22010! Less than four numbers available
-22020 N99=0
-22030 IF X1>99. THEN N99=N99+1
-22040 IF X2>99. THEN N99=N99+1
-22050 IF X3>99. THEN N99=N99+1
-22060 IF X4>99. THEN N99=N99+1
-22070 IF N99>1.5 THEN GOTO 23950
-22080! We have three numbers available
-22090!
-22100 IF X1>99. THEN
-22110! Three numbers are x2,x3 and x4
-22120 Xmax=MAX(X2,X3,X4)
-22130 Xmin=MIN(X2,X3,X4)
-22140 FOR Con=Con1 TO Con2 STEP Conin
-22150 IF Con<Xmin THEN GOTO 22500
-22160 IF Con>Xmax THEN GOTO 23950
-22170! a contour passes through
-22180 Ip=0
-22190 Zmin=MIN(X2,X3)
-22200 Zmax=MAX(X2,X3)
-22210 IF Con>=Zmin AND Con<=Zmax THEN
-22220 Ip=Ip+1
-22230 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
-22240 Yp(Ip)=Y0+Dy
-22250 END IF
-22260!
-22270 Zmin=MIN(X3,X4)
-22280 Zmax=MAX(X3,X4)
-22290 IF Con>=Zmin AND Con<=Zmax THEN
-22300 Ip=Ip+1
-22310 Xp(Ip)=X0+Dx
-22320 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
-22330 END IF
-22340!
-22350 Zmin=MIN(X2,X4)
-22360 Zmax=MAX(X2,X4)
-22370 IF Con>=Zmin AND Con<=Zmax THEN
-22380 Ip=Ip+1
-22390 Xp(Ip)=X0+Dx*(Con-X2)/(X4-X2)
-22400 Yp(Ip)=Y0+Dy*(Con-X4)/(X2-X4)
-22410 END IF
-22420!
-22430 IF Con<-.5*Conin THEN PEN 2
-22440 IF ABS(Con)<.5*Conin THEN PEN 3
-22450 IF Con>.5*Conin THEN PEN 4
-22460!
-22470 MOVE Xp(1),Yp(1)
-22480 DRAW Xp(2),Yp(2)
-22490 PEN 1
-22500 NEXT Con
-22510!
-22520 GOTO 23950
-22530 END IF
-22540!
-22550 IF X2>99. THEN
-22560! Three numbers are x1,x3 and x4
-22570 Xmax=MAX(X1,X3,X4)
-22580 Xmin=MIN(X1,X3,X4)
-22590 FOR Con=Con1 TO Con2 STEP Conin
-22600 IF Con<Xmin THEN GOTO 22950
-22610 IF Con>Xmax THEN GOTO 23950
-22620! a contour passes through
-22630 Ip=0
-22640 Zmin=MIN(X1,X3)
-22650 Zmax=MAX(X1,X3)
-22660 IF Con>=Zmin AND Con<=Zmax THEN
-22670 Ip=Ip+1
-22680 Xp(Ip)=X0+Dx*(Con-X1)/(X3-X1)
-22690 Yp(Ip)=Y0+Dy*(Con-X1)/(X3-X1)
-22700 END IF
-22710!
-22720 Zmin=MIN(X3,X4)
-22730 Zmax=MAX(X3,X4)
-22740 IF Con>=Zmin AND Con<=Zmax THEN
-22750 Ip=Ip+1
-22760 Xp(Ip)=X0+Dx
-22770 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
-22780 END IF
-22790!
-22800 Zmin=MIN(X1,X4)
-22810 Zmax=MAX(X1,X4)
-22820 IF Con>=Zmin AND Con<=Zmax THEN
-22830 Ip=Ip+1
-22840 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
-22850 Yp(Ip)=Y0
-22860 END IF
-22870!
-22880 IF Con<-.5*Conin THEN PEN 2
-22890 IF ABS(Con)<.5*Conin THEN PEN 3
-22900 IF Con>.5*Conin THEN PEN 4
-22910!
-22920 MOVE Xp(1),Yp(1)
-22930 DRAW Xp(2),Yp(2)
-22940 PEN 1
-22950 NEXT Con
-22960!
-22970 GOTO 23950
-22980 END IF
-22990!
-23000 IF X3>99. THEN
-23010! Three numbers are x1,x2 and x4
-23020 Xmax=MAX(X1,X2,X4)
-23030 Xmin=MIN(X1,X2,X4)
-23040 FOR Con=Con1 TO Con2 STEP Conin
-23050 IF Con<Xmin THEN GOTO 23400
-23060 IF Con>Xmax THEN GOTO 23950
-23070! a contour passes through
-23080 Ip=0
-23090 Zmin=MIN(X1,X2)
-23100 Zmax=MAX(X1,X2)
-23110 IF Con>=Zmin AND Con<=Zmax THEN
-23120 Ip=Ip+1
-23130 Xp(Ip)=X0
-23140 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
-23150 END IF
-23160!
-23170 Zmin=MIN(X2,X4)
-23180 Zmax=MAX(X2,X4)
-23190 IF Con>=Zmin AND Con<=Zmax THEN
-23200 Ip=Ip+1
-23210 Xp(Ip)=X0+Dx*(Con-X2)/(X4-X2)
-23220 Yp(Ip)=Y0+Dy*(Con-X2)/(X4-X2)
-23230 END IF
-23240!
-23250 Zmin=MIN(X1,X4)
-23260 Zmax=MAX(X1,X4)
-23270 IF Con>=Zmin AND Con<=Zmax THEN
-23280 Ip=Ip+1
-23290 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
-23300 Yp(Ip)=Y0
-23310 END IF
-23320!
-23330 IF Con<-.5*Conin THEN PEN 2
-23340 IF ABS(Con)<.5*Conin THEN PEN 3
-23350 IF Con>.5*Conin THEN PEN 4
-23360!
-23370 MOVE Xp(1),Yp(1)
-23380 DRAW Xp(2),Yp(2)
-23390 PEN 1
-23400 NEXT Con
-23410!
-23420 GOTO 23950
-23430 END IF
-23440!
-23450 IF X4>99. THEN
-23460! Three numbers are x1,x2 and x3
-23470!
-23480 Xmax=MAX(X1,X2,X3)
-23490 Xmin=MIN(X1,X2,X3)
-23500 FOR Con=Con1 TO Con2 STEP Conin
-23510 IF Con<Xmin THEN GOTO 23860
-23520 IF Con>Xmax THEN GOTO 23950
-23530! a contour passes through
-23540 Ip=0
-23550 Zmin=MIN(X1,X2)
-23560 Zmax=MAX(X1,X2)
-23570 IF Con>=Zmin AND Con<=Zmax THEN
-23580 Ip=Ip+1
-23590 Xp(Ip)=X0
-23600 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
-23610 END IF
-23620!
-23630 Zmin=MIN(X2,X3)
-23640 Zmax=MAX(X2,X3)
-23650 IF Con>=Zmin AND Con<=Zmax THEN
-23660 Ip=Ip+1
-23670 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
-23680 Yp(Ip)=Y0+Dy
-23690 END IF
-23700!
-23710 Zmin=MIN(X1,X3)
-23720 Zmax=MAX(X1,X3)
-23730 IF Con>=Zmin AND Con<=Zmax THEN
-23740 Ip=Ip+1
-23750 Xp(Ip)=X0+Dx*(Con-X1)/(X3-X1)
-23760 Yp(Ip)=Y0+Dy*(Con-X1)/(X3-X4)
-23770 END IF
-23780!
-23790 IF Con<-.5*Conin THEN PEN 2
-23800 IF ABS(Con)<.5*Conin THEN PEN 3
-23810 IF Con>.5*Conin THEN PEN 4
-23820!
-23830 MOVE Xp(1),Yp(1)
-23840 DRAW Xp(2),Yp(2)
-23850 PEN 1
-23860 NEXT Con
-23870!
-23880 GOTO 23950
-23890 END IF
-23900!
-23910!
-23920!
-23930 END IF
-23940!
-23950 NEXT I
-23960 NEXT J
+	21100 Y0=(J-1.)*Dy
+	21110 FOR I=1 TO Nxm1
+		21120 X0=(I-1.)*Dx
+		21130 X1=E(I,J)+(RND-.5)/1.0E+5
+		21140 X2=E(I,J+1)+(RND-.5)/1.0E+5
+		21150 X3=E(I+1,J+1)+(RND-.5)/1.0E+5
+		21160 X4=E(I+1,J)+(RND-.5)/1.0E+5
+		21170!
+		21180 Xmax=MAX(X1,X2,X3,X4)
+		21190 Xmin=MIN(X1,X2,X3,X4)
+		21200 IF Xmax<99. THEN
+		21210! Four numbers available
+		21220 FOR Con=Con1 TO Con2 STEP Conin
+			21230 IF Con>Xmax THEN GOTO 23950
+			21240 IF Con<Xmin THEN GOTO 21970
+			21250! Get here, con>Xmin and Con<Xmax so contour passes through box
+			21260 Ip=0
+			21270 Zmin=MIN(X1,X2)
+			21280 Zmax=MAX(X1,X2)
+			21290 IF Con>=Zmin AND Con<=Zmax THEN
+			21300 Ip=Ip+1
+			21310 Xp(Ip)=X0
+			21320 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
+			21330 END IF
+			21340!
+			21350 Zmin=MIN(X3,X2)
+			21360 Zmax=MAX(X3,X2)
+			21370 IF Con>=Zmin AND Con<=Zmax THEN
+			21380 Ip=Ip+1
+			21390 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
+			21400 Yp(Ip)=Y0+Dy
+			21410 END IF
+			21420!
+			21430 Zmin=MIN(X3,X4)
+			21440 Zmax=MAX(X3,X4)
+			21450 IF Con>=Zmin AND Con<=Zmax THEN
+			21460 Ip=Ip+1
+			21470 Xp(Ip)=X0+Dx
+			21480 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
+			21490 END IF
+			21500!
+			21510 Zmin=MIN(X1,X4)
+			21520 Zmax=MAX(X1,X4)
+			21530 IF Con>=Zmin AND Con<=Zmax THEN
+			21540 Ip=Ip+1
+			21550 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
+			21560 Yp(Ip)=Y0
+			21570 END IF
+			21580!
+			21590 IF Con<-.5*Conin THEN PEN 2
+			21600 IF ABS(Con)<.5*Conin THEN PEN 3
+			21610 IF Con>.5*Conin THEN PEN 4
+			21620!
+			21630 IF Ip<3.1 THEN
+			21640 MOVE Xp(1),Yp(1)
+			21650 DRAW Xp(2),Yp(2)
+			21660 ELSE
+			21670 !
+			21680 Xc=.25*(X1+X2+X3+X4)
+			21690 Dir_opt=3
+			21700 IF X4<=Con AND Con<=Xc THEN Dir_opt=1
+			21710 IF X4>=Con AND Con>=Xc THEN Dir_opt=1
+			21720 IF X2<=Con AND Con<=Xc THEN Dir_opt=1
+			21730 IF X2>=Con AND Con>=Xc THEN Dir_opt=1
+			21740 !
+			21750 IF X1<=Con AND Con<=Xc THEN Dir_opt=2
+			21760 IF X1>=Con AND Con>=Xc THEN Dir_opt=2
+			21770 IF Xc>=Con AND Con>=X3 THEN Dir_opt=2
+			21780 IF Xc<=Con AND Con<=X3 THEN Dir_opt=2
+			21790 !
+			21800 IF ABS(Dir_opt-1.)<.1 THEN
+			21810 MOVE Xp(1),Yp(1)
+			21820 DRAW Xp(2),Yp(2)
+			21830 MOVE Xp(3),Yp(3)
+			21840 DRAW Xp(4),Yp(4)
+			21850 END IF
+			21860 !
+			21870 IF ABS(Dir_opt-2.)<.1 THEN
+			21880 MOVE Xp(1),Yp(1)
+			21890 DRAW Xp(4),Yp(4)
+			21900 MOVE Xp(3),Yp(3)
+			21910 DRAW Xp(2),Yp(2)
+			21920 END IF
+			21930!
+			21940 END IF
+			21950!
+			21960 PEN 1
+			21970 NEXT Con
+		21980!
+		21990 ELSE
+		22000!
+		22010! Less than four numbers available
+		22020 N99=0
+		22030 IF X1>99. THEN N99=N99+1
+		22040 IF X2>99. THEN N99=N99+1
+		22050 IF X3>99. THEN N99=N99+1
+		22060 IF X4>99. THEN N99=N99+1
+		22070 IF N99>1.5 THEN GOTO 23950
+		22080! We have three numbers available
+		22090!
+		22100 IF X1>99. THEN
+		22110! Three numbers are x2,x3 and x4
+		22120 Xmax=MAX(X2,X3,X4)
+		22130 Xmin=MIN(X2,X3,X4)
+		22140 FOR Con=Con1 TO Con2 STEP Conin
+			22150 IF Con<Xmin THEN GOTO 22500
+			22160 IF Con>Xmax THEN GOTO 23950
+			22170! a contour passes through
+			22180 Ip=0
+			22190 Zmin=MIN(X2,X3)
+			22200 Zmax=MAX(X2,X3)
+			22210 IF Con>=Zmin AND Con<=Zmax THEN
+			22220 Ip=Ip+1
+			22230 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
+			22240 Yp(Ip)=Y0+Dy
+			22250 END IF
+			22260!
+			22270 Zmin=MIN(X3,X4)
+			22280 Zmax=MAX(X3,X4)
+			22290 IF Con>=Zmin AND Con<=Zmax THEN
+			22300 Ip=Ip+1
+			22310 Xp(Ip)=X0+Dx
+			22320 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
+			22330 END IF
+			22340!
+			22350 Zmin=MIN(X2,X4)
+			22360 Zmax=MAX(X2,X4)
+			22370 IF Con>=Zmin AND Con<=Zmax THEN
+			22380 Ip=Ip+1
+			22390 Xp(Ip)=X0+Dx*(Con-X2)/(X4-X2)
+			22400 Yp(Ip)=Y0+Dy*(Con-X4)/(X2-X4)
+			22410 END IF
+			22420!
+			22430 IF Con<-.5*Conin THEN PEN 2
+			22440 IF ABS(Con)<.5*Conin THEN PEN 3
+			22450 IF Con>.5*Conin THEN PEN 4
+			22460!
+			22470 MOVE Xp(1),Yp(1)
+			22480 DRAW Xp(2),Yp(2)
+			22490 PEN 1
+			22500 NEXT Con
+		22510!
+		22520 GOTO 23950
+		22530 END IF
+		22540!
+		22550 IF X2>99. THEN
+		22560! Three numbers are x1,x3 and x4
+		22570 Xmax=MAX(X1,X3,X4)
+		22580 Xmin=MIN(X1,X3,X4)
+		22590 FOR Con=Con1 TO Con2 STEP Conin
+			22600 IF Con<Xmin THEN GOTO 22950
+			22610 IF Con>Xmax THEN GOTO 23950
+			22620! a contour passes through
+			22630 Ip=0
+			22640 Zmin=MIN(X1,X3)
+			22650 Zmax=MAX(X1,X3)
+			22660 IF Con>=Zmin AND Con<=Zmax THEN
+			22670 Ip=Ip+1
+			22680 Xp(Ip)=X0+Dx*(Con-X1)/(X3-X1)
+			22690 Yp(Ip)=Y0+Dy*(Con-X1)/(X3-X1)
+			22700 END IF
+			22710!
+			22720 Zmin=MIN(X3,X4)
+			22730 Zmax=MAX(X3,X4)
+			22740 IF Con>=Zmin AND Con<=Zmax THEN
+			22750 Ip=Ip+1
+			22760 Xp(Ip)=X0+Dx
+			22770 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
+			22780 END IF
+			22790!
+			22800 Zmin=MIN(X1,X4)
+			22810 Zmax=MAX(X1,X4)
+			22820 IF Con>=Zmin AND Con<=Zmax THEN
+			22830 Ip=Ip+1
+			22840 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
+			22850 Yp(Ip)=Y0
+			22860 END IF
+			22870!
+			22880 IF Con<-.5*Conin THEN PEN 2
+			22890 IF ABS(Con)<.5*Conin THEN PEN 3
+			22900 IF Con>.5*Conin THEN PEN 4
+			22910!
+			22920 MOVE Xp(1),Yp(1)
+			22930 DRAW Xp(2),Yp(2)
+			22940 PEN 1
+			22950 NEXT Con
+		22960!
+		22970 GOTO 23950
+		22980 END IF
+		22990!
+		23000 IF X3>99. THEN
+		23010! Three numbers are x1,x2 and x4
+		23020 Xmax=MAX(X1,X2,X4)
+		23030 Xmin=MIN(X1,X2,X4)
+		23040 FOR Con=Con1 TO Con2 STEP Conin
+			23050 IF Con<Xmin THEN GOTO 23400
+			23060 IF Con>Xmax THEN GOTO 23950
+			23070! a contour passes through
+			23080 Ip=0
+			23090 Zmin=MIN(X1,X2)
+			23100 Zmax=MAX(X1,X2)
+			23110 IF Con>=Zmin AND Con<=Zmax THEN
+			23120 Ip=Ip+1
+			23130 Xp(Ip)=X0
+			23140 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
+			23150 END IF
+			23160!
+			23170 Zmin=MIN(X2,X4)
+			23180 Zmax=MAX(X2,X4)
+			23190 IF Con>=Zmin AND Con<=Zmax THEN
+			23200 Ip=Ip+1
+			23210 Xp(Ip)=X0+Dx*(Con-X2)/(X4-X2)
+			23220 Yp(Ip)=Y0+Dy*(Con-X2)/(X4-X2)
+			23230 END IF
+			23240!
+			23250 Zmin=MIN(X1,X4)
+			23260 Zmax=MAX(X1,X4)
+			23270 IF Con>=Zmin AND Con<=Zmax THEN
+			23280 Ip=Ip+1
+			23290 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
+			23300 Yp(Ip)=Y0
+			23310 END IF
+			23320!
+			23330 IF Con<-.5*Conin THEN PEN 2
+			23340 IF ABS(Con)<.5*Conin THEN PEN 3
+			23350 IF Con>.5*Conin THEN PEN 4
+			23360!
+			23370 MOVE Xp(1),Yp(1)
+			23380 DRAW Xp(2),Yp(2)
+			23390 PEN 1
+			23400 NEXT Con
+		23410!
+		23420 GOTO 23950
+		23430 END IF
+		23440!
+		23450 IF X4>99. THEN
+		23460! Three numbers are x1,x2 and x3
+		23470!
+		23480 Xmax=MAX(X1,X2,X3)
+		23490 Xmin=MIN(X1,X2,X3)
+		23500 FOR Con=Con1 TO Con2 STEP Conin
+			23510 IF Con<Xmin THEN GOTO 23860
+			23520 IF Con>Xmax THEN GOTO 23950
+			23530! a contour passes through
+			23540 Ip=0
+			23550 Zmin=MIN(X1,X2)
+			23560 Zmax=MAX(X1,X2)
+			23570 IF Con>=Zmin AND Con<=Zmax THEN
+			23580 Ip=Ip+1
+			23590 Xp(Ip)=X0
+			23600 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
+			23610 END IF
+			23620!
+			23630 Zmin=MIN(X2,X3)
+			23640 Zmax=MAX(X2,X3)
+			23650 IF Con>=Zmin AND Con<=Zmax THEN
+			23660 Ip=Ip+1
+			23670 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
+			23680 Yp(Ip)=Y0+Dy
+			23690 END IF
+			23700!
+			23710 Zmin=MIN(X1,X3)
+			23720 Zmax=MAX(X1,X3)
+			23730 IF Con>=Zmin AND Con<=Zmax THEN
+			23740 Ip=Ip+1
+			23750 Xp(Ip)=X0+Dx*(Con-X1)/(X3-X1)
+			23760 Yp(Ip)=Y0+Dy*(Con-X1)/(X3-X4)
+			23770 END IF
+			23780!
+			23790 IF Con<-.5*Conin THEN PEN 2
+			23800 IF ABS(Con)<.5*Conin THEN PEN 3
+			23810 IF Con>.5*Conin THEN PEN 4
+			23820!
+			23830 MOVE Xp(1),Yp(1)
+			23840 DRAW Xp(2),Yp(2)
+			23850 PEN 1
+			23860 NEXT Con
+		23870!
+		23880 GOTO 23950
+		23890 END IF
+		23900!
+		23910!
+		23920!
+		23930 END IF
+		23940!
+		23950 NEXT I
+	23960 NEXT J
 23970 PEN 1
 23980!
 23990 SUBEND
@@ -2408,84 +2408,84 @@
 24080 SHOW -.20*Xl,1.001*Xl,-.1*Yl,1.001*Yl
 24090!
 24100 FOR J=1 TO Nym1
-24110 Y0=(J-1.)*Dy
-24120 FOR I=1 TO Nxm1
-24130 X0=(I-1.)*Dx
-24140 X1=E(I,J)
-24150 X2=E(I,J+1)
-24160 X3=E(I+1,J+1)
-24170 X4=E(I+1,J)
-24180!
-24190 Xmax=MAX(X1,X2,X3,X4)
-24200 Xmin=MIN(X1,X2,X3,X4)
-24210! Four numbers available
-24220 FOR Con=Conin TO Conin STEP Conin
-24230 IF Con>Xmax THEN GOTO 24850
-24240 IF Con<Xmin THEN GOTO 24850
-24250! Get here, con>Xmin and Con<Xmax so contour passes through box
-24260 Ip=0
-24270 Zmin=MIN(X1,X2)
-24280 Zmax=MAX(X1,X2)
-24290 IF Con>=Zmin AND Con<=Zmax THEN
-24300 Ip=Ip+1
-24310 Xp(Ip)=X0
-24320 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
-24330 END IF
-24340!
-24350 Zmin=MIN(X3,X2)
-24360 Zmax=MAX(X3,X2)
-24370 IF Con>=Zmin AND Con<=Zmax THEN
-24380 Ip=Ip+1
-24390 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
-24400 Yp(Ip)=Y0+Dy
-24410 END IF
-24420!
-24430 Zmin=MIN(X3,X4)
-24440 Zmax=MAX(X3,X4)
-24450 IF Con>=Zmin AND Con<=Zmax THEN
-24460 Ip=Ip+1
-24470 Xp(Ip)=X0+Dx
-24480 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
-24490 END IF
-24500!
-24510 Zmin=MIN(X1,X4)
-24520 Zmax=MAX(X1,X4)
-24530 IF Con>=Zmin AND Con<=Zmax THEN
-24540 Ip=Ip+1
-24550 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
-24560 Yp(Ip)=Y0
-24570 END IF
-24580!
-24590 IF Ip<3.1 THEN
-24600 MOVE Xp(1),Yp(1)
-24610 DRAW Xp(2),Yp(2)
-24620 ELSE
-24630 Xc=.25*(X1+X2+X3+X4)
-24640 Dir_opt=1
-24650 IF X1<=Con AND Con<=Xc THEN Dir_opt=2
-24660 IF X1>=Con AND Con>=Xc THEN Dir_opt=2
-24670 IF Xc>=Con AND Con>=X3 THEN Dir_opt=2
-24680 IF Xc<=Con AND Con<=X3 THEN Dir_opt=2
-24690!
-24700 IF Dir_opt=1 THEN
-24710 MOVE Xpt(1),Ypt(1)
-24720 DRAW Xpt(2),Ypt(2)
-24730 MOVE Xpt(3),Ypt(3)
-24740 DRAW Xpt(4),Ypt(4)
-24750 ELSE
-24760 MOVE Xpt(1),Ypt(1)
-24770 DRAW Xpt(4),Ypt(4)
-24780 MOVE Xpt(3),Ypt(3)
-24790 DRAW Xpt(2),Ypt(2)
-24800 END IF
-24810!
-24820 END IF
-24830!
-24840 PEN 1
-24850 NEXT Con
-24860!
-24870 NEXT I
-24880 NEXT J
+	24110 Y0=(J-1.)*Dy
+	24120 FOR I=1 TO Nxm1
+		24130 X0=(I-1.)*Dx
+		24140 X1=E(I,J)
+		24150 X2=E(I,J+1)
+		24160 X3=E(I+1,J+1)
+		24170 X4=E(I+1,J)
+		24180!
+		24190 Xmax=MAX(X1,X2,X3,X4)
+		24200 Xmin=MIN(X1,X2,X3,X4)
+		24210! Four numbers available
+		24220 FOR Con=Conin TO Conin STEP Conin
+			24230 IF Con>Xmax THEN GOTO 24850
+			24240 IF Con<Xmin THEN GOTO 24850
+			24250! Get here, con>Xmin and Con<Xmax so contour passes through box
+			24260 Ip=0
+			24270 Zmin=MIN(X1,X2)
+			24280 Zmax=MAX(X1,X2)
+			24290 IF Con>=Zmin AND Con<=Zmax THEN
+			24300 Ip=Ip+1
+			24310 Xp(Ip)=X0
+			24320 Yp(Ip)=Y0+Dy*(Con-X1)/(X2-X1)
+			24330 END IF
+			24340!
+			24350 Zmin=MIN(X3,X2)
+			24360 Zmax=MAX(X3,X2)
+			24370 IF Con>=Zmin AND Con<=Zmax THEN
+			24380 Ip=Ip+1
+			24390 Xp(Ip)=X0+Dx*(Con-X2)/(X3-X2)
+			24400 Yp(Ip)=Y0+Dy
+			24410 END IF
+			24420!
+			24430 Zmin=MIN(X3,X4)
+			24440 Zmax=MAX(X3,X4)
+			24450 IF Con>=Zmin AND Con<=Zmax THEN
+			24460 Ip=Ip+1
+			24470 Xp(Ip)=X0+Dx
+			24480 Yp(Ip)=Y0+Dy*(Con-X4)/(X3-X4)
+			24490 END IF
+			24500!
+			24510 Zmin=MIN(X1,X4)
+			24520 Zmax=MAX(X1,X4)
+			24530 IF Con>=Zmin AND Con<=Zmax THEN
+			24540 Ip=Ip+1
+			24550 Xp(Ip)=X0+Dx*(Con-X1)/(X4-X1)
+			24560 Yp(Ip)=Y0
+			24570 END IF
+			24580!
+			24590 IF Ip<3.1 THEN
+			24600 MOVE Xp(1),Yp(1)
+			24610 DRAW Xp(2),Yp(2)
+			24620 ELSE
+			24630 Xc=.25*(X1+X2+X3+X4)
+			24640 Dir_opt=1
+			24650 IF X1<=Con AND Con<=Xc THEN Dir_opt=2
+			24660 IF X1>=Con AND Con>=Xc THEN Dir_opt=2
+			24670 IF Xc>=Con AND Con>=X3 THEN Dir_opt=2
+			24680 IF Xc<=Con AND Con<=X3 THEN Dir_opt=2
+			24690!
+			24700 IF Dir_opt=1 THEN
+			24710 MOVE Xpt(1),Ypt(1)
+			24720 DRAW Xpt(2),Ypt(2)
+			24730 MOVE Xpt(3),Ypt(3)
+			24740 DRAW Xpt(4),Ypt(4)
+			24750 ELSE
+			24760 MOVE Xpt(1),Ypt(1)
+			24770 DRAW Xpt(4),Ypt(4)
+			24780 MOVE Xpt(3),Ypt(3)
+			24790 DRAW Xpt(2),Ypt(2)
+			24800 END IF
+			24810!
+			24820 END IF
+			24830!
+			24840 PEN 1
+			24850 NEXT Con
+		24860!
+		24870 NEXT I
+	24880 NEXT J
 24890 PEN 1
 24900!
 24910 MOVE 0,0
@@ -2524,16 +2524,16 @@
 25240 Sumewgt=0.
 25250 A2=.25
 25260 FOR I=I1 TO I2
-25270 IF I<1 OR I>Nx THEN GOTO 25360
-25280 FOR J=J1 TO J2
-25290 IF J<1 OR J>Ny THEN GOTO 25350
-25300 IF E(I,J,M)>99. THEN GOTO 25350
-25310 Rho2=(I-X)*(I-X)+(J-Y)*(J-Y)
-25320 Wgt=EXP(-Rho2/A2)
-25330 Sumwgt=Sumwgt+Wgt
-25340 Sumewgt=Sumewgt+E(I,J,M)*Wgt
-25350 NEXT J
-25360 NEXT I
+	25270 IF I<1 OR I>Nx THEN GOTO 25360
+	25280 FOR J=J1 TO J2
+		25290 IF J<1 OR J>Ny THEN GOTO 25350
+		25300 IF E(I,J,M)>99. THEN GOTO 25350
+		25310 Rho2=(I-X)*(I-X)+(J-Y)*(J-Y)
+		25320 Wgt=EXP(-Rho2/A2)
+		25330 Sumwgt=Sumwgt+Wgt
+		25340 Sumewgt=Sumewgt+E(I,J,M)*Wgt
+		25350 NEXT J
+	25360 NEXT I
 25370!
 25380 IF Sumwgt>.2 THEN Eval=Sumewgt/Sumwgt
 25390!
