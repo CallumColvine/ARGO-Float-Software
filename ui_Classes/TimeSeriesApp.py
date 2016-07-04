@@ -6,7 +6,7 @@ sys.path.append("..")
 
 
 # Utility File imports
-from utilities.TimeSeriesUtilities import formatToDateTime, julianToDate, \
+from utilities.ARGO_Utilities import formatToDateTime, julianToDate, \
     dateToJulian, lastRun, todayInDate, getSigmaT, getSvanom, getSpiciness, \
     getProfile, checkPressureMonotonic, removeIndexFromPTS
 # UI imports
