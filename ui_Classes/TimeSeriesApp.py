@@ -35,13 +35,11 @@ SAVELOCALLY = True
 class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     def __init__(self, parent):
-        print "TimeSeriesApp init called"
         super(TimeSeriesApp, self).__init__()
         self.setupUi(self)
         self.initAllClassVariables()
         self.setupSignals()
         self.userDefinedSettings()
-
         return
         
     ''' This method holds references to all class variables. For anyone unclear,

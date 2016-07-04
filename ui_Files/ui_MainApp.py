@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainApp.ui'
+# Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\MainApp.ui'
 #
-# Created: Thu Jun 30 16:18:56 2016
+# Created: Mon Jul 04 12:17:23 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -169,13 +169,10 @@ class Ui_MainApp(object):
         spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_20.addItem(spacerItem10)
         self.verticalLayout_3.addLayout(self.horizontalLayout_20)
-        self.label_3 = QtGui.QLabel(self.circulationPage)
-        self.label_3.setObjectName("label_3")
-        self.verticalLayout_3.addWidget(self.label_3)
-        self.widget = QtGui.QWidget(self.circulationPage)
-        self.widget.setMinimumSize(QtCore.QSize(0, 600))
-        self.widget.setObjectName("widget")
-        self.verticalLayout_3.addWidget(self.widget)
+        self.circulationApp = CirculationApp(self.circulationPage)
+        self.circulationApp.setMinimumSize(QtCore.QSize(0, 600))
+        self.circulationApp.setObjectName("circulationApp")
+        self.verticalLayout_3.addWidget(self.circulationApp)
         self.horizontalLayout_21 = QtGui.QHBoxLayout()
         self.horizontalLayout_21.setObjectName("horizontalLayout_21")
         self.backToProgramListButton2 = QtGui.QPushButton(self.circulationPage)
@@ -195,7 +192,7 @@ class Ui_MainApp(object):
         MainApp.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainApp)
-        self.listAllPages.setCurrentIndex(0)
+        self.listAllPages.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainApp)
 
     def retranslateUi(self, MainApp):
@@ -211,7 +208,7 @@ class Ui_MainApp(object):
         self.label_4.setText(QtGui.QApplication.translate("MainApp", "Time Series", None, QtGui.QApplication.UnicodeUTF8))
         self.backToProgramListButton.setText(QtGui.QApplication.translate("MainApp", "Back to Program List", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("MainApp", "Circulation", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("MainApp", "Under Devlopment...", None, QtGui.QApplication.UnicodeUTF8))
         self.backToProgramListButton2.setText(QtGui.QApplication.translate("MainApp", "Back to Program List", None, QtGui.QApplication.UnicodeUTF8))
 
+from ui_Classes.CirculationApp import CirculationApp
 from ui_Classes.TimeSeriesApp import TimeSeriesApp

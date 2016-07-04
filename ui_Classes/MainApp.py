@@ -20,6 +20,8 @@ Potential upgrades to TimeSeries if there is time in the futre:
 # This is to deal with path issues for the sake of project organizaiton
 import sys
 sys.path.append("..")
+# For development, make this your path to the project ui_Classes folder
+sys.path.append('C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software')
 
 from PySide import QtCore, QtGui
 from TimeSeriesApp import TimeSeriesApp
