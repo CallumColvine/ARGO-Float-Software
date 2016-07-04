@@ -6,8 +6,9 @@ sys.path.append("..")
 
 
 # Utility File imports
-from utilities.TimeSeriesUtilities import formatToDateTime, \
-    julianToDate, dateToJulian
+from utilities.TimeSeriesUtilities import formatToDateTime, julianToDate, \
+    dateToJulian, lastRun, todayInDate, getSigmaT, getSvanom, getSpiciness, \
+    getProfile, checkPressureMonotonic, removeIndexFromPTS
 # UI imports
 from PySide import QtCore, QtGui
 from PySide.QtGui import QWidget
@@ -103,12 +104,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.curMonth = 05
             self.curYear = 2016
         else:
-            self.curDay = int(time.strftime("%d"))
-            self.curMonth = int(time.strftime("%m"))
-            self.curYear = int(time.strftime("%Y"))
-        todayInJul = self.todayInJulian()
-        day, month, year = self.todayInDate()
-        self.currentDayDateEdit.setDate(QDate(year, month, day))
+            self.curDay, self.curMonth, self.curYear = todayInDate()
+        self.currentDayDateEdit.setDate(QDate(self.curYear,
+                                              self.curMonth, 
+                                              self.curDay))
         self.numFloats = 0
 
         self.Te = np.empty((500, 500))
@@ -148,9 +147,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.localSoftwarePath = "C:\\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
             self.outPath = self.localSoftwarePath + "argo_out_TEST\\TimeSeries\\"
             self.sigPath = self.localSoftwarePath + "projects\\Sigma_Climate\\"
-            self.lastRun(self.localSoftwarePath, 2)
+            lastRun(self.localSoftwarePath, 2)
         else:
-            self.lastRun(self.drive, 2)
+            lastRun(self.drive, 2)
         # Made this file empty here when he writes 3x71 empties
         # if problems: change this maybe
         csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
@@ -370,191 +369,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         #     self.nPress = 300
         return
 
-
-    ''' Heavy calculations originated from Howard's code. Will not be converted
-    to naming standards '''
-    def getSigmaT(self, S, T):
-        # 12640! T  = Temperature in C
-        # 12650! S  = salinity in pss-78
-        R4 = 4.8314E-4
-        Dr350 = 28.106331
-        salSqRoot = np.sqrt(S)
-        R1 = ((((6.536332E-9 * T - 1.120083E-6) * T + 1.001685E-4)
-               * T - 9.09529E-3) * T + 6.793952E-2) * T - 28.263737
-        R2 = (((5.3875E-9 * T - 8.2467E-7) * T + 7.6438E-5)
-              * T - 4.0899E-3) * T + 8.24493E-1
-        R3 = (-1.6546E-6 * T + 1.0227E-4) * T - 5.72466E-3
-        Sig = (R4 * S + R3 * salSqRoot + R2) * S + R1
-        Sigma = Sig + Dr350
-        Sigma_t = ((Sigma + 1000.) / .999975) - 1000.
-        return Sigma_t
-
-    ''' Called on float numbers that have been found in the index file. Get 
-    profile will determine the order in which and fill up the P, T, S arrays '''
-    def getProfile(self,
-                   floatPath,
-                   rFlag):
-        rFlag = -1
-        order = []
-        numChannels = 0
-        numRecords = 0
-        fileTempQc = 0
-        filePSalQc = 0
-        numRecs = self.extractDataFromFloatFile(floatPath, order)
-        if not self.checkIfReturn(numRecs, fileTempQc, filePSalQc):
-            print "in getProfile, returning prematurely due to bad values"
-            return
-        return numRecs
-
-    def sanityCheck(self, numRecs):
-        numRecs = self.checkOutOfRange(numRecs)
-        numRecs = self.checkPressureMonotonic(numRecs)
-        return numRecs
-
-    def removeIndexFromPTS(self, i, numRecs):
-        np.delete(self.P, i)
-        np.delete(self.T, i)
-        np.delete(self.S, i)
-        numRecs -= 1
-        return numRecs
-
-
-    # ToDo: could be moved to the Utils file
-    ''' Checks if the pressure array is monotonic'''
-    def checkPressureMonotonic(self, numRecs):
-        for i in xrange(1, (numRecs - 2)):
-            if ((self.P[i] > self.P[i - 1] and self.P[i] > self.P[i + 1]) or 
-                (self.P[i] < self.P[i - 1] and self.P[i] < self.P[i + 1])):
-                numRecs = self.removeIndexFromPTS(i, numRecs)
-        return numRecs
-
-    def checkOutOfRange(self, numRecs):
-        # Loop, if out of range, remove and adjust all values to cover up
-        for i in xrange(0, numRecs):
-            if (self.P[i] < -0.5 or
-                self.P[i] > 2200 or
-                self.T[i] < -2.5 or
-                self.T[i] > 30 or
-                self.S[i] < 30 or
-                self.S[i] > 39):
-                numRecs = self.removeIndexFromPTS(i, numRecs)
-        return numRecs
-
-    ''' Used by getProfile() to determine validity of float data '''
-    def extractDataFromFloatFile(self, path, order):
-        # print "Opening path ", path
-        floatFile = open(path, 'r')
-        passedEndOfHeader = False
-        pFound = False
-        tFound = False
-        sFound = False
-        numRecs = 0
-        i = 0
-        for line in floatFile:
-            if not passedEndOfHeader:
-                if line.find("NUMBER OF RECORDS") != -1:
-                    numRecs = self.getNumRecs(line)
-                order, pFound, tFound, sFound = \
-                    self.findOrder(line, order, pFound, tFound, sFound)
-                if not (self.verifyUsability(line)):
-                    return
-            else:
-                i += 1
-                self.appendInfo(line, order, i)
-            if line.find("END OF HEADER") != -1:
-                passedEndOfHeader = True
-        return numRecs
-
-    def getNumRecs(self, line):
-        split = line.split()
-        # print "numRecs is ", int(split[4])
-        return int(split[4])
-
-    ''' Adds data pulled form individual float files to the P, T, S arrays '''
-    def appendInfo(self, line, order, i):
-        split = line.split()
-        # print "Split is ", split
-        offset = 5
-        position = 0
-        # if order != ['P', 'T', 'S']:
-        #     print "----- Order is different -----"
-        for data in order:
-            twoPos = float(split[2 + (position * 5)])
-            zeroPos = float(split[0 + (position * 5)])
-            if data == 'P':
-                if np.abs(twoPos) < 9000:
-                    self.P[i] = twoPos
-                else:
-                    self.P[i] = zeroPos
-            elif data == 'T':
-                if np.abs(twoPos) < 9000:
-                    self.T[i] = twoPos
-                else:
-                    self.T[i] = zeroPos
-            elif data == 'S':
-                if np.abs(twoPos) < 9000:
-                    self.S[i] = twoPos
-                else:
-                    self.S[i] = zeroPos
-            position += 1
-
-        return
-
-    ''' Makes sure float has minimum requirements for data '''
-    def verifyUsability(self, line):
-        if line.find("NUMBER OF RECORDS") != -1:
-            if line.split()[2] < 15:
-                return False
-        if line.find("NUMBER OF CHANNELS") != -1:
-            if line.split()[2] < 8:
-                return False
-        return True
-
-    ''' Used to determine the order of data held inside each float file'''
-    # TODO: Improve runtime, reduce calls to this function
-    def findOrder(self, line, order, pFound, tFound, sFound):
-        resP = -1
-        resT = -1
-        resS = -1
-        # print line
-        if not pFound:
-            resP = line.find("PRES_ADJUSTED ")
-        if not tFound:
-            resT = line.find("TEMP_ADJUSTED ")
-        if not sFound:
-            resS = line.find("PSAL_ADJUSTED ")
-        if resP != -1:
-            pFound = True
-            order.append('P')
-        elif resT != -1:
-            tFound = True
-            order.append('T')
-        elif resS != -1:
-            sFound = True
-            order.append('S')
-        return order, pFound, tFound, sFound
-
-    ''' Quits dataset of float if it does not have all the required components '''
-    def checkIfReturn(self, numRecords, fileTempQc, filePSalQc):
-        if numRecords < 15:
-            return False
-        if fileTempQc == 'C':
-            return False
-        if fileTempQc == 'D':
-            return False
-        if fileTempQc == 'E':
-            return False
-        if fileTempQc == 'F':
-            return False
-        if filePSalQc == 'C':
-            return False
-        if filePSalQc == 'D':
-            return False
-        if filePSalQc == 'E':
-            return False
-        if filePSalQc == 'F':
-            return False
-        return True
     ''' Pulls from self.startDate and self.endDate to get the 2 corresponding 
     Julian dates '''
     def getJulianStartAndEnd(self):
@@ -623,10 +437,14 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             rFlag = -1
             j = 0
             for singleFloat in floats:
-                numRecs = self.getProfile(singleFloat, rFlag)
+                numRecs = getProfile(singleFloat, 
+                                     rFlag, 
+                                     self.P, 
+                                     self.T, 
+                                     self.S)
                 numRecs = self.sanityCheck(numRecs)
                 self.floatUsable[j] = True
-                sigT = self.getSigmaT(self.S[0], self.T[0])
+                sigT = getSigmaT(self.S[0], self.T[0])
                 sTav, sTavSq, sTKnt = self.calcStats(
                     sigT, sTav, sTavSq, sTKnt, numRecs, j)
                 j += 1
@@ -672,9 +490,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
         if SAVELOCALLY:
-            self.lastRun(self.localSoftwarePath, -1)
+            lastRun(self.localSoftwarePath, -1)
         else:
-            self.lastRun(self.drive, -1)
+            lastRun(self.drive, -1)
         return
 
     ''' Writes to final output files TS_Shgt.csv, Strat.csv, and lstmsge.csv '''
@@ -797,9 +615,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             else:
                 print "float not usable to calculate qSal"
             self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
-            qSigmaT = self.getSigmaT(qSal, qTemp)
-            qSpice = self.getSpiciness(qTemp, qSal)
-            sigma, svan = self.getSvanom(qSal, qTemp, 0)
+            qSigmaT = getSigmaT(qSal, qTemp)
+            qSpice = getSpiciness(qTemp, qSal)
+            sigma, svan = getSvanom(qSal, qTemp, 0)
             self.P[iterPress] = self.stepSize * (iterPress - 1)
             self.T[iterPress] = qTemp
             self.S[iterPress] = qSal
@@ -884,79 +702,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             ',' + Sap)
         return Tep, Sap
 
-    # Variable names conflict with standard due to direct port of code of 
-    # Howard's HT Basic.
-    def getSvanom(self, S, T, P0):
-        # Compute the density anomaly, sigma, in kg/m^3
-        # Density anomaly is identical with sigma-t without pressure terms
-        # P0 = Pressure in decibars
-        # T  = Temperature in deg C
-        # S  = salinity in pss-78
-        R3500 = 1028.106331
-        R4 = 4.8314E-4
-        Dr350 = 28.106331
-        P = P0 / 10
-        salSqRoot = np.sqrt(S)
-        R1 = ((((6.536332E-9 * T - 1.120083E-6) * T + 1.001685E-4)
-               * T - 9.09529E-3) * T + 6.793952E-2) * T - 28.263737
-        R2 = (((5.3875E-9 * T - 8.2467E-7) * T + 7.6438E-5)
-              * T - 4.0899E-3) * T + 8.24493E-1
-        R3 = (-1.6546E-6 * T + 1.0227E-4) * T - 5.72466E-3
-        Sig = (R4 * S + R3 * salSqRoot + R2) * S + R1
-        V350p = 1 / R3500
-        Sva = -Sig * V350p / (R3500 + Sig)
-        Sigma = Sig + Dr350
-        # Scale specific volume anomaly to normally reported units
-        Svan = Sva * 1.0E+8
-        if P == 0:
-            return Sigma, Svan
-        E = (9.1697E-10 * T + 2.0816E-8) * T - 9.9348E-7
-        Bw = (5.2787E-8 * T - 6.12293E-6) * T + 3.47718E-5
-        B = Bw + E * S
-        D = 1.91075E-4
-        C = (-1.6078E-6 * T - 1.0981E-5) * T + 2.2838E-3
-        Aw = ((-5.77905E-7 * T + 1.16092E-4) * T + 1.43713E-3) * T - .1194975
-        A = (D * salSqRoot + C) * S + Aw
-        B1 = (-5.3009E-4 * T + 1.6483E-2) * T + 7.944E-2
-        A1 = ((-6.167E-5 * T + 1.09987E-2) * T - .603459) * T + 54.6746
-        Kw = (((-5.155288E-5 * T + 1.360477E-2) * T - 2.327105)
-              * T + 148.4206) * T - 1930.06
-        K0 = (B1 * salSqRoot + A1) * S + Kw
-        Dk = (B * P + A) * P + K0
-        K35 = (5.03217E-5 * P + 3.359406) * P + 21582.27
-        Gam = P / K35
-        Pk = 1.0 - Gam
-        Sva = Sva * Pk + \
-            (V350p + Sva) * P * Dk / (K35 * (K35 + Dk))
-        Svan = Sva * 1.0E+8
-        V350p = V350p * Pk
-        # Density anomaly computed relative to 1000 kg/m^3
-        # DR350 = density anomaly at 35 pss, 0 deg C and 0 decibars
-        # dr35p = density anomaly at 35 pss, 0 deg C and pressure = p0 decibars
-        # Dvan  = Density anomaly variations involving spec vol anom
-        Dr35p = Gam / V350p
-        Dvan = Sva / (V350p * (V350p + Sva))
-        Sigma = Dr350 + Dr35p - Dvan
-        return Sigma, Svan
-
-    ''' Returns the spiciness of the water. '''
-    def getSpiciness(self, temp, salt):
-        # Hardcoded by Howard
-        b = np.matrix([[0.0, .77442, -.00585, .000984, -.000206],
-                       [.051665, .002034, -.0002745, -.0000085, .0000136],
-                       [-6.64783E-3, -2.4681E-4, -1.428E-5, 3.337E-5, 7.894E-6],
-                       [-5.4023E-5, 7.326E-6, 7.0036E-6, -3.0412E-6, -1.0853E-6],
-                       [3.949E-7, -3.029E-8, -3.8209E-7, 1.0012E-7, 4.7133E-8],
-                       [-6.36E-10, -1.309E-9, 6.048E-9, -1.1409E-9, -6.676E-10]])
-        spice = 0
-        sp = salt - 35
-        theta = temp
-        # Reversed I and J here, are arrays backwards in HP Basic?
-        for i in range(0, 5):
-            for j in range(0, 4):
-                spice = spice + b[i, j] * (np.power(theta, i)) * (np.power(sp, j))
-        return spice
-
     def checkFloatsFromIndex(self, floats, cycleJulDate):
         day, month, year = julianToDate(cycleJulDate)
         if self.verbose:
@@ -1012,15 +757,33 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # ToDo: A few lines left out here, looks completely unnecessary
         return
 
+    def defaultOptions(self):
+        self.setEnabledParameters(False)
+        return
+
+
+    def sanityCheck(self, numRecs):
+        numRecs = self.checkOutOfRange(numRecs)
+        numRecs = checkPressureMonotonic(numRecs, self.P, self.T, self.S)
+        return numRecs
+
+    def checkOutOfRange(self, numRecs):
+        # Loop, if out of range, remove and adjust all values to cover up
+        for i in xrange(0, numRecs):
+            if (self.P[i] < -0.5 or
+                self.P[i] > 2200 or
+                self.T[i] < -2.5 or
+                self.T[i] > 30 or
+                self.S[i] < 30 or
+                self.S[i] > 39):
+                numRecs = removeIndexFromPTS(i, numRecs, self.P, self.T, self.S)
+        return numRecs
+
     ''' TODO 
     Pulls settings from an already existing file. INCOMPLETE'''
     def setSettings():
         # Now using a .cfg file to load settings
         # settingsF = open((self.drive + "argo_programs\\TSlast.txt"), 'r+')
-        return
-
-    def defaultOptions(self):
-        self.setEnabledParameters(False)
         return
 
     def setEnabledParameters(self, isEnabled):
@@ -1092,26 +855,4 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.stratCSV = open((stratPath), writeType)
         if SAVELOCALLY:
             self.filesInUse = open((self.outPath + "IOS_Files_In_Use.txt"), 'w+')
-        return
-
-    def todayInDate(self):
-        return self.curDay, self.curMonth, self.curYear
-
-    def todayInJulian(self):
-        day = int(time.strftime("%d"))
-        month = int(time.strftime("%m"))
-        year = int(time.strftime("%Y"))
-        dayOfYear = int(time.strftime("%j"))
-        todayInJul = dateToJulian(day, month, year, dayOfYear)
-        return todayInJul
-
-    ''' Lastrun (I think) defines if the program was a success or not. 
-    Starts with 2 being written, then writes -1 after "Normal End"-ing'''
-
-    def lastRun(self, curDrive, status):
-        # Overwrite the previous "lastrun.txt" file
-        lastRunF = open((curDrive + r"projects\lastrun.txt"), 'w+')
-        # Typecast status to a string because write() uses strings
-        lastRunF.write(str(status))
-        lastRunF.close()
         return
