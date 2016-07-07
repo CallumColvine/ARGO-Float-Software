@@ -29,6 +29,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="defaultSettingsCheckBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -388,7 +391,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Sample Window (Max 30)</string>
+            <string>Range of days used on both sides of current date to interpolate float (Max 30)</string>
            </property>
           </widget>
          </item>
@@ -435,7 +438,7 @@
             </font>
            </property>
            <property name="text">
-            <string>First Latitude Point</string>
+            <string>Start Latitude</string>
            </property>
           </widget>
          </item>
@@ -481,7 +484,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Second Latitude Point</string>
+            <string>End Latitude</string>
            </property>
           </widget>
          </item>
@@ -528,7 +531,7 @@
             </font>
            </property>
            <property name="text">
-            <string>First Longitude Point</string>
+            <string>Start Longitude</string>
            </property>
           </widget>
          </item>
@@ -574,7 +577,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Second Longitude Point</string>
+            <string>End Longitude</string>
            </property>
           </widget>
          </item>
@@ -618,7 +621,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Pressure Cut-Off (m)</string>
+            <string>Minimum float depth during drift (m)</string>
            </property>
           </widget>
          </item>
@@ -669,7 +672,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Interpolate Vertically to P-max  (m)</string>
+            <string>Interpolate to depth (m)</string>
            </property>
           </widget>
          </item>

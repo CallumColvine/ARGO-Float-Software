@@ -1,4 +1,21 @@
+''' TimeSeriesApp.py
+Callum Colvine - Research Assistant
+Callum.Colvine@dfo-mpo.gc.ca
 
+Following Pep 8 formatting with the following exceptions:
+- There is no spacing between a docstring and a function
+
+TimeSeries has the functionality from Howard Freeland's TimeSeries written in 
+HT Basic.
+
+TimeSeries reads ARGO data and outputs interpolated float data into several 
+TS_*.csv files. 
+
+Potential upgrades to TimeSeries if there is time in the futre:
+- Eliminate all the individual data arrays, and use a dictionary instead
+- Concurrently handle mutiple tasks to improve runtime
+- Examine loop structure in an attempt to improve runtime
+'''
 
 # This is to deal with path issues for the sake of project organizaiton
 import sys
@@ -21,7 +38,8 @@ import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
 from math import ceil
-
+# I/O imports
+import configparser
 from ui_Files.ui_timeseriesapp import Ui_TimeSeriesApp
 
 
@@ -38,6 +56,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def __init__(self, parent):
         super(TimeSeriesApp, self).__init__()
         self.setupUi(self)
+        self.loadOldSettings()
         self.initAllClassVariables()
         self.setupSignals()
         self.userDefinedSettings()
@@ -341,6 +360,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         print "Next clicked!!"
         self.progressLabel.setText("Interpolation in progress. Please wait...")
         print "Label text is set"
+        self.saveUsedSettings()
         self.prepareOutputFiles()
         self.commenceInterpolation()
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
@@ -815,11 +835,86 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def userDefinedSettings(self):
         self.setEnabledParameters(True)
         # If the user has NOT selected default settings
-        self.writeDefinedSettings()
+        # self.writeDefinedSettings()
         return
 
-    def writeDefinedSettings(self):
-        # Save settings to .cfg file
+    # def writeDefinedSettings(self):
+    #     # Save settings to .cfg file
+    #     return
+
+
+    ''' Reads in the settings from the last run of TimeSeries from 
+    TimeSeriesSettings.cfg '''
+    def loadOldSettings(self):
+        cfg = configparser.SafeConfigParser()
+        cfg.read('TimeSeriesSettings.cfg')
+        startDateRaw = cfg.get("inputParams", "dayRangeStart")
+        startDateList = [x.strip() for x in startDateRaw.split(',')]
+        self.startRangeDateEdit.setDate(QDate(int(startDateList[0]), 
+                                              int(startDateList[1]), 
+                                              int(startDateList[2])))
+        endDateRaw = cfg.get("inputParams", "dayRangeEnd")
+        endDateList = [x.strip() for x in endDateRaw.split(',')]
+        self.endRangeDateEdit.setDate(QDate(int(endDateList[0]), 
+                                            int(endDateList[1]), 
+                                            int(endDateList[2])))
+        self.dayStepSizeBox.setValue(cfg.getint("inputParams", "dayStepSize"))
+        self.sampleWindowBox.setValue(cfg.getint("inputParams", "timeWindow"))
+        self.firstLatitudeBox.setValue(cfg.getint("inputParams", "firstLatitude"))
+        self.secondLatitudeBox.setValue(cfg.getint("inputParams", "secondLatitude"))
+        self.firstLongitudeBox.setValue(cfg.getint("inputParams", "firstLongitude"))
+        self.secondLongitudeBox.setValue(cfg.getint("inputParams", "secondLongitude"))
+        self.pressureCutOffBox.setValue(cfg.getint("inputParams", "pressureCutoff"))
+        self.maxInterpDepthBox.setValue(cfg.getint("inputParams", "maxPressure"))
+        self.stepSizeBox.setValue(cfg.getint("inputParams", "changeInPressure"))
+
+        self.tempCheckBox.setChecked(cfg.getboolean("desiredResults", "dispTemp"))
+        self.salinityCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSalinity"))
+        self.sigmaTCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSigmaT"))
+        self.spicinessCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSpiciness"))
+        self.dynamicHeightCheckBox.setChecked(cfg.getboolean("desiredResults", "dispDynamicHeight"))
+        self.latitudeDesiredBox.setValue(cfg.getint("desiredResults", "latitudeDesired"))                
+        self.longitudeDesiredBox.setValue(cfg.getint("desiredResults", "longitudeDesired"))        
+        return
+
+
+    ''' Writes the settings from this run to TimeSeriesSettings.cfg '''
+    # From my understanding and research, writing to a *.cfg file needs to 
+    # completely overwrite file. Because of this, every option will always
+    # be written. This isn't TOO inefficient since the file is very short
+    def saveUsedSettings(self):
+        print "Saving settings"
+        cfg = configparser.SafeConfigParser()
+        date = self.startRangeDateEdit.date().getDate()
+        cfg.add_section("inputParams")
+        cfg.set("inputParams", "dayRangeStart", str(date[0]) + ',' + 
+                                                str(date[1]) + ',' + 
+                                                str(date[2]))
+        date = self.endRangeDateEdit.date().getDate()
+        cfg.set("inputParams", "dayRangeEnd", str(date[0]) + ',' + 
+                                              str(date[1]) + ',' + 
+                                              str(date[2]))
+        cfg.set("inputParams", "dayStepSize", str(self.dayStepSizeBox.value()))
+        cfg.set("inputParams", "timeWindow", str(self.sampleWindowBox.value()))
+        cfg.set("inputParams", "firstLatitude", str(self.firstLatitudeBox.value()))
+        cfg.set("inputParams", "secondLatitude", str(self.secondLatitudeBox.value()))
+        cfg.set("inputParams", "firstLongitude", str(self.firstLongitudeBox.value()))
+        cfg.set("inputParams", "secondLongitude", str(self.secondLongitudeBox.value()))
+        cfg.set("inputParams", "pressureCutoff", str(self.pressureCutOffBox.value()))
+        cfg.set("inputParams", "maxPressure", str(self.maxInterpDepthBox.value()))
+        cfg.set("inputParams", "changeInPressure", str(self.stepSizeBox.value()))
+        
+        cfg.add_section("desiredResults")
+        cfg.set("desiredResults", "dispTemp", str(self.tempCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSalinity", str(self.salinityCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSigmaT", str(self.sigmaTCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSpiciness", str(self.spicinessCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispDynamicHeight", str(self.dynamicHeightCheckBox.isChecked()))
+        cfg.set("desiredResults", "latitudeDesired", str(self.latitudeDesiredBox.value()))
+        cfg.set("desiredResults", "longitudeDesired", str(self.longitudeDesiredBox.value()))
+
+        with open('TimeSeriesSettings.cfg', 'wb') as cfgFile:
+            cfg.write(cfgFile)
         return
 
     ''' Opens and saves the output destination files in the class scope ''' 

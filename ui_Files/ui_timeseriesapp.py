@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\timeseriesapp.ui'
 #
-# Created: Mon Jul 04 12:17:23 2016
+# Created: Thu Jul 07 14:29:10 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,6 +26,7 @@ class Ui_TimeSeriesApp(object):
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.verticalLayout_5.addLayout(self.horizontalLayout_6)
         self.defaultSettingsCheckBox = QtGui.QCheckBox(self.settingsPage)
+        self.defaultSettingsCheckBox.setEnabled(False)
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setWeight(75)
@@ -557,13 +558,13 @@ class Ui_TimeSeriesApp(object):
         self.currentDayRangeLabel_2.setText(QtGui.QApplication.translate("TimeSeriesApp", "Earliest Recommended Day: ", None, QtGui.QApplication.UnicodeUTF8))
         self.earliestDayDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("TimeSeriesApp", "Day Step Size", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_7.setText(QtGui.QApplication.translate("TimeSeriesApp", "Sample Window (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_8.setText(QtGui.QApplication.translate("TimeSeriesApp", "First Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_16.setText(QtGui.QApplication.translate("TimeSeriesApp", "Second Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_9.setText(QtGui.QApplication.translate("TimeSeriesApp", "First Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_17.setText(QtGui.QApplication.translate("TimeSeriesApp", "Second Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_10.setText(QtGui.QApplication.translate("TimeSeriesApp", "Pressure Cut-Off (m)", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_11.setText(QtGui.QApplication.translate("TimeSeriesApp", "Interpolate Vertically to P-max  (m)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_7.setText(QtGui.QApplication.translate("TimeSeriesApp", "Range of days used on both sides of current date to interpolate float (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_8.setText(QtGui.QApplication.translate("TimeSeriesApp", "Start Latitude", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_16.setText(QtGui.QApplication.translate("TimeSeriesApp", "End Latitude", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_9.setText(QtGui.QApplication.translate("TimeSeriesApp", "Start Longitude", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_17.setText(QtGui.QApplication.translate("TimeSeriesApp", "End Longitude", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_10.setText(QtGui.QApplication.translate("TimeSeriesApp", "Minimum float depth during drift (m)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_11.setText(QtGui.QApplication.translate("TimeSeriesApp", "Interpolate to depth (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_12.setText(QtGui.QApplication.translate("TimeSeriesApp", "Step size for depth/pressure (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_13.setText(QtGui.QApplication.translate("TimeSeriesApp", "Desired outputs:", None, QtGui.QApplication.UnicodeUTF8))
         self.tempCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Temperature", None, QtGui.QApplication.UnicodeUTF8))

@@ -2,7 +2,8 @@ ToDo for ARGO Time Series Software:
 
 - Wait for feedback from Tetjana before proceeding on these.
 	- Fix screen switches so user can see the “Loading” screen
-	    - Backup: add progress bar to first page
+		- To have real time updating progress bar, I think I have to 
+		domultithreaded programming. This is too much time for now, 
+		it will stay as is
 	- Test with actual use paths instead of fake testing paths
 	    - Allow user to edit save paths with browse window?
-	- Start using the settings file

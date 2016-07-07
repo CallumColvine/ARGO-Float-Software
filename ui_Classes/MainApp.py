@@ -6,15 +6,8 @@ Callum.Colvine@dfo-mpo.gc.ca
 Following Pep 8 formatting with the following exceptions:
 - There is no spacing between a docstring and a function
 
-MainApp hosts the GUI window surrounding the TimeSeries Application. TimeSeries
-has the functionality from Howard Freeland's TimeSeries written in HT Basic. 
-
-TimeSeries reads ARGO data and outputs interpolated float data into several 
-TS_*.csv files. 
-
-Potential upgrades to TimeSeries if there is time in the futre:
-- Eliminate all the individual data arrays, and use a dictionary instead
-
+MainApp hosts the GUI window surrounding the TimeSeries and Circulation 
+Applications.  
 '''
 
 # This is to deal with path issues for the sake of project organizaiton
@@ -22,6 +15,7 @@ import sys
 sys.path.append("..")
 # For development, make this your path to the project ui_Classes folder
 sys.path.append('C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software')
+# ToDo: os.path.join(os.getcwd()) <--- Try this instead
 
 from PySide import QtCore, QtGui
 from TimeSeriesApp import TimeSeriesApp

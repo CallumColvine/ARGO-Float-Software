@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\MainApp.ui'
 #
-# Created: Mon Jul 04 12:17:23 2016
+# Created: Thu Jul 07 14:29:10 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -192,7 +192,7 @@ class Ui_MainApp(object):
         MainApp.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainApp)
-        self.listAllPages.setCurrentIndex(2)
+        self.listAllPages.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainApp)
 
     def retranslateUi(self, MainApp):
