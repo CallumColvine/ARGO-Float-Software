@@ -47,16 +47,16 @@ class MainApp(QMainWindow, Ui_MainApp):
 
     def circulationButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.circulationPage)
+        self.circulationApp.experimentSelected()
         return
 
     def backToProgramListButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.programListPage)
         return
 
-
-
     def timeSeriesButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.timeSeriesPage)
+        self.timeSeriesApp.experimentSelected()
         return
 
 

@@ -19,12 +19,28 @@
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="settingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+          <widget class="QDateEdit" name="centreOfPlotDateEdit">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="date">
+            <date>
+             <year>2016</year>
+             <month>1</month>
+             <day>1</day>
+            </date>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -54,24 +70,39 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+          <widget class="QSpinBox" name="sampleWindowBox">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>30</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QLabel" name="label_7">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>Range is centre date +/- Dt days, Dt</string>
+            <string>Range of days used on both sides of current date to interpolate float (Max 30)</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_5">
+          <spacer name="horizontalSpacer_10">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -540,6 +571,9 @@
            <property name="maximum">
             <number>20</number>
            </property>
+           <property name="value">
+            <number>4</number>
+           </property>
           </widget>
          </item>
          <item>
@@ -579,7 +613,7 @@
             </font>
            </property>
            <property name="text">
-            <string>generate an array for density calculations...</string>
+            <string>generate an array for density calculations (Do not use??)</string>
            </property>
           </widget>
          </item>
@@ -667,7 +701,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>128</height>
+           <height>124</height>
           </size>
          </property>
         </spacer>
@@ -718,7 +752,17 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2"/>
+     <widget class="QWidget" name="calculatingPage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Calculations in progress....</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

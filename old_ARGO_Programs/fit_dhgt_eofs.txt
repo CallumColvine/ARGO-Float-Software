@@ -348,7 +348,7 @@
 3480 OUTPUT @Pout;"Lon1&Lon2,"&TRIM$(VAL$(Lon1))&","&TRIM$(VAL$(Lon2))
 3490 OUTPUT @Pout;"Pcutoff,"&TRIM$(VAL$(Pcutoff))
 3500 OUTPUT @Pout;"Remove double entries, "&TRIM$(VAL$(Sort_opt))
-3510 OUTPUT @Pout;"Pmax&Deltap,"&TRIM$(VAL$(Pmax))&","&TRIM$(VAL$(Deltap))
+3510 OUTPUT @Pout;"Pmax&Deltap,"&TRIM$(VAL$(Pmax))&","&TRIM$(VAself.sL$(Deltap))
 3520 OUTPUT @Pout;"Pmap,"&TRIM$(VAL$(Pmap))
 3530 OUTPUT @Pout;"Pref,"&TRIM$(VAL$(Pref))
 3540 OUTPUT @Pout;"Nmodes,"&TRIM$(VAL$(Nmodes))
@@ -838,7 +838,7 @@
 	8380 FOR J=1 TO Ny
 		8390 IF E(I,J,1)<99. THEN
 		8400 FOR M=1 TO Nmodes
-			8410 Dhfit(I,J)=Dhfit(I,J)+Evals(M)*E(I,J,M)
+			8410 Dhfit(I,J)=Dhfit(I,J)+Evals(k)*E(I,J,M)
 			8420 NEXT M
 		8430 ELSE
 		8440 Dhfit(I,J)=99.99
@@ -3005,137 +3005,137 @@
 30050 ! Get here, we know the number of records and are ready to read data records
 30060 Rflag=1
 30070 FOR I=1 TO Nrecs
-30080 ON ERROR GOTO Line_rflag
-30090 ENTER @Pin;S$
-30100 GOTO Line_offerr1
-30110 Line_rflag: Rflag=-1
-30120 OFF ERROR
-30130 GOTO Line1
-30140 !
-30150 Line_offerr1: OFF ERROR
-30160 ON ERROR GOTO Line1
-30170 T$=S$
-30180 Pc1=POS(T$,".")
-30190 T$[Pc1,Pc1]="/"
-30200 Pc2=POS(T$,".")
-30210 T$[Pc2,Pc2]="/"
-30220 Pc3=POS(T$,".")
-30230 T$[Pc3,Pc3]="/"
-30240 Pc4=POS(T$,".")
-30250 T$[Pc4,Pc4]="/"
-30260 Pc5=POS(T$,".")
-30270 T$[Pc5,Pc5]="/"
-30280 Pc6=POS(T$,".")
-30290 T$[Pc6,Pc6]="/"
-30300 Pc7=POS(T$,".")
-30310 T$[Pc7,Pc7]="/"
-30320 Pc8=POS(T$,".")
-30330 T$[Pc8,Pc8]="/"
-30340 Pc9=POS(T$,".")
-30350 IF ABS(Pc9)>1.5 THEN T$[Pc9,Pc9]="/"
-30360 !
-30370 SELECT Chanord
-30380 CASE 1
-30390 Ppo=Pc1
-30400 Ppc=Pc2
-30410 Pto=Pc4
-30420 Ptc=Pc5
-30430 Pso=Pc7
-30440 Psc=Pc8
-30450 CASE 2
-30460 Ppo=Pc1
-30470 Ppc=Pc2
-30480 Pso=Pc4
-30490 Psc=Pc5
-30500 Pto=Pc7
-30510 Ptc=Pc8
-30520 CASE 3
-30530 Pto=Pc1
-30540 Ptc=Pc2
-30550 Ppo=Pc4
-30560 Ppc=Pc5
-30570 Pso=Pc7
-30580 Psc=Pc8
-30590 CASE 4
-30600 Pto=Pc1
-30610 Ptc=Pc2
-30620 Pso=Pc4
-30630 Psc=Pc5
-30640 Ppo=Pc7
-30650 Ppc=Pc8
-30660 CASE 5
-30670 Pso=Pc1
-30680 Psc=Pc2
-30690 Pto=Pc4
-30700 Ptc=Pc5
-30710 Ppo=Pc7
-30720 Ppc=Pc8
-30730 CASE 6
-30740 Pso=Pc1
-30750 Psc=Pc2
-30760 Ppo=Pc4
-30770 Ppc=Pc5
-30780 Pto=Pc7
-30790 Ptc=Pc8
-30800 END SELECT
-30810 !
-30820 Po=VAL(S$[Ppo-5,Ppo+1])
-30830 Pc=VAL(S$[Ppc-5,Ppc+1])
-30840 ON ERROR GOTO Line_pqual
-30850 Pblnk=Ppo
-30860 Line_pq_find:  !
-30870 Pblnk=Pblnk+1
-30880 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_pq_find
-30890 Pqual=VAL(S$[Pblnk,Pblnk+1])
-30900 GOTO Line_po
-30910 Line_pqual: Pqual=2
-30920 Line_po: IF ABS(Pc)<9000. THEN Po=Pc
-30930 OFF ERROR
-30940 !
-30950 To=VAL(S$[Pto-5,Pto+3])
-30960 Tc=VAL(S$[Ptc-5,Ptc+3])
-30970 ON ERROR GOTO Line_tqual
-30980 Pblnk=Pto
-30990 Line_tq_find:  !
-31000 Pblnk=Pblnk+1
-31010 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_tq_find
-31020 Tqual=VAL(S$[Pblnk,Pblnk+1])
-31030 GOTO Line_to
-31040 Line_tqual: Tqual=2
-31050 Line_to: IF ABS(Tc)<9000. THEN To=Tc
-31060 OFF ERROR
-31070 !
-31080 So=VAL(S$[Pso-5,Pso+3])
-31090 Sc=VAL(S$[Psc-5,Psc+3])
-31100 ON ERROR GOTO Line_squal
-31110 Pblnk=Pso
-31120 Line_sq_find:  !
-31130 Pblnk=Pblnk+1
-31140 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_sq_find
-31150 Squal=VAL(S$[Pblnk,Pblnk+1])
-31160 GOTO Line_so
-31170 Line_squal: Squal=2
-31180 Line_so: IF ABS(Sc)<9000. THEN So=Sc
-31190 OFF ERROR
-31200 !
-31210 P(I)=Po
-31220 T(I)=To
-31230 S(I)=So
-31240 IF ABS(I-1.)>.1 THEN GOTO Line_pad
-31250 IF P(1)<69. THEN GOTO Line_pad
-31260 Rflag=-1
-31270 GOTO Line1
-31280 !
-31290 Line_pad:  ! Continue
-31300 IF Pqual>3 OR Tqual>3 OR Squal>3 THEN
-31310 T(I)=999.9
-31320 S(I)=999.9
-31330 END IF
-31340 !
-31350 IF T(I)>35. OR T(I)<-2.0 THEN T(I)=999.9
-31360 IF S(I)>38. OR S(I)<20. THEN S(I)=999.9
-31370 !
-31380 NEXT I
+	30080 ON ERROR GOTO Line_rflag
+	30090 ENTER @Pin;S$
+	30100 GOTO Line_offerr1
+	30110 Line_rflag: Rflag=-1
+	30120 OFF ERROR
+	30130 GOTO Line1
+	30140 !
+	30150 Line_offerr1: OFF ERROR
+	30160 ON ERROR GOTO Line1
+	30170 T$=S$
+	30180 Pc1=POS(T$,".")
+	30190 T$[Pc1,Pc1]="/"
+	30200 Pc2=POS(T$,".")
+	30210 T$[Pc2,Pc2]="/"
+	30220 Pc3=POS(T$,".")
+	30230 T$[Pc3,Pc3]="/"
+	30240 Pc4=POS(T$,".")
+	30250 T$[Pc4,Pc4]="/"
+	30260 Pc5=POS(T$,".")
+	30270 T$[Pc5,Pc5]="/"
+	30280 Pc6=POS(T$,".")
+	30290 T$[Pc6,Pc6]="/"
+	30300 Pc7=POS(T$,".")
+	30310 T$[Pc7,Pc7]="/"
+	30320 Pc8=POS(T$,".")
+	30330 T$[Pc8,Pc8]="/"
+	30340 Pc9=POS(T$,".")
+	30350 IF ABS(Pc9)>1.5 THEN T$[Pc9,Pc9]="/"
+	30360 !
+	30370 SELECT Chanord
+	30380 CASE 1
+	30390 Ppo=Pc1
+	30400 Ppc=Pc2
+	30410 Pto=Pc4
+	30420 Ptc=Pc5
+	30430 Pso=Pc7
+	30440 Psc=Pc8
+	30450 CASE 2
+	30460 Ppo=Pc1
+	30470 Ppc=Pc2
+	30480 Pso=Pc4
+	30490 Psc=Pc5
+	30500 Pto=Pc7
+	30510 Ptc=Pc8
+	30520 CASE 3
+	30530 Pto=Pc1
+	30540 Ptc=Pc2
+	30550 Ppo=Pc4
+	30560 Ppc=Pc5
+	30570 Pso=Pc7
+	30580 Psc=Pc8
+	30590 CASE 4
+	30600 Pto=Pc1
+	30610 Ptc=Pc2
+	30620 Pso=Pc4
+	30630 Psc=Pc5
+	30640 Ppo=Pc7
+	30650 Ppc=Pc8
+	30660 CASE 5
+	30670 Pso=Pc1
+	30680 Psc=Pc2
+	30690 Pto=Pc4
+	30700 Ptc=Pc5
+	30710 Ppo=Pc7
+	30720 Ppc=Pc8
+	30730 CASE 6
+	30740 Pso=Pc1
+	30750 Psc=Pc2
+	30760 Ppo=Pc4
+	30770 Ppc=Pc5
+	30780 Pto=Pc7
+	30790 Ptc=Pc8
+	30800 END SELECT
+	30810 !
+	30820 Po=VAL(S$[Ppo-5,Ppo+1])
+	30830 Pc=VAL(S$[Ppc-5,Ppc+1])
+	30840 ON ERROR GOTO Line_pqual
+	30850 Pblnk=Ppo
+	30860 Line_pq_find:  !
+	30870 Pblnk=Pblnk+1
+	30880 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_pq_find
+	30890 Pqual=VAL(S$[Pblnk,Pblnk+1])
+	30900 GOTO Line_po
+	30910 Line_pqual: Pqual=2
+	30920 Line_po: IF ABS(Pc)<9000. THEN Po=Pc
+	30930 OFF ERROR
+	30940 !
+	30950 To=VAL(S$[Pto-5,Pto+3])
+	30960 Tc=VAL(S$[Ptc-5,Ptc+3])
+	30970 ON ERROR GOTO Line_tqual
+	30980 Pblnk=Pto
+	30990 Line_tq_find:  !
+	31000 Pblnk=Pblnk+1
+	31010 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_tq_find
+	31020 Tqual=VAL(S$[Pblnk,Pblnk+1])
+	31030 GOTO Line_to
+	31040 Line_tqual: Tqual=2
+	31050 Line_to: IF ABS(Tc)<9000. THEN To=Tc
+	31060 OFF ERROR
+	31070 !
+	31080 So=VAL(S$[Pso-5,Pso+3])
+	31090 Sc=VAL(S$[Psc-5,Psc+3])
+	31100 ON ERROR GOTO Line_squal
+	31110 Pblnk=Pso
+	31120 Line_sq_find:  !
+	31130 Pblnk=Pblnk+1
+	31140 IF S$[Pblnk,Pblnk]<>" " THEN GOTO Line_sq_find
+	31150 Squal=VAL(S$[Pblnk,Pblnk+1])
+	31160 GOTO Line_so
+	31170 Line_squal: Squal=2
+	31180 Line_so: IF ABS(Sc)<9000. THEN So=Sc
+	31190 OFF ERROR
+	31200 !
+	31210 P(I)=Po
+	31220 T(I)=To
+	31230 S(I)=So
+	31240 IF ABS(I-1.)>.1 THEN GOTO Line_pad
+	31250 IF P(1)<69. THEN GOTO Line_pad
+	31260 Rflag=-1
+	31270 GOTO Line1
+	31280 !
+	31290 Line_pad:  ! Continue
+	31300 IF Pqual>3 OR Tqual>3 OR Squal>3 THEN
+	31310 T(I)=999.9
+	31320 S(I)=999.9
+	31330 END IF
+	31340 !
+	31350 IF T(I)>35. OR T(I)<-2.0 THEN T(I)=999.9
+	31360 IF S(I)>38. OR S(I)<20. THEN S(I)=999.9
+	31370 !
+	31380 NEXT I
 31390 !
 31400 CALL Despike(T(*),Nrecs)
 31410 CALL Despike(S(*),Nrecs)

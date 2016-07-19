@@ -56,10 +56,13 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def __init__(self, parent):
         super(TimeSeriesApp, self).__init__()
         self.setupUi(self)
+        return
+
+    def experimentSelected(self):
         self.loadOldSettings()
         self.initAllClassVariables()
         self.setupSignals()
-        self.userDefinedSettings()
+        self.userDefinedSettings()        
         return
         
     ''' This method holds references to all class variables. For anyone unclear,
@@ -85,6 +88,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.secondLongitude = self.secondLongitudeBox.value()
         self.pressureCutOff = self.pressureCutOffBox.value()
         self.maxInterpDepth = self.maxInterpDepthBox.value()
+
         self.stepSize = self.stepSizeBox.value()
         self.nPress = 0
         self.updateNPress()
@@ -404,6 +408,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                               yearDayEnd)
         return julStart, julEnd
 
+    def sampleWindowBoxEditingFinished(self):
+        self.sampleWindow = self.sampleWindowBox.value()
+        return
+
     def updateProgress(self, iterDayNum, julStart, julEnd):
         if iterDayNum != 0:
             self.progress = (iterDayNum / 
@@ -450,18 +458,14 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             julWindowEnd = Dc + self.sampleWindow
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
-                self.checkFloatsFromIndex(floats, cycleJulDate)
+                floats, self.yearMonthDayPath0 = \
+                    self.checkFloatsFromIndex(floats, cycleJulDate, self.path0)
             sTav = 0
             sTavSq = 0
             sTKnt = 0
-            rFlag = -1
             j = 0
             for singleFloat in floats:
-                numRecs = getProfile(singleFloat, 
-                                     rFlag, 
-                                     self.P, 
-                                     self.T, 
-                                     self.S)
+                numRecs = getProfile(singleFloat, self.P, self.T, self.S)
                 numRecs = self.sanityCheck(numRecs)
                 self.floatUsable[j] = True
                 sigT = getSigmaT(self.S[0], self.T[0])
@@ -476,6 +480,64 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.finishUp(iPres75)
             iterDayNum += 1
         self.cleanUp()
+        return
+
+    ''' Not in a utils file due to repeated use of class variables. ''' 
+    def checkFloatsFromIndex(self, floats, cycleJulDate, path0):
+        day, month, year = julianToDate(cycleJulDate)
+        if self.verbose:
+            print "Day, month, year are ", day, month, year
+        yearMonthDayPath0 = (path0 + 
+                             str(year) + '\\' + 
+                             str(month).zfill(2) + '\\' + 
+                             str(day).zfill(2) + '\\')
+        inFileName = (yearMonthDayPath0 + 
+                      str(year) + 
+                      str(month).zfill(2) + 
+                      str(day).zfill(2) + 
+                      '_index.csv')
+        print "inFileName is ", inFileName
+        try:
+            with open((inFileName),
+                      'rb') as indexCSV:
+                if self.verbose:
+                    print "Opened index ", inFileName
+                reader = csv.reader(indexCSV)
+                # Skip the first entry since it's a header
+                reader.next()
+                for row in reader:
+                    # Filer out the ******* lines that are in some index files 
+                    if row[3] == "*******":
+                        continue
+                    lat = float(row[1])
+                    lon = float(row[2])
+                    if lon < 0:
+                        lon += 360
+                    press = float(row[3])
+                    if(lat > self.firstLatitude and 
+                       lat < self.secondLatitude and 
+                       lon > self.firstLongitude and 
+                       lon < self.secondLongitude and 
+                       press > self.pressureCutOff):
+                        # print "So it passed, press is ", press
+                        floatNum = row[0]
+                        floats.append(yearMonthDayPath0 + row[0])
+                        self.passedFloat(floatNum, lat, lon)
+                        self.numFloats += 1
+        except (OSError, IOError), e:
+            print "File was not found: ", inFileName
+        return floats, yearMonthDayPath0
+
+    def passedFloat(self, floatNum, lat, lon):
+        self.Lat[self.numFloats] = lat
+        self.Lon[self.numFloats] = lon
+        dX = self.sCX0 * (float(lon) - self.longitudeDesired)
+        dY = self.sCY * (float(lat) - self.latitudeDesired)
+        rho = np.sqrt(dX * dX + dY * dY)
+        if self.closestDist > rho:
+            self.closestDist = rho
+            self.closestFloatNum = floatNum
+        # ToDo: A few lines left out here, looks completely unnecessary
         return
 
     ''' Creates a contour plot popup window from the input parameters:
@@ -629,11 +691,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 qTemp = tempWeightSumT / weightSumT
             else:
                 qTemp = tempWeightSumT
-                print "float not usable to calculate qTemp"
+                # print "float not usable to calculate qTemp"
             if weightSumS > 0:
                 qSal = salWeightSumT / weightSumS
             else:
-                print "float not usable to calculate qSal"
+                pass
+                # print "float not usable to calculate qSal"
             self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
             qSigmaT = getSigmaT(qSal, qTemp)
             qSpice = getSpiciness(qTemp, qSal)
@@ -721,61 +784,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
             ',' + Sap)
         return Tep, Sap
-
-    def checkFloatsFromIndex(self, floats, cycleJulDate):
-        day, month, year = julianToDate(cycleJulDate)
-        if self.verbose:
-            print "Day, month, year are ", day, month, year
-        self.yearMonthDayPath0 = (self.path0 
-            + str(year).zfill(4) + '\\'     # Because why not
-            + str(month).zfill(2) + '\\' 
-            + str(day).zfill(2) + '\\')
-        inFileName = (self.yearMonthDayPath0 + str(year)
-                      + str(month).zfill(2)
-                      + str(day).zfill(2)
-                      + '_index.csv')
-        try:
-            with open((inFileName),
-                      'rb') as indexCSV:
-                if self.verbose:
-                    print "Opened index ", inFileName
-                reader = csv.reader(indexCSV)
-                # Skip the first entry since it's a header
-                reader.next()
-                for row in reader:
-                    # Filer out the ******* lines that are in some index files 
-                    if row[3] == "*******":
-                        continue
-                    lat = float(row[1])
-                    lon = float(row[2])
-                    if lon < 0:
-                        lon += 360
-                    press = float(row[3])
-                    if(lat > self.firstLatitude and 
-                       lat < self.secondLatitude and 
-                       lon > self.firstLongitude and 
-                       lon < self.secondLongitude and 
-                       press > self.pressureCutOff):
-                        # print "So it passed, press is ", press
-                        floatNum = row[0]
-                        floats.append(self.yearMonthDayPath0 + row[0])
-                        self.passedFloat(floatNum, lat, lon)
-                        self.numFloats += 1
-        except (OSError, IOError), e:
-            print "File was not found: ", inFileName
-        return floats
-
-    def passedFloat(self, floatNum, lat, lon):
-        self.Lat[self.numFloats] = lat
-        self.Lon[self.numFloats] = lon
-        dX = self.sCX0 * (float(lon) - self.longitudeDesired)
-        dY = self.sCY * (float(lat) - self.latitudeDesired)
-        rho = np.sqrt(dX * dX + dY * dY)
-        if self.closestDist > rho:
-            self.closestDist = rho
-            self.closestFloatNum = floatNum
-        # ToDo: A few lines left out here, looks completely unnecessary
-        return
 
     def defaultOptions(self):
         self.setEnabledParameters(False)

@@ -165,8 +165,7 @@ def getSpiciness(temp, salt):
 
 ''' Called on float numbers that have been found in the index file. Get 
 profile will determine the order in which and fill up the P, T, S arrays '''
-def getProfile(floatPath, rFlag, P, T, S):
-    rFlag = -1
+def getProfile(floatPath, P, T, S):
     order = []
     numChannels = 0
     numRecords = 0
@@ -318,3 +317,54 @@ def removeIndexFromPTS(i, numRecs, P, T, S):
     return numRecs
 
 
+def despike(T, N):
+    Nm1 = N - 1
+    for i in xrange(1, Nm1):
+        Dt1 = T[i] - T[i - 1]
+        Dt2 = T[i + 1] - T[i]
+        Pr = Dt1 * Dt2
+        if(Pr < 0. and np.abs(Dt1) > 3. and np.abs(Dt2) > 3.): 
+            T[i]= .5 * (T[i + 1] + T[i - 1])
+    return
+
+# Maybe not necessary?
+def fillgaps(T, Nrecs1):
+    # 31630 Nrecs=Nrecs1
+    # 31640 !
+    # 31650 Ifirst=0
+    # 31660 Line_ifirst: Ifirst=Ifirst+1
+    # 31670 IF T(Ifirst)>900. THEN GOTO Line_ifirst
+    # 31680 !
+    # 31690 ! Ifirst is first good value
+    # 31700 Nrecs=Nrecs+1
+    # 31710 Line_nrecs: Nrecs=Nrecs-1
+    # 31720 IF Nrecs<2 THEN Line_nogaps
+    # 31730 IF T(Nrecs)>900. THEN GOTO Line_nrecs
+    # 31740 !
+    # 31750 ! Nrecs is the last good value
+    # 31760 !
+    # 31770 ! Now search for a gap
+    # 31780 I1=Ifirst
+    # 31790 !
+    # 31800 Line_i1: I1=I1+1
+    # 31810 IF I1>=Nrecs THEN GOTO Line_nogaps
+    # 31820 IF T(I1)<900. THEN GOTO Line_i1
+    # 31830 !
+    # 31840 ! Have a gap, 1st bad value is at I1
+    # 31850 I2=I1
+    # 31860 Line_i2: I2=I2+1
+    # 31870 IF T(I2)>900. THEN GOTO Line_i2
+    # 31880 !
+    # 31890 ! 1st good value after I1 is I2
+    # 31900 !
+    # 31910 I2=I2-1
+    # 31920 Wid=I2-I1+1
+    # 31930 Tdif=T(I2+1)-T(I1-1)
+    # 31940 FOR I=I1 TO I2
+    # 31950 T(I)=T(I-1)+Tdif/Wid
+    # 31960 NEXT I
+    # 31970 I1=I2
+    # 31980 GOTO Line_i1
+    # 31990 !
+    # 32000 Line_nogaps: ! No gaps left
+    return
