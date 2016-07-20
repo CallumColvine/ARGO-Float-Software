@@ -10,6 +10,9 @@ Following Pep 8 formatting with the following exceptions:
 # UI Imports
 from PySide import QtCore, QtGui
 from PySide.QtGui import QWidget
+# Plotting Imports
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 # Calculations imports
 import numpy as np
 from datetime import date, timedelta
@@ -114,6 +117,9 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
         self.Nx = 65
         self.Ny = 91
+
+        self.Dx = 78.63
+        self.Dy = 111.2 / 3.0
 
         # This seems dumb and non Pythonic. Redo
         self.E = np.empty((20, self.Ny, self.Nx))
@@ -333,21 +339,135 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.subtractMeanFromStored(dynHeightBar)
         self.bestFitMode(dynHeightVar)
         self.mapCirculations(dynHeightBar)
-        self.prepareCallContour()
+        divSl = self.findDivingStreamline()
+        xPLL, xPLH, yPLL, yPLH = self.collectPlotData(divSl)
+        # self.contour(xPLL, xPLH, yPLL, yPLH)
+        self.saveOutput()
         return
+
+    def saveOutput(self):
+
+        outFilePath = self.outPath + "Dh" + str(self.plotCentre) + "_0000.csv" 
+        outFile = open(outFilePath, 'w')
+        for I in xrange(0, self.Nx):
+            Lonc = I - 180.
+            for J in xrange(0, self.Ny):
+                if (self.Dhfit[J, I] < 90.0):
+                    Latc = 30. + J / 3.
+                    S = (str(Lonc) + "," + str(Latc) + "," + 
+                         str(self.Dhfit[J, I]) + '\n')
+                    outFile.write(S)
+        return
+
+    def collectPlotData(self, Divsl):
+        Xp = np.empty((4))
+        Yp = np.empty((4))
+        XpListLow = []
+        XpListHigh = []
+        YpListLow = []
+        YpListHigh = []
+
+        for Idiv in xrange(0, 64):
+            X0 = self.Dx * (Idiv - 1.)
+            for Jdiv in xrange(0, 90):
+                Y0 = self.Dy * (Jdiv - 1.)
+                X1 = self.Dhfit[Jdiv, Idiv]
+                X2 = self.Dhfit[Jdiv+1, Idiv]
+                X3 = self.Dhfit[Jdiv+1, Idiv+1]
+                X4 = self.Dhfit[Jdiv, Idiv+1]
+                Xmax = max(X1,X2,X3,X4)
+                Xmin = min(X1,X2,X3,X4)
+                if(Xmax > 90. or Xmax < Divsl or Xmin > Divsl):
+                    continue
+                # Contour passes through the box
+                Ip = 0
+
+                Xmax = max(X1, X2)
+                Xmin = min(X1, X2)
+                if(Divsl >= Xmin and Divsl <= Xmax):
+                    print "Adding 1 to Xp and Yp"
+                    Ip = Ip + 1
+                    Xp[Ip] = X0
+                    Yp[Ip] = Y0 + self.Dy * (Divsl - X1) / (X2 - X1)
+                Xmax = max(X2,X3)
+                Xmin = min(X2,X3)
+                if(Divsl>=Xmin and Divsl<=Xmax):
+                    print "Adding 2 to Xp and Yp"
+                    Ip=Ip+1
+                    Xp[Ip] = X0 + self.Dx * (Divsl - X2) / (X3 - X2)
+                    Yp[Ip] = Y0 + self.Dy
+                Xmax = max(X3,X4)
+                Xmin = min(X3,X4)
+                if(Divsl >= Xmin and Divsl <= Xmax):
+                    print "Adding 3 to Xp and Yp"
+                    Ip = Ip + 1
+                    Xp[Ip] = X0 + self.Dx
+                    Yp[Ip] = Y0 + self.Dy * (Divsl - X4) / (X3 - X4)
+                Xmax = max(X1,X4)
+                Xmin = min(X1,X4)
+                if(Divsl >= Xmin and Divsl <= Xmax):
+                    print "Adding 4 to Xp and Yp"
+                    Ip = Ip + 1
+                    Xp[Ip] = X0 + self.Dx * (Divsl - X1) / (X4 - X1)
+                    Yp[Ip] = Y0
+                XpListLow.append(Xp[0])
+                XpListHigh.append(Xp[1])
+                YpListLow.append(Yp[0])                
+                YpListHigh.append(Yp[1])
+                # MOVE Xp(1),Yp(1)
+                # DRAW Xp(2),Yp(2)
+        # print "XpList is ", XpList
+        # print "YpList is ", YpList
+        return XpListLow, XpListHigh, YpListLow, YpListHigh 
+
+    def findDivingStreamline(self):
+        # Now search for dividing streamline
+        Divsl = 0.
+        Knt = 0
+        # ToDo: Was 58, changed to 59
+        for Latd in xrange(40, 59):
+            J = int(1.01 + 3. * (Latd - 30.)) - 1
+            for Im in xrange(0, 60):
+                I = 64 - Im
+                if self.Dhfit[J, I] > 90.: 
+                    continue
+                Dh1 = self.Dhfit[J, I]
+                break
+            # ! Have Dh1
+            Divsl = Divsl + Dh1
+            Knt = Knt + 1
+        Divsl = Divsl / Knt
+        return Divsl
 
     def prepareCallContour(self):
         # ! CLEAR SCREEN
-        Dx = 78.63
-        Dy = 111.2 / 3.0
+        contourInterval = 0.05
         # CALL Contour(Dhfit(*),Dx,Dy,Nx,Ny,Conin)
         self.contour()
-        Xl = Dx * (self.Nx - 1.0)
-        Yl = Dy * (self.Ny - 1.0)
+        # Xl = Dx * (self.Nx - 1.0)
+        # Yl = Dy * (self.Ny - 1.0)
         return
 
-    def contour(self):
-        
+    # self.Dhfit, Dx, Dy, self.Nx, self.Ny
+    def contour(self, xPLL, xPLH, yPLL, yPLH):
+        # setup polyconic basemap
+        # by specifying lat/lon corners and central point.
+        # area_thresh=1000 means don't plot coastline features less
+        # than 1000 km^2 in area.
+        m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
+                    resolution='l',area_thresh=1000.,projection='poly',\
+                    lat_0=50,lon_0=-140)
+        m.drawcoastlines()
+        m.fillcontinents(color='darksage',lake_color='royalblue')
+        # draw parallels and meridians.
+        m.drawparallels(np.arange(-80.,81.,20.))
+        m.drawmeridians(np.arange(-180.,181.,20.))
+        m.drawmapboundary(fill_color='royalblue')
+        plt.title("Circulation Data on the Southern Alaskan Coast")
+        for x in xrange(0, len(xPLL) - 1):
+            plt.plot([xPLL[x], xPLH[x]], [yPLL[x], yPLH[x]])
+         
+        plt.show()
         return
 
     def mapCirculations(self, dynHeightBar):
@@ -645,6 +765,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         dateTimeObj = formatToDateTime(date[0], date[1], date[2])
         dayOfYear = dateTimeObj.timetuple().tm_yday 
         julDate = dateToJulian(date[2], date[1], date[0], dayOfYear)
+        self.plotCentre = julDate
         julStart = julDate - self.sampleWindow
         julEnd = julDate + self.sampleWindow
         print "julStart: ", julStart, " julEnd: ", julEnd
