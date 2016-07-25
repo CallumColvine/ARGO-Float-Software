@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\circulationapp.ui'
 #
-# Created: Wed Jul 20 16:43:47 2016
+# Created: Mon Jul 25 14:48:30 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -28,6 +28,7 @@ class Ui_CirculationApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.centreOfPlotDateEdit.setFont(font)
+        self.centreOfPlotDateEdit.setCalendarPopup(True)
         self.centreOfPlotDateEdit.setDate(QtCore.QDate(2016, 1, 1))
         self.centreOfPlotDateEdit.setObjectName("centreOfPlotDateEdit")
         self.horizontalLayout_3.addWidget(self.centreOfPlotDateEdit)
@@ -122,7 +123,7 @@ class Ui_CirculationApp(object):
         self.secondLongitudeBox.setFont(font)
         self.secondLongitudeBox.setMinimum(-9999)
         self.secondLongitudeBox.setMaximum(9999)
-        self.secondLongitudeBox.setProperty("value", 230)
+        self.secondLongitudeBox.setProperty("value", 250)
         self.secondLongitudeBox.setObjectName("secondLongitudeBox")
         self.horizontalLayout_11.addWidget(self.secondLongitudeBox)
         self.label_17 = QtGui.QLabel(self.settingsPage)

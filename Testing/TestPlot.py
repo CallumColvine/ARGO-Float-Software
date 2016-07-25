@@ -8,9 +8,14 @@ import numpy as np
 # by specifying lat/lon corners and central point.
 # area_thresh=1000 means don't plot coastline features less
 # than 1000 km^2 in area.
-m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
+
+m = Basemap(llcrnrlon=-50,llcrnrlat=43,urcrnrlon=-20,urcrnrlat=57,\
             resolution='l',area_thresh=1000.,projection='poly',\
             lat_0=50,lon_0=-140)
+
+# m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
+#             resolution='l',area_thresh=1000.,projection='poly',\
+#             lat_0=50,lon_0=-140)
 m.drawcoastlines()
 m.fillcontinents(color='darksage',lake_color='royalblue')
 # draw parallels and meridians.

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\timeseriesapp.ui'
 #
-# Created: Wed Jul 20 16:43:47 2016
+# Created: Mon Jul 25 14:48:30 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!

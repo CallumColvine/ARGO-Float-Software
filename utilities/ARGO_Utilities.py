@@ -327,6 +327,16 @@ def despike(T, N):
             T[i]= .5 * (T[i + 1] + T[i - 1])
     return
 
+def convertLatLonToNegative(latIn, lonIn):
+    if latIn > 90:
+        latIn -= 90
+        latIn = -(latIn)
+    if lonIn > 180:
+        lonIn = lonIn % 180
+        lonIn -= 180
+        # lonIn = -(lonIn)
+    return latIn, lonIn
+
 # Maybe not necessary?
 def fillgaps(T, Nrecs1):
     # 31630 Nrecs=Nrecs1

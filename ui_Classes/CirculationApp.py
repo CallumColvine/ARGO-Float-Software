@@ -19,7 +19,8 @@ from datetime import date, timedelta
 import csv
 # Util file Imports
 from utilities.ARGO_Utilities import formatToDateTime, dateToJulian, \
-    julianToDate, getProfile, despike, fillgaps, getSigmaT, getSvanom
+    julianToDate, getProfile, despike, fillgaps, getSigmaT, getSvanom, \
+    convertLatLonToNegative
 # Formatting Imports
 import re
 
@@ -150,6 +151,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
     def readEndOfFiles(self):
         # Read eofs using non-HTBasic code
+        self.E.fill(np.nan)
         modes = open((self.outPath + "hjf_modes.31"), 'r')
         n = 0
         k = 0
@@ -168,14 +170,22 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             lat = float(split[2])
             value = float(split[3])
 
-            i = int(1.002 + 1.0 * (lon - 180.0))
-            j = int(1.002 + 3.0 * (lat - 30.0))        
-
+            i = int(0.002 + 1.0 * (lon - 180.0))
+            j = int(0.002 + 3.0 * (lat - 30.0))        
+            # print "Settings to val", value
             self.E[k, j, i] = value
-            if (lat >= 51.7) and (lon <= 200):
-                y = 51.7 + .033 * (lon - 180.0) * (lat - 180.0)
-                if lat > y:
-                    self.E[k, j, i] = np.nan
+            # WHY IS THIS HERE?!?!
+            # if (lat >= 51.7) and (lon <= 200):
+            #     y = 51.7 + .033 * (lon - 180.0) * (lon - 180.0)
+            #     if lat > y:
+            #         if k == 0:
+            #             print "K IS 0 and setting no nan"
+            #             print "j problem is ", j, "i problem is ", i
+            #             print "lat problem is ", lat, "lon problem is ", lon
+            #         # print "lat is ", lat, " y is ", y
+            #         # print "on iters k", k, "j", j, "i", i
+            #         self.E[k, j, i] = np.nan
+            #         # print ""
         return
 
     def setupSignals(self):
@@ -316,10 +326,13 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         julStart, julEnd = self.getJulianStartAndEnd()
         # Non-inclusive, should I do (julEnd + 1) ?
         # floats = []
+        self.numFloats = 0
         for i in xrange(julStart, julEnd):
-            self.numFloats = 0
             yearMonthDayPath0 = self.checkFloatsFromIndex(i, self.path0)
         iFlt = 0
+        if self.numFloats == 0:
+            print "There are no floats within the provided range"
+            return
         for flt in self.floats:
             numRecs = getProfile(flt, self.P, self.T, self.S)
             despike(self.T, numRecs)
@@ -332,7 +345,10 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.dataForcing()
             self.storeData(numRecs, iFlt)
             iFlt += 1
-        self.calculationsOnData()
+        # Specific volume and Dynamic Heights
+        # Replaced Deltap with self.stepSize
+        self.specificVolAndDynH()
+        self.meanAndStdDev()
         if doSort:
             self.removeDuplicates()
         dynHeightBar, dynHeightVar = self.recomputeMeanAndVariation()
@@ -341,7 +357,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.mapCirculations(dynHeightBar)
         divSl = self.findDivingStreamline()
         xPLL, xPLH, yPLL, yPLH = self.collectPlotData(divSl)
-        # self.contour(xPLL, xPLH, yPLL, yPLH)
+        self.contour(xPLL, xPLH, yPLL, yPLH)
         self.saveOutput()
         return
 
@@ -352,7 +368,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         for I in xrange(0, self.Nx):
             Lonc = I - 180.
             for J in xrange(0, self.Ny):
-                if (self.Dhfit[J, I] < 90.0):
+                if not np.isnan(self.Dhfit[J, I]):
                     Latc = 30. + J / 3.
                     S = (str(Lonc) + "," + str(Latc) + "," + 
                          str(self.Dhfit[J, I]) + '\n')
@@ -385,31 +401,31 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 Xmax = max(X1, X2)
                 Xmin = min(X1, X2)
                 if(Divsl >= Xmin and Divsl <= Xmax):
-                    print "Adding 1 to Xp and Yp"
-                    Ip = Ip + 1
+                    # print "Adding 1 to Xp and Yp"
                     Xp[Ip] = X0
                     Yp[Ip] = Y0 + self.Dy * (Divsl - X1) / (X2 - X1)
+                    Ip = Ip + 1
                 Xmax = max(X2,X3)
                 Xmin = min(X2,X3)
                 if(Divsl>=Xmin and Divsl<=Xmax):
-                    print "Adding 2 to Xp and Yp"
-                    Ip=Ip+1
+                    # print "Adding 2 to Xp and Yp"
                     Xp[Ip] = X0 + self.Dx * (Divsl - X2) / (X3 - X2)
                     Yp[Ip] = Y0 + self.Dy
+                    Ip=Ip+1
                 Xmax = max(X3,X4)
                 Xmin = min(X3,X4)
                 if(Divsl >= Xmin and Divsl <= Xmax):
-                    print "Adding 3 to Xp and Yp"
-                    Ip = Ip + 1
+                    # print "Adding 3 to Xp and Yp"
                     Xp[Ip] = X0 + self.Dx
                     Yp[Ip] = Y0 + self.Dy * (Divsl - X4) / (X3 - X4)
+                    Ip = Ip + 1
                 Xmax = max(X1,X4)
                 Xmin = min(X1,X4)
                 if(Divsl >= Xmin and Divsl <= Xmax):
-                    print "Adding 4 to Xp and Yp"
-                    Ip = Ip + 1
+                    # print "Adding 4 to Xp and Yp"
                     Xp[Ip] = X0 + self.Dx * (Divsl - X1) / (X4 - X1)
                     Yp[Ip] = Y0
+                    Ip = Ip + 1
                 XpListLow.append(Xp[0])
                 XpListHigh.append(Xp[1])
                 YpListLow.append(Yp[0])                
@@ -429,7 +445,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             J = int(1.01 + 3. * (Latd - 30.)) - 1
             for Im in xrange(0, 60):
                 I = 64 - Im
-                if self.Dhfit[J, I] > 90.: 
+                if np.isnan(self.Dhfit[J, I]): 
                     continue
                 Dh1 = self.Dhfit[J, I]
                 break
@@ -454,9 +470,18 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         # by specifying lat/lon corners and central point.
         # area_thresh=1000 means don't plot coastline features less
         # than 1000 km^2 in area.
-        m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
+        latLeft, lonLeft = convertLatLonToNegative(self.firstLatitude, 
+                                                   self.firstLongitude)
+        latRight, lonRight = convertLatLonToNegative(self.secondLatitude,
+                                                     self.secondLongitude)
+        # print "lonLeft", lonLeft, "latLeft", latLeft, "latRight", latRight, "lonRight", lonRight
+        m = Basemap(llcrnrlon=lonLeft,llcrnrlat=latLeft,urcrnrlon=lonRight, \
+                    urcrnrlat=latRight,\
                     resolution='l',area_thresh=1000.,projection='poly',\
                     lat_0=50,lon_0=-140)
+        # m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
+        #             resolution='l',area_thresh=1000.,projection='poly',\
+        #             lat_0=50,lon_0=-140)
         m.drawcoastlines()
         m.fillcontinents(color='darksage',lake_color='royalblue')
         # draw parallels and meridians.
@@ -464,8 +489,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         m.drawmeridians(np.arange(-180.,181.,20.))
         m.drawmapboundary(fill_color='royalblue')
         plt.title("Circulation Data on the Southern Alaskan Coast")
-        for x in xrange(0, len(xPLL) - 1):
-            plt.plot([xPLL[x], xPLH[x]], [yPLL[x], yPLH[x]])
+        # for x in xrange(0, len(xPLL) - 1):
+        #     plt.plot([xPLL[x], xPLH[x]], [yPLL[x], yPLH[x]])
          
         plt.show()
         return
@@ -475,12 +500,16 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.Dhfit.fill(dynHeightBar)
         for i in xrange(0, self.Nx):
             for j in xrange(0, self.Ny):
-                if self.E[0, j, i] != np.nan:
+                if not np.isnan(self.E[0, j, i]):
                     for k in xrange(0, self.totalModes): 
-                        self.Dhfit[j, i] = (self.Dhfit[j, i] + self.evals[k] * 
-                                            self.E[k, j, i])
+                        self.Dhfit[j, i] += (self.evals[k] * self.E[k, j, i])
+                        # if i == 0 and j < 20:
+                        #     # print "self.evals[k] is ", self.evals[k], "self.E[k, j, i] is ", self.E[k, j, i]
+                        #     # print "dynHeightBar is ", dynHeightBar
+                        #     pass
                 else:
                     self.Dhfit[j, i] = np.nan
+                    # print "Dhfit nan set on j", j, " i ", i 
         return
 
     def bestFitMode(self, Dhvar):
@@ -496,14 +525,15 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             for Iflt in xrange(0, self.numFloats):
                 if self.accept[Iflt]:
                     Ef = self.interpolate(self.E, M, self.Nx, self.Ny, 
-                                            self.Lat[Iflt], self.Lon[Iflt])
+                                          self.Lat[Iflt], self.Lon[Iflt])
+                    # print "Ef is ", Ef
                     self.Dhf[Iflt] = Ef
                     Nent = Nent + 1
             Q1 = 0.
             Q2 = 0.
             Ntemp = 0
             for Iflt in xrange(0, self.numFloats):
-                if self.Dhf[Iflt] < 90. and self.accept[Iflt]:
+                if not np.isnan(self.Dhf[Iflt]) and self.accept[Iflt]:
                     Q1 += self.Dh[Iflt] * self.Dhf[Iflt]
                     # print "self.Dh[Iflt]", self.Dh[Iflt], "self.Dhf[Iflt]", self.Dhf[Iflt]
                     Q2 += self.Dhf[Iflt] * self.Dhf[Iflt]
@@ -512,7 +542,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.evals[M] = Q1 / Q2
             Rvar = 0.
             for Iflt in xrange(0, self.numFloats): 
-                if self.Dhf[Iflt] < 90. and self.accept[Iflt]:
+                if not np.isnan(self.Dhf[Iflt]) and self.accept[Iflt]:
                     self.Dh[Iflt] = (self.Dh[Iflt] - 
                                      self.evals[M] * self.Dhf[Iflt])
                     Rvar = Rvar + self.Dh[Iflt] * self.Dh[Iflt]
@@ -526,7 +556,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def interpolate(self, E, M, Nx, Ny, Lati, Loni):
-        Eval = 99.99
+        Eval = np.nan
         Y = 1. + 3. * (Lati - 30.)
         X = 1. + 1. * (Loni - 180.)
         Ix = int(X + .0001)
@@ -536,18 +566,20 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         
          # Outside bounds, so ignore
         if Ix < 1 or Ix >= Nx:
+            print "returning early X"
             return Eval
         if Iy < 1 or Iy >= Ny:
+            print "returning early Y"
             return Eval
          # Integer lat/lon, so easy
         if np.abs(Rx) < .01 and np.abs(Ry) < .01:
             Eval = self.E[M, Iy, Ix]
             print "Returning 3rd if Eval", Eval
             return Eval       
-        I1 = Ix
-        I2 = Ix + 1
-        J1 = Iy
-        J2 = Iy + 1
+        I1 = Ix - 1
+        I2 = Ix + 2
+        J1 = Iy - 1
+        J2 = Iy + 2
         
         sumWeight = 0.
         sumWeightE = 0.
@@ -556,7 +588,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             if I < 1 or I > Nx:
                 continue
             for J in xrange(J1, J2):
-                if J < 1 or J > Ny or self.E[M, J, I] > 99.:
+                if J < 1 or J > Ny or np.isnan(self.E[M, J, I]):
                     continue
                 Rho2 = (I - X) * (I - X) + (J - Y) * (J - Y)
                 Wgt = np.square(-Rho2 / A2)
@@ -565,7 +597,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 # print "self.E[M, J, I]", self.E[M, J, I], "Wgt", Wgt
         if sumWeight > .2:
             Eval = sumWeightE / sumWeight
-            # print "Returning 4th Eval", Eval
+        #     print "Returning 4th Eval", Eval
+        # print "Returning end Eval"
         return Eval
 
     def subtractMeanFromStored(self, dynHeightBar):
@@ -581,7 +614,9 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         Dhvar = 0.
         Mfloats = 0
         for iFlt in xrange(0,  self.numFloats):
+            print "numFloats looped"
             if self.accept[iFlt]:
+                print "Accept the iFlt one"
                 Dhbar = Dhbar + self.Dh[iFlt]
                 Dhvar = Dhvar + self.Dh[iFlt] * self.Dh[iFlt]
                 Mfloats = Mfloats + 1
@@ -603,7 +638,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             splitName = re.split('[\W_]+', flt)
             # Gets 2nd last element from split string. Last element is "IOS"
             endOfName = splitName[-2]
-            print "Split name is ", splitName
+            # print "Split name is ", splitName
             for jFlt in xrange(iFlt + 1, self.numFloats):
                 if(not self.accept[jFlt]): 
                     continue
@@ -639,13 +674,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 self.accept[jFlt] = False
         return
 
-    def calculationsOnData(self):
-        # Specific volume and Dynamic Heights
-        # Replaced Deltap with self.stepSize
-        self.specificVolAndDynH()
-        self.meanAndStdDev()
-        return
-
     def meanAndStdDev(self):
         # ! Now compute mean and stnd dev and remove mean from Dh(*)
         print "Computing mean and standard deviation"
@@ -671,7 +699,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     if (Devn > Devmax):
                         Devmax = Devn
                     if (Devn > 3):
-                        self.Accpt[iFlt] = -1
+                        self.accept[iFlt] = False
                         # IF Verb_opt > .5 THEN PRINT "Rejecting float # ";Iflt
                         Nrej = Nrej + 1
 
@@ -683,27 +711,31 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     def specificVolAndDynH(self):
         Ipref = 1 + self.Pref / self.stepSize
         for iFlt in xrange(0, self.numFloats):
-            for iPress in xrange(1, 500):
+            for iPress in xrange(0, 500):
                 pressCount = self.stepSize * (iPress - 1.)
                 qTe = self.Te[iFlt, iPress]
                 qSa = self.Sa[iFlt, iPress]
                 if (qSa > 900):
+                    print "Skipping from qSa"
                     continue
                 if (qTe > 900):
+                    print "Skipping from qTe"
                     continue
                 qSt = getSigmaT(qSa, qTe)
                 sigma, Svan = getSvanom(qSa, qTe, 0)
+                # print "Svan is ", Svan
                 self.Sa[iFlt,iPress] = Svan
                 
             # ! Compute dynamic height at surface P = Pmap relative to 1000
             Dhi = 0
             Q = 0.5 * 1.0E-5
-            Ipr0 = int(1.01 + self.dynHeightsAtP / self.stepSize)
+            Ipr0 = int(0.01 + self.dynHeightsAtP / self.stepSize)
             Ipr1 = Ipr0 + 1
 
             for iPress in xrange(Ipr1, Ipref):
-                Dhi = (Dhi + Q * (self.Sa[iFlt, iPress] + 
-                    self.Sa[iFlt, iPress-1]) * self.stepSize)
+                Dhi += (Q * (self.Sa[iFlt, iPress] + 
+                            self.Sa[iFlt, iPress-1]) * 
+                        self.stepSize)
             self.Dh[iFlt] = Dhi
         return
 
@@ -783,7 +815,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                       str(month).zfill(2) + 
                       str(day).zfill(2) + 
                       '_index.csv')
-        print "inFileName is ", inFileName
+        # print "inFileName is ", inFileName
         try:
             with open((inFileName),
                       'rb') as indexCSV:
