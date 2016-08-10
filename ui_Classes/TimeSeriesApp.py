@@ -544,6 +544,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     plotInput: 2D array with data at correct time/depth related positions
     plotTime: 1D array '''
     def plotContour(self, plotInput, plotTime, plotDepth):
+        print "Length of plotInput is ", len(plotInput), "plotInput[0] ", len(plotInput[0])
+        print "Length of plotTime is ", len(plotTime), "plotDepth is ", len(plotDepth)
         if len(plotTime) < 2:
             print "Error: plotting data. There are too few time entries"
             return

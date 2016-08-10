@@ -246,7 +246,7 @@
              </font>
             </property>
             <property name="text">
-             <string>This thing does something about water circulation somewhere on the coast of somewhere?</string>
+             <string>Plots dynamic height data near the Alaskan Coast</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>

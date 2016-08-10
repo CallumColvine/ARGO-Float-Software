@@ -214,6 +214,8 @@ def extractDataFromFloatFile(path, order, P, T, S):
         if not passedEndOfHeader:
             if line.find("NUMBER OF RECORDS") != -1:
                 numRecs = getNumRecs(line)
+                # if numRecs > 500:
+                #     print "Num recs > 500 in file: ", path
             order, pFound, tFound, sFound = \
                 findOrder(line, order, pFound, tFound, sFound)
             if not (verifyUsability(line)):

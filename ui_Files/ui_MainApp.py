@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\MainApp.ui'
 #
-# Created: Mon Jul 25 14:48:29 2016
+# Created: Wed Aug 10 13:41:06 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -203,7 +203,7 @@ class Ui_MainApp(object):
         self.timeSeriesButton.setText(QtGui.QApplication.translate("MainApp", "Time Series", None, QtGui.QApplication.UnicodeUTF8))
         self.label_19.setText(QtGui.QApplication.translate("MainApp", "Time Series is a program that interpolates data at a specific location and time, based on the data available from ARGO floats within the selected nearby area", None, QtGui.QApplication.UnicodeUTF8))
         self.circulationButton.setText(QtGui.QApplication.translate("MainApp", "Circulation", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_20.setText(QtGui.QApplication.translate("MainApp", "This thing does something about water circulation somewhere on the coast of somewhere?", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_20.setText(QtGui.QApplication.translate("MainApp", "Plots dynamic height data near the Alaskan Coast", None, QtGui.QApplication.UnicodeUTF8))
         self.exitButton.setText(QtGui.QApplication.translate("MainApp", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("MainApp", "Time Series", None, QtGui.QApplication.UnicodeUTF8))
         self.backToProgramListButton.setText(QtGui.QApplication.translate("MainApp", "Back to Program List", None, QtGui.QApplication.UnicodeUTF8))

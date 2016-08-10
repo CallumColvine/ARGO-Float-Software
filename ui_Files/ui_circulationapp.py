@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\circulationapp.ui'
 #
-# Created: Mon Jul 25 14:48:30 2016
+# Created: Wed Aug 10 13:41:06 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,7 +29,7 @@ class Ui_CirculationApp(object):
         font.setPointSize(10)
         self.centreOfPlotDateEdit.setFont(font)
         self.centreOfPlotDateEdit.setCalendarPopup(True)
-        self.centreOfPlotDateEdit.setDate(QtCore.QDate(2016, 1, 1))
+        self.centreOfPlotDateEdit.setDate(QtCore.QDate(2016, 7, 15))
         self.centreOfPlotDateEdit.setObjectName("centreOfPlotDateEdit")
         self.horizontalLayout_3.addWidget(self.centreOfPlotDateEdit)
         self.label_2 = QtGui.QLabel(self.settingsPage)
@@ -49,7 +49,7 @@ class Ui_CirculationApp(object):
         self.sampleWindowBox.setFont(font)
         self.sampleWindowBox.setMinimum(1)
         self.sampleWindowBox.setMaximum(30)
-        self.sampleWindowBox.setProperty("value", 10)
+        self.sampleWindowBox.setProperty("value", 15)
         self.sampleWindowBox.setObjectName("sampleWindowBox")
         self.horizontalLayout_9.addWidget(self.sampleWindowBox)
         self.label_7 = QtGui.QLabel(self.settingsPage)
@@ -69,7 +69,7 @@ class Ui_CirculationApp(object):
         self.firstLatitudeBox.setFont(font)
         self.firstLatitudeBox.setMinimum(-9999)
         self.firstLatitudeBox.setMaximum(9999)
-        self.firstLatitudeBox.setProperty("value", 40)
+        self.firstLatitudeBox.setProperty("value", 30)
         self.firstLatitudeBox.setObjectName("firstLatitudeBox")
         self.horizontalLayout_10.addWidget(self.firstLatitudeBox)
         self.label_8 = QtGui.QLabel(self.settingsPage)
@@ -86,7 +86,7 @@ class Ui_CirculationApp(object):
         self.secondLatitudeBox.setFont(font)
         self.secondLatitudeBox.setMinimum(-9999)
         self.secondLatitudeBox.setMaximum(9999)
-        self.secondLatitudeBox.setProperty("value", 65)
+        self.secondLatitudeBox.setProperty("value", 60)
         self.secondLatitudeBox.setObjectName("secondLatitudeBox")
         self.horizontalLayout_10.addWidget(self.secondLatitudeBox)
         self.label_16 = QtGui.QLabel(self.settingsPage)
@@ -106,7 +106,7 @@ class Ui_CirculationApp(object):
         self.firstLongitudeBox.setFont(font)
         self.firstLongitudeBox.setMinimum(-9999)
         self.firstLongitudeBox.setMaximum(9999)
-        self.firstLongitudeBox.setProperty("value", 200)
+        self.firstLongitudeBox.setProperty("value", 180)
         self.firstLongitudeBox.setObjectName("firstLongitudeBox")
         self.horizontalLayout_11.addWidget(self.firstLongitudeBox)
         self.label_9 = QtGui.QLabel(self.settingsPage)
@@ -123,7 +123,7 @@ class Ui_CirculationApp(object):
         self.secondLongitudeBox.setFont(font)
         self.secondLongitudeBox.setMinimum(-9999)
         self.secondLongitudeBox.setMaximum(9999)
-        self.secondLongitudeBox.setProperty("value", 250)
+        self.secondLongitudeBox.setProperty("value", 244)
         self.secondLongitudeBox.setObjectName("secondLongitudeBox")
         self.horizontalLayout_11.addWidget(self.secondLongitudeBox)
         self.label_17 = QtGui.QLabel(self.settingsPage)
@@ -142,7 +142,7 @@ class Ui_CirculationApp(object):
         font.setPointSize(10)
         self.pressureCutOffBox.setFont(font)
         self.pressureCutOffBox.setMaximum(2100)
-        self.pressureCutOffBox.setProperty("value", 970)
+        self.pressureCutOffBox.setProperty("value", 950)
         self.pressureCutOffBox.setObjectName("pressureCutOffBox")
         self.horizontalLayout_12.addWidget(self.pressureCutOffBox)
         self.label_10 = QtGui.QLabel(self.settingsPage)
@@ -212,7 +212,7 @@ class Ui_CirculationApp(object):
         self.dynHeightAtPBox.setFont(font)
         self.dynHeightAtPBox.setMinimum(-9999)
         self.dynHeightAtPBox.setMaximum(9999)
-        self.dynHeightAtPBox.setProperty("value", 200)
+        self.dynHeightAtPBox.setProperty("value", 0)
         self.dynHeightAtPBox.setObjectName("dynHeightAtPBox")
         self.horizontalLayout_14.addWidget(self.dynHeightAtPBox)
         self.label_13 = QtGui.QLabel(self.settingsPage)
@@ -229,7 +229,7 @@ class Ui_CirculationApp(object):
         self.relativeToPrefBox.setFont(font)
         self.relativeToPrefBox.setMinimum(-9999)
         self.relativeToPrefBox.setMaximum(9999)
-        self.relativeToPrefBox.setProperty("value", 230)
+        self.relativeToPrefBox.setProperty("value", 1000)
         self.relativeToPrefBox.setObjectName("relativeToPrefBox")
         self.horizontalLayout_14.addWidget(self.relativeToPrefBox)
         self.label_18 = QtGui.QLabel(self.settingsPage)
@@ -248,7 +248,7 @@ class Ui_CirculationApp(object):
         font.setPointSize(10)
         self.totalModesBox.setFont(font)
         self.totalModesBox.setMaximum(20)
-        self.totalModesBox.setProperty("value", 4)
+        self.totalModesBox.setProperty("value", 20)
         self.totalModesBox.setObjectName("totalModesBox")
         self.horizontalLayout.addWidget(self.totalModesBox)
         self.label_4 = QtGui.QLabel(self.settingsPage)
