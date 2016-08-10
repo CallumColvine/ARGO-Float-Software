@@ -13,6 +13,7 @@ This might (hopefully) make the code more readable
 # UI Imports
 from PySide import QtCore, QtGui
 from PySide.QtGui import QWidget
+from ui_Files.ui_circulationapp import Ui_CirculationApp
 # Plotting Imports
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
@@ -29,10 +30,6 @@ from utilities.ARGO_Utilities import formatToDateTime, dateToJulian, \
 import re
 
 
-from ui_Files.ui_circulationapp import Ui_CirculationApp
-
-
-
 class CirculationApp(QWidget, Ui_CirculationApp):
     def __init__(self, parent):
         super(CirculationApp, self).__init__()
@@ -47,6 +44,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def initAllClassVariables(self):
+        self.verbose = True
         self.plotCentre = None
         self.rangeCentre = None
         self.firstLatitude = self.firstLatitudeBox.value()
@@ -127,28 +125,18 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.dX = 78.63
         self.dY = 111.2 / 3.0
 
-        # This seems dumb and non Pythonic. Redo
+        # This seems non Pythonic. ToDo
         self.E = np.empty((20, self.nY, self.nX))
         self.evals = np.empty((20))
         self.dHFit = np.empty((self.nY, self.nX))
-        # ,Deld(193),Xp(4),Yp(4),Maxlat(20),Maxval(20)
-        # 150 INTEGER Depi(361,361)
-        # 160 DIM Cov(20,20),Tr(20)
-        # 170 MAT Cov=(0.)
-        # 180 DIM Halat(133),Halon(193),Ha(193,133)
-        # ...
-        # ...
-        # ...
+
         self.argoPath = "C:\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
         self.outPath = self.argoPath + "argo_out_TEST\\Circulation\\"
         self.drive = "P:\\"
         self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
-
         # Used for plotting
         self.scy = 111.2        #! Scy = km/degree of latitude
         self.scx = 78.3
-        # self.relativeToPref = 1000    #! Reference level for dynamic height calculations
-        # self.relativeToPref = self.relativeToPrefBox.value()
         self.stepSize = self.stepSizeBox.value()
         self.nPress = 0
         self.updateNPress()
@@ -172,18 +160,17 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 continue
             # Default parameters for split is whitespace
             split = line.split()
-            # print "it is ", split
             lon = float(split[1])
             lat = float(split[2])
             value = float(split[3])
 
             i = int(0.002 + 1.0 * (lon - 180.0))
             j = int(0.002 + 3.0 * (lat - 30.0))        
-            # print "Settings to val", value
             if i > iMax:
                 iMax = i
             self.E[k][j][i] = value
-            # WHY IS THIS HERE?!?!
+            # Why are these lines here in Howard's commented code? 
+            # They create errors in E-values
             # if (lat >= 51.7) and (lon <= 200):
             #     y = 51.7 + .033 * (lon - 180.0) * (lon - 180.0)
             #     if lat > y:
@@ -274,8 +261,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
     def updateNPress(self):
         self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
-        # if self.nPress > 300:
-        #     self.nPress = 300
         return
 
     def maxInterpDepthBoxEditingFinished(self):
@@ -331,11 +316,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def mainLoop(self):
-        # self.numFloats = 0
         doSort = True
         julStart, julEnd = self.getJulianStartAndEnd()
-        # Non-inclusive, should I do (julEnd + 1) ?
-        # floats = []
         self.numFloats = 0
         for i in xrange(julStart, julEnd):
             yearMonthDayPath0 = self.checkFloatsFromIndex(i, self.path0)
@@ -349,8 +331,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             numRecs = getProfile(flt, self.P, self.T, self.S)
             despike(self.T, numRecs)
             despike(self.S, numRecs)
-            # fillgaps(self.T)
-            # fillgaps(self.S)
             skip = self.checkSkip()
             if skip:
                 continue
@@ -374,9 +354,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def saveOutput(self):
-
-        # plotLats = np.zeros((self.nX, self.nY))
-        # plotLons = np.zeros((self.nY, self.nX))
         plotLats = []
 
         minLat = 90
@@ -409,19 +386,10 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                         minLon = lonC
                     if lonC > maxLon:
                         maxLon = lonC
-
-        print "plotLats pre np array ", plotLats 
         latDiff = ceil(abs(maxLat - minLat) * 3)
         lonDiff = int(abs(maxLon - minLon))
         plotLats = np.asarray(plotLats)
         plotLons = np.arange(minLon, maxLon + 1)
-
-
-        # print "maxLat is ", maxLat, "minLat is ", minLat
-        # print "maxLon is ", maxLon, "minLon is ", minLon
-        # print "latDiff is ", latDiff
-        # print "lonDiff is ", lonDiff
-
 
         plotData = self.savePlotData(len(plotLons), len(plotLats))        
         plotLats, plotLons = self.convertTo2D(plotLats, plotLons)
@@ -429,7 +397,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return plotLats, plotLons, plotData
 
     def convertTo2D(self, plotLats, plotLons):
-        print "lat/lon lenghtsh ", len(plotLats), len(plotLons)
         plotLatsFix = np.zeros((len(plotLats), len(plotLons)))
         plotLonsFix = np.zeros((len(plotLats), len(plotLons)))
         for i in xrange(0, len(plotLats)):
@@ -442,8 +409,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return plotLatsFix, plotLonsFix
 
     def savePlotData(self, dimX, dimY):
-        print "dimX is ", dimX, "dimY is", dimY
-        print "nX is ", self.nX, "nY is ", self.nY
         jPlot = 0
         iPlot = 0
         iNext = False
@@ -453,9 +418,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             lonC = i - 180.
             for j in xrange(0, self.nY):
                 if not np.isnan(self.dHFit[j][i]):
-                    # if i == 0 and j == 64:
-                        # print "dhFit is ", self.dHFit[j][i]
-                        # print "len "
                     latC = 30. + j / 3.
                     plotData[i][j] = self.dHFit[j][i]
                     jPlot += 1
@@ -491,28 +453,24 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 xMax = max(x1, x2)
                 xMin = min(x1, x2)
                 if(divSl >= xMin and divSl <= xMax):
-                    # print "Adding 1 to xP and yP"
                     xP[iP] = x0
                     yP[iP] = y0 + self.dY * (divSl - x1) / (x2 - x1)
                     iP = iP + 1
                 xMax = max(x2,x3)
                 xMin = min(x2,x3)
                 if(divSl>=xMin and divSl<=xMax):
-                    # print "Adding 2 to xP and yP"
                     xP[iP] = x0 + self.dX * (divSl - x2) / (x3 - x2)
                     yP[iP] = y0 + self.dY
                     iP=iP+1
                 xMax = max(x3,x4)
                 xMin = min(x3,x4)
                 if(divSl >= xMin and divSl <= xMax):
-                    # print "Adding 3 to xP and yP"
                     xP[iP] = x0 + self.dX
                     yP[iP] = y0 + self.dY * (divSl - x4) / (x3 - x4)
                     iP = iP + 1
                 xMax = max(x1,x4)
                 xMin = min(x1,x4)
                 if(divSl >= xMin and divSl <= xMax):
-                    # print "Adding 4 to xP and yP"
                     xP[iP] = x0 + self.dX * (divSl - x1) / (x4 - x1)
                     yP[iP] = y0
                     iP = iP + 1
@@ -520,46 +478,31 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 xPListHigh.append(xP[1])
                 yPListLow.append(yP[0])                
                 yPListHigh.append(yP[1])
-                # MOVE xP(1),yP(1)
-                # DRAW xP(2),yP(2)
-        # print "xPList is ", xPList
-        # print "yPList is ", yPList
         return xPListLow, xPListHigh, yPListLow, yPListHigh 
 
     def findDivingStreamline(self):
         # Now search for dividing streamline
         divSl = 0.
         knt = 0
-        # ToDo: Was 58, changed to 59
+        # Was 58, changed to 59. Change is valid
         for dLat in xrange(40, 59):
-            j = int(1.01 + 3. * (dLat - 30.)) - 1
+            j = int(1.01 + 3. * (dLat - 30.))
             for iM in xrange(0, 60):
                 i = 64 - iM
                 if np.isnan(self.dHFit[j][i]): 
                     continue
                 dynHeight1 = self.dHFit[j][i]
                 break
-            # ! Have dynHeight1
+            # Have dynHeight1
             divSl = divSl + dynHeight1
             knt = knt + 1
         divSl = divSl / knt
         return divSl
 
-    def prepareCallContour(self):
-        # ! CLEAR SCREEN
-        contourInterval = 0.05
-        # CALL Contour(dHFit(*),Dx,Dy,self.nX,self.nY,Conin)
-        self.contour()
-        # Xl = Dx * (self.nX - 1.0)
-        # Yl = Dy * (self.nY - 1.0)
-        return
-
-    # self.dHFit, Dx, Dy, self.nX, self.nY
     def contour(self, xPLL, xPLH, yPLL, yPLH, plotLats, plotLons, plotData):
         m = self.plotBasemap()
         self.plotFloatDots(m)
         self.plotContour(m, plotLats, plotLons, plotData)
-        # print "plotLats is ", plotLats, "plotLons is ", plotLons 
         plt.show()
         return
 
@@ -568,12 +511,14 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         try:
             cs = m.contour(mX, mY, plotData.T)
         except Exception, e:
+            print "ERROR: Invalid parameters for contour plotting"
             raise e
         return
 
     def plotFloatDots(self, m):        
         latToDel = []
         lonToDel = []
+        # Remove all values that do not fit within existing lat/lon possibilites
         for i in xrange(0, self.Lat.size):
             if self.Lat[i] == 0 or self.Lat[i] > 360:
                 latToDel.append(i)                
@@ -583,24 +528,19 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.Lat = np.delete(self.Lat, latToDel)
         self.Lon = np.delete(self.Lon, lonToDel)
 
-
-        # interLon, interLat = m.shiftdata(self.Lon, self.Lat) 
-        # self.Lon += 30
         mapLon, mapLat = m(self.Lon, self.Lat) 
 
+        if self.verbose:
+            print "NOR Lon Max ", np.amax(self.Lon), " Lon Min ", np.amin(self.Lon)
+            print "NOR Lat Max ", np.amax(self.Lat), " Lat Min ", np.amin(self.Lat)
 
-        print "NOR Lon Max ", np.amax(self.Lon), " Lon Min ", np.amin(self.Lon)
-        print "NOR Lat Max ", np.amax(self.Lat), " Lat Min ", np.amin(self.Lat)
+            print "MAP Lon Max ", np.amax(mapLon), " Lon Min ", np.amin(mapLon)
+            print "MAP Lat Max ", np.amax(mapLat), " Lat Min ", np.amin(mapLat)
 
-        print "MAP Lon Max ", np.amax(mapLon), " Lon Min ", np.amin(mapLon)
-        print "MAP Lat Max ", np.amax(mapLat), " Lat Min ", np.amin(mapLat)
+            axes = plt.gca()
+            print "X axis intervals ", axes.xaxis.get_view_interval()
+            print "Y axis intervals ", axes.yaxis.get_view_interval()
 
-        axes = plt.gca()
-        print "X axis intervals ", axes.xaxis.get_view_interval()
-        print "Y axis intervals ", axes.yaxis.get_view_interval()
-
-        # axes.set_xlim([self.firstLongitude, self.secondLongitude])
-        # axes.set_ylim([self.firstLatitude, self.secondLatitude])
         plt.plot(mapLon, mapLat, 'ro')
         return 
 
@@ -609,24 +549,15 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         # by specifying lat/lon corners and central point.
         # area_thresh=1000 means don't plot coastline features less
         # than 1000 km^2 in area.
-
-        # latLeft, lonLeft = convertLatLonToNegative(self.firstLatitude, 
-        #                                            self.firstLongitude)
-        # latRight, lonRight = convertLatLonToNegative(self.secondLatitude,
-        #                                              self.secondLongitude)
         latLeft = self.firstLatitude
         lonLeft = self.firstLongitude
         latRight = self.secondLatitude
         lonRight = self.secondLongitude
 
-
-        # print "lonLeft", lonLeft, "latLeft", latLeft, "latRight", latRight, "lonRight", lonRight
         m = Basemap(llcrnrlon=lonLeft,llcrnrlat=latLeft,urcrnrlon=lonRight, \
                     urcrnrlat=latRight, resolution='l',area_thresh=1000., \
                     projection='poly',lat_0=50,lon_0=-140)
-        # m = Basemap(llcrnrlon=-160,llcrnrlat=43,urcrnrlon=-100,urcrnrlat=57,\
-        #             resolution='l',area_thresh=1000.,projection='poly',\
-        #             lat_0=50,lon_0=-140)
+
         m.drawcoastlines()
         m.fillcontinents(color='darksage',lake_color='royalblue')
         # draw parallels and meridians.
@@ -635,8 +566,9 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         m.drawmapboundary(fill_color='royalblue')
         plt.title("Circulation Data on the Southern Alaskan Coast")
 
-        print "BASEMAP PLOT lonLeft/latLeft/lonRight/latRight ", lonLeft, latLeft, lonRight, latRight
-
+        if self.verbose:
+            print ("BASEMAP PLOT lonLeft/latLeft/lonRight/latRight ", 
+                lonLeft, latLeft, lonRight, latRight)
         return m
 
     def mapCirculations(self, dynHeightBar):
@@ -647,14 +579,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 if not np.isnan(self.E[0][j][i]):
                     for k in xrange(0, self.totalModes): 
                         self.dHFit[j][i] += (self.evals[k] * self.E[k][j][i])
-                        # if i == 0 and j < 20:
-                        #     # print "self.evals[k] is ", self.evals[k], "self.E[k, j, i] is ", self.E[k, j, i]
-                        #     # print "dynHeightBar is ", dynHeightBar
-                        #     pass
                 else:
                     self.dHFit[j][i] = np.nan
-                    # print "dHFit nan set on j", j, " i ", i 
-        # print "dHFit at [nY - 1][0]", self.dHFit[0][self.nX - 1]
         return
 
     def bestFitMode(self, dynHeightVar):
@@ -665,12 +591,11 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             if qMode < 3.5:
                 mode = 4 - qMode
             mode = qMode
-            # ! Find best fit between Mode M and the data
+            # Find best fit between Mode M and the data
             numEnt = 0
             for iFloat in xrange(0, self.numFloats):
                 if self.accept[iFloat]:
                     eF = self.interpolate(self.E, mode, self.Lat[iFloat], self.Lon[iFloat])
-                    # print "eF is ", eF
                     self.Dhf[iFloat] = eF
                     numEnt = numEnt + 1
             q1 = 0.
@@ -679,10 +604,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             for iFloat in xrange(0, self.numFloats):
                 if not np.isnan(self.Dhf[iFloat]) and self.accept[iFloat]:
                     q1 += self.Dh[iFloat] * self.Dhf[iFloat]
-                    # print "self.Dh[iFloat]", self.Dh[iFloat], "self.Dhf[iFloat]", self.Dhf[iFloat]
                     q2 += self.Dhf[iFloat] * self.Dhf[iFloat]
                     nTemp = nTemp + 1
-            # print "q1 is ", q1, " q2 is ", q2
             self.evals[mode] = q1 / q2
             rVar = 0.
             for iFloat in xrange(0, self.numFloats): 
@@ -692,11 +615,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     rVar = rVar + self.Dh[iFloat] * self.Dh[iFloat]
             rVar = rVar / nTemp
             frVar = rVar / dynHeightVar
-            # IF Verb_opt>.5 THEN PRINT "After fitting mode #";mode;" residual variance = ";frVar
             Contvar = frVarLast - frVar
             frVarLast = frVar
-            # OUTPUT @Pvar;VAL$(mode)&","&VAL$(frVar)&","&VAL$(Contvar)
-        # ASSIGN @Pvar TO *
         return
 
     def interpolate(self, E, mode, Lati, Loni):
@@ -708,14 +628,14 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         rX = x - iX
         rY = y - iY
         
-         # Outside bounds, so ignore
+        # Outside bounds, so ignore
         if iX < 1 or iX >= self.nX:
             print "returning early X"
             return eVal
         if iY < 1 or iY >= self.nY:
             print "returning early Y"
             return eVal
-         # Integer lat/lon, so easy
+        # Integer lat/lon, so easy
         if np.abs(rX) < .01 and np.abs(rY) < .01:
             eVal = self.E[mode][iY][iX]
             print "Returning 3rd if eVal", eVal
@@ -728,8 +648,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         sumWeight = 0.
         sumWeightE = 0.
         a2 = .25
-        # print "i1 is ", i1, " i2 is ", i2
-        # print "Loni is ", Loni, " x is ", x
         for i in xrange(i1, i2):
             if i < 1 or i > self.nX:
                 continue
@@ -740,19 +658,14 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 weight = np.square(-rho2 / a2)
                 sumWeight += weight
                 sumWeightE += self.E[mode][j][i] * weight
-                # print "self.E[mode, j, i]", self.E[mode, j, i], "weight", weight
         if sumWeight > .2:
             eVal = sumWeightE / sumWeight
-        #     print "Returning 4th eVal", eVal
-        # print "Returning end eVal"
         return eVal
 
     def subtractMeanFromStored(self, dynHeightBar):
-        # MAT Dhsave=Dh
         for iFloat in xrange(0, self.numFloats):
             if self.accept[iFloat]:
                 self.Dh[iFloat] = self.Dh[iFloat] - dynHeightBar
-        # MAT Dhk=Dh
         return
 
     def recomputeMeanAndVariation(self):
@@ -760,23 +673,22 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         dynHeightVar = 0.
         mFloats = 0
         for iFloat in xrange(0,  self.numFloats):
-            # print "numFloats looped"
             if self.accept[iFloat]:
-                # print "Accept the iFloat one"
                 dynHeightBar = dynHeightBar + self.Dh[iFloat]
                 dynHeightVar = dynHeightVar + self.Dh[iFloat] * self.Dh[iFloat]
                 mFloats = mFloats + 1
         dynHeightBar = dynHeightBar / mFloats
         dynHeightVar = dynHeightVar / mFloats
         dynHeightVar = dynHeightVar - dynHeightBar * dynHeightBar
-        # PRINT "Mean Dh = ";dynHeightBar;" Variance in Dh = ";dynHeightVar;mFloats
+        print "Mean dynamic height ", dynHeightBar
+        print "Variance in dynamic Height ", dynHeightVar
         return dynHeightBar, dynHeightVar
 
     def removeDuplicates(self):
-        # ! Now have a list of good float observations, bad ones have Accpt(i)=-1
+        # Now have a list of good float observations, bad ones have Accpt(i)=-1
         print "Checking for duplicates"
-        # ! Sort entries so that there is only one entry per float
-        # ! First see if there are any duplicates
+        # Sort entries so that there is only one entry per float
+        # First see if there are any duplicates
         for iFloat in xrange(0, self.numFloats - 1):
             if not self.accept[iFloat]: 
                 continue
@@ -784,7 +696,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             splitName = re.split('[\W_]+', flt)
             # Gets 2nd last element from split string. Last element is "IOS"
             endOfName = splitName[-2]
-            # print "Split name is ", splitName
             for jFlt in xrange(iFloat + 1, self.numFloats):
                 if(not self.accept[jFlt]): 
                     continue
@@ -794,7 +705,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def foundDuplicate(self, endOfName, dFlt):
-        # ! at least one duplicate is present for float dFlt
+        # At least one duplicate is present for float dFlt
         dynHeightBar = 0.
         avgLat = 0.
         avgLon = 0.
@@ -814,14 +725,13 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.Dh[dFlt] = dynHeightBar / Nav
             self.Lat[dFlt] = avgLat / Nav
             self.Lon[dFlt] = avgLon / Nav
-        # if Verb_opt>.5 THEN PRINT "Eliminating duplicate entries of "&Q$;Nav;" of them."
         for jFlt in xrange(dFlt+1, self.numFloats):
             if (self.floats[jFlt] == endOfName): 
                 self.accept[jFlt] = False
         return
 
     def meanAndStdDev(self):
-        # ! Now compute mean and stnd dev and remove mean from Dh(*)
+        # Now compute mean and stnd dev and remove mean from dynHeight
         print "Computing mean and standard deviation"
         for i in xrange(0, 10):
             dynHeightBar = 0.
@@ -846,10 +756,11 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                         devMax = devN
                     if (devN > 3):
                         self.accept[iFloat] = False
-                        # IF Verb_opt > .5 THEN PRINT "Rejecting float # ";iFloat
+                        if self.verbose:
+                            "Rejecting float #", iFloat
                         nRej = nRej + 1
-
-            # IF Verb_opt>.5 THEN PRINT "Maximum deviation = ";devMax;" standard deviations."
+            if self.verbose:
+                "Max deviation: ", devMax
             if(nRej < .5): 
                 break
         return
@@ -869,10 +780,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     continue
                 qSt = getSigmaT(qSa, qTe)
                 sigma, sVan = getSvanom(qSa, qTe, 0)
-                # print "Svan is ", Svan
                 self.Sa[iFloat][iPress] = sVan
-                
-            # ! Compute dynamic height at surface P = Pmap relative to 1000
+            # Compute dynamic height at surface P = Pmap relative to 1000
             dHi = 0
             q = 0.5 * 1.0E-5
             iPress0 = int(0.01 + self.dynHeightsAtP / self.stepSize)
@@ -892,9 +801,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 continue
             if pressCount > self.P[numRecs]:
                 return
-            # print "in storeData"
-            # print "numRecs is ", numRecs
-            # print "numFloat is ", numFloat
             for i in xrange(1, numRecs):
                 if pressCount >= self.P[i-1]:
                     rho = 0
@@ -911,8 +817,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     if (np.abs(self.S[i-1]) < 50. and np.abs(self.S[i]) < 50.): 
                         self.Sa[numFloat, iPr] = \
                             self.S[i-1] + rho * (self.S[i] - self.S[i-1])
-        #     5320 ! Finished interpolation to standard pressures for Float iFloat
-        # 5340 ! Finished interpolation to standard pressures for all floats
+                # Finished interpolation to standard pressures for Float iFloat
+            # Finished interpolation to standard pressures for all floats
         return
 
     def dataForcing(self):
@@ -964,14 +870,15 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                       str(month).zfill(2) + 
                       str(day).zfill(2) + 
                       '_index.csv')
-        # print "inFileName is ", inFileName
+        if self.verbose:
+            print "inFileName is ", inFileName
         try:
             with open((inFileName), 'rb') as indexCSV:
                 reader = csv.reader(indexCSV)
                 # Skip the first entry since it's a header
                 reader.next()
                 for row in reader:
-                    # Filer out the ******* lines that are in some index files 
+                    # Filer out the '*******' lines that are in some index files 
                     if row[3] == "*******":
                         continue
                     lat = float(row[1])
@@ -984,7 +891,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                        lon > self.firstLongitude and 
                        lon < self.secondLongitude and 
                        press > self.pressureCutOff):
-                        # print "So it passed, press is ", press
                         floatNum = row[0]
                         self.floats.append(yearMonthDayPath0 + row[0])
                         self.passedFloat(lat, lon)
@@ -996,11 +902,5 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     def passedFloat(self, lat, lon):
         self.Lat[self.numFloats] = lat
         self.Lon[self.numFloats] = lon
-        # dX = self.sCX0 * (float(lon) - self.longitudeDesired)
-        # dY = self.sCY * (float(lat) - self.latitudeDesired)
-        # rho = np.sqrt(dX * dX + dY * dY)
-        # if self.closestDist > rho:
-        #     self.closestDist = rho
-        #     self.closestFloatNum = floatNum
         # ToDo: A few lines left out here, looks completely unnecessary
         return
