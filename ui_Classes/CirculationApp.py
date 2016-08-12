@@ -1,6 +1,22 @@
-''' TimeSeriesApp.py
+''' CirculationApp.py
 Callum Colvine - Research Assistant
-Callum.Colvine@dfo-mpo.gc.ca
+Callum.Colvine@dfo-mpo.gc.ca (until August 25th)
+CallumColvine@gmail.com
+
+CirculationApp builds on the functionality of Howard Freeland's CirculationApp 
+which was written in HT Basic.
+
+CirculationApp reads ARGO data from *_index.csv and *.IOS files to calculate the
+dynamic height between longitudes: 180-224 and latitudes: 30-60. CirculationApp
+then outputs this data into Dh****_0000.cav files and forms a contour plot with
+the used float locations on it. 
+
+ToDo:
+- dhpa, xKMa investigate
+- dList, x, y are part of plotting. Investigate
+- O(n^3) loop in program, would be nice to rework
+- Change mainLoop for loop calls to be inside functions (slightly faster)
+
 
 Following Pep 8 formatting with the following exceptions:
 - There is no spacing between a docstring and a function
@@ -36,17 +52,20 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.setupUi(self)
         return
 
+    ''' This is called when the user clicks the Circulation App button on the 
+    homepage. This saves memory by not initializing lists unless the user 
+    chooses this experiment. '''
     def experimentSelected(self):
         self.initAllClassVariables()
         self.loadDefaultSettings()
         self.setupSignals()
-        self.readEndOfFiles()
         return
 
+    ''' This method holds references to all class variables. For anyone unclear,
+    Python allows any method inside the class to access these variables. They 
+    work similarly to "Global" variables, but in the class scope.'''
     def initAllClassVariables(self):
         self.verbose = True
-        self.plotCentre = None
-        self.rangeCentre = None
         self.firstLatitude = self.firstLatitudeBox.value()
         self.secondLatitude = self.secondLatitudeBox.value()
         self.firstLongitude = self.firstLongitudeBox.value()
@@ -79,41 +98,19 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.T = ""         # 100 length string
         self.path0 = ""
         self.outPath = ""
-        self.path = ""
-        self.pathHg = ""
-        self.gif = ""
-        self.hlt = [[""]]
         
-        self.dHPa = np.empty((100))
-        self.vPa = np.empty((100))
-        self.xKMa = np.empty((100))
-        self.dList = np.empty((900))
-        self.dListX = np.empty((900))
-        self.dListY = np.empty((900))
+        # self.dHPa = np.empty((100))
+        # self.xKMa = np.empty((100))
+        # self.dList = np.empty((900))
+        # self.dListX = np.empty((900))
+        # self.dListY = np.empty((900))
         
-        self.line1 = ""
-        self.line2 = ""
-        self.line3 = ""
-        self.line4 = ""
-        self.line5 = ""
-        self.line6 = ""
-
-        self.fil = ""
-        self.filTe = ""
-        self.filSa = ""
-        self.filSt = ""
-
-        self.sTe = ""
-        self.sSa = ""
-        self.sSt = ""
-        self.sSp = ""
-        self.sDh = ""
-        self.sShgt = ""
-        self.Pa = ""
-        self.Qdt = ""
-
-        self.listFil = ""
-        self.param = ""
+        # self.line1 = ""
+        # self.line2 = ""
+        # self.line3 = ""
+        # self.line4 = ""
+        # self.line5 = ""
+        # self.line6 = ""
 
         self.P = np.empty((2000))
         self.T = np.empty((2000))
@@ -130,10 +127,16 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.evals = np.empty((20))
         self.dHFit = np.empty((self.nY, self.nX))
 
-        self.argoPath = "C:\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
-        self.outPath = self.argoPath + "argo_out_TEST\\Circulation\\"
-        self.drive = "P:\\"
-        self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
+        # self.argoPath = "C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\\"
+        # self.outPath = self.argoPath + "argo_out_TEST\\Circulation\\"
+        # self.drive = "P:\\"
+        # self.path0 = self.drive + "argo_mirror\pacific_ocean\\"
+
+        print "Init my path in Circ"
+        self.argoPath = ''
+        self.path0 = ''
+        self.outPath = ''
+
         # Used for plotting
         self.scy = 111.2        #! Scy = km/degree of latitude
         self.scx = 78.3
@@ -143,8 +146,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
         return
 
-    def readEndOfFiles(self):
-        # Read eofs using non-HTBasic code
+    def readEVals(self):
         self.E.fill(np.nan)
         modes = open((self.outPath + "hjf_modes.31"), 'r')
         n = 0
@@ -185,6 +187,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         print "i max is", iMax
         return
 
+    ''' Methods called by the user interacting with the GUI '''
     def setupSignals(self):
         self.setupInputParameterSignals()
         self.setupButtonPressSignals()
@@ -315,6 +318,9 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         # Read default/previous from a *.cfg file
         return
 
+    ''' Every function call for the normal working of the program is made here.
+    mainLoop is called at the start of the program and it does everything from
+    collecting data, to plotting results.'''
     def mainLoop(self):
         doSort = True
         julStart, julEnd = self.getJulianStartAndEnd()
@@ -322,10 +328,12 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         for i in xrange(julStart, julEnd):
             yearMonthDayPath0 = self.checkFloatsFromIndex(i, self.path0)
         if self.numFloats == 0:
-            print "There are no floats within the provided range"
+            print ("There are no floats within the provided range. ",
+                   "Terminating program")
             return
-        print "numFloats is ", self.numFloats
-        print "len of floats is ", len(self.floats)
+        if self.verbose:
+            print "numFloats is ", self.numFloats
+            print "len of floats is ", len(self.floats)
         iFloat = 0
         for flt in self.floats:
             numRecs = getProfile(flt, self.P, self.T, self.S)
@@ -334,7 +342,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             skip = self.checkSkip()
             if skip:
                 continue
-            self.dataForcing()
+            self.dataForcing(numRecs)
             self.storeData(numRecs, iFloat)
             iFloat += 1
         # Specific volume and Dynamic Heights
@@ -349,11 +357,13 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.mapCirculations(dynHeightBar)
         divSl = self.findDivingStreamline()
         xPLL, xPLH, yPLL, yPLH = self.collectPlotData(divSl)
-        plotLats, plotLons, plotData = self.saveOutput()
+        plotLats, plotLons, plotData = self.saveOutput(dynHeightBar)
         self.contour(xPLL, xPLH, yPLL, yPLH, plotLats, plotLons, plotData)
         return
 
-    def saveOutput(self):
+    ''' Writes results to .csv file and creates storage arrays for data to be 
+    plotted.'''
+    def saveOutput(self, dynHeightBar):
         plotLats = []
 
         minLat = 90
@@ -386,6 +396,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                         minLon = lonC
                     if lonC > maxLon:
                         maxLon = lonC
+        outFile.write("-116,60.0," + str(dynHeightBar) + '\n')
         latDiff = ceil(abs(maxLat - minLat) * 3)
         lonDiff = int(abs(maxLon - minLon))
         plotLats = np.asarray(plotLats)
@@ -394,20 +405,10 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         plotData = self.savePlotData(len(plotLons), len(plotLats))        
         plotLats, plotLons = self.convertTo2D(plotLats, plotLons)
 
+        outFile.close()
         return plotLats, plotLons, plotData
 
-    def convertTo2D(self, plotLats, plotLons):
-        plotLatsFix = np.zeros((len(plotLats), len(plotLons)))
-        plotLonsFix = np.zeros((len(plotLats), len(plotLons)))
-        for i in xrange(0, len(plotLats)):
-            for j in xrange(0, len(plotLons)):
-                plotLatsFix[i][j] = plotLats[i]
-
-        for i in xrange(0, len(plotLats)):
-            for j in xrange(0, len(plotLons)):
-                plotLonsFix[i][j] = plotLons[j]
-        return plotLatsFix, plotLonsFix
-
+    ''' Pulls formats results in a way that there are no empty/wasted lines '''
     def savePlotData(self, dimX, dimY):
         jPlot = 0
         iPlot = 0
@@ -426,6 +427,21 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                         iNext = False
             jPlot = 0
         return plotData
+
+    ''' Converts 1D latitude/longitude arrays into 2D arrays with longitude 
+    iterating across the 2nd array, and latitude iterating across the 1st array
+    '''
+    def convertTo2D(self, plotLats, plotLons):
+        plotLatsFix = np.zeros((len(plotLats), len(plotLons)))
+        plotLonsFix = np.zeros((len(plotLats), len(plotLons)))
+        for i in xrange(0, len(plotLats)):
+            for j in xrange(0, len(plotLons)):
+                plotLatsFix[i][j] = plotLats[i]
+
+        for i in xrange(0, len(plotLats)):
+            for j in xrange(0, len(plotLons)):
+                plotLonsFix[i][j] = plotLons[j]
+        return plotLatsFix, plotLonsFix
 
     def collectPlotData(self, divSl):
         xP = np.empty((4))
@@ -480,6 +496,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 yPListHigh.append(yP[1])
         return xPListLow, xPListHigh, yPListLow, yPListHigh 
 
+    ''' Calculates the dividing streamline '''
     def findDivingStreamline(self):
         # Now search for dividing streamline
         divSl = 0.
@@ -499,6 +516,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         divSl = divSl / knt
         return divSl
 
+    ''' Calls functions to create the Basemap plot, the contour lines on top, 
+    and the red dots representing ARGO floats. '''
     def contour(self, xPLL, xPLH, yPLL, yPLH, plotLats, plotLons, plotData):
         m = self.plotBasemap()
         self.plotFloatDots(m)
@@ -506,6 +525,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         plt.show()
         return
 
+    ''' Adds contour lines to the basemap object'''
     def plotContour(self, m, plotLats, plotLons, plotData):
         mX, mY = m(plotLons, plotLats)
         try:
@@ -515,6 +535,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             raise e
         return
 
+    ''' Adds dots for the positions of each float that dat was collected form'''
     def plotFloatDots(self, m):        
         latToDel = []
         lonToDel = []
@@ -544,6 +565,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         plt.plot(mapLon, mapLat, 'ro')
         return 
 
+    ''' Creates the basemap plot object. Many of the parameters are editable,
+    so if the user is interested look at different projections to start. '''
     def plotBasemap(self):
         # setup polyconic basemap
         # by specifying lat/lon corners and central point.
@@ -571,6 +594,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 lonLeft, latLeft, lonRight, latRight)
         return m
 
+    ''' Saves final dHFit results. '''
     def mapCirculations(self, dynHeightBar):
         # Now add mean and modes
         self.dHFit.fill(dynHeightBar)
@@ -583,6 +607,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     self.dHFit[j][i] = np.nan
         return
 
+    ''' Various calculations. Edits values of self.Dhf, self.Dh, self.evals. '''
     def bestFitMode(self, dynHeightVar):
         frVarLast = 1.
         for qMode in xrange(0, self.totalModes):
@@ -619,6 +644,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             frVarLast = frVar
         return
 
+    ''' Calculates the e-value. '''
     def interpolate(self, E, mode, Lati, Loni):
         eVal = np.nan
         y = 1. + 3. * (Lati - 30.)
@@ -669,8 +695,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def recomputeMeanAndVariation(self):
-        dynHeightBar = 0.
-        dynHeightVar = 0.
+        dynHeightBar = 0
+        dynHeightVar = 0
         mFloats = 0
         for iFloat in xrange(0,  self.numFloats):
             if self.accept[iFloat]:
@@ -680,13 +706,18 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         dynHeightBar = dynHeightBar / mFloats
         dynHeightVar = dynHeightVar / mFloats
         dynHeightVar = dynHeightVar - dynHeightBar * dynHeightBar
-        print "Mean dynamic height ", dynHeightBar
-        print "Variance in dynamic Height ", dynHeightVar
+        if self.verbose:
+            print "Mean dynamic height ", dynHeightBar
+            print "Variance in dynamic Height ", dynHeightVar
         return dynHeightBar, dynHeightVar
 
+    ''' The goal of this functuon is to remove the listings for floats that 
+    are very close together. This would help avoid map clutter. This function
+    is still in testing due to its non-crucial nature. '''
     def removeDuplicates(self):
         # Now have a list of good float observations, bad ones have Accpt(i)=-1
-        print "Checking for duplicates"
+        if self.verbose:
+            print "Checking for duplicates"
         # Sort entries so that there is only one entry per float
         # First see if there are any duplicates
         for iFloat in xrange(0, self.numFloats - 1):
@@ -704,16 +735,17 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                     self.foundDuplicate(endOfName, iFloat)
         return
 
+    ''' This function is called when very similar floats are being used. '''
     def foundDuplicate(self, endOfName, dFlt):
         # At least one duplicate is present for float dFlt
-        dynHeightBar = 0.
-        avgLat = 0.
-        avgLon = 0.
+        dynHeightBar = 0
+        avgLat = 0
+        avgLon = 0
         Nav = 0
         for jFlt in xrange(dFlt, self.numFloats):
             if (self.floats[jFlt] == endOfName): 
                 continue
-            if (self.Dh[jFlt] < 0 or self.Dh[jFlt]>5):
+            if (self.Dh[jFlt] < 0 or self.Dh[jFlt] > 5):
                 self.accept[jFlt] = False
             if (not self.accept[jFlt]): 
                 continue
@@ -721,7 +753,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             avgLat = avgLat + self.Lat[jFlt]
             avgLon = avgLon + self.Lon[jFlt]
             Nav = Nav + 1
-        if Nav > .5:
+        if Nav > 0.5:
             self.Dh[dFlt] = dynHeightBar / Nav
             self.Lat[dFlt] = avgLat / Nav
             self.Lon[dFlt] = avgLon / Nav
@@ -729,6 +761,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             if (self.floats[jFlt] == endOfName): 
                 self.accept[jFlt] = False
         return
+
 
     def meanAndStdDev(self):
         # Now compute mean and stnd dev and remove mean from dynHeight
@@ -761,15 +794,16 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                         nRej = nRej + 1
             if self.verbose:
                 "Max deviation: ", devMax
-            if(nRej < .5): 
+            if(nRej < 0.5): 
                 break
         return
 
+    ''' Calculate specific volume and then dynamic height '''
     def specificVolAndDynH(self):
         iPressRef = 1 + self.relativeToPref / self.stepSize
         for iFloat in xrange(0, self.numFloats):
             for iPress in xrange(0, 500):
-                pressCount = self.stepSize * (iPress - 1.)
+                # pressCount = self.stepSize * (iPress - 1.0)
                 qTe = self.Te[iFloat][iPress]
                 qSa = self.Sa[iFloat][iPress]
                 if (qSa > 900):
@@ -794,6 +828,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.Dh[iFloat] = dHi
         return
 
+    ''' Save results into self.P, self.T, and self.S '''
     def storeData(self, numRecs, numFloat):
         for iPr in xrange(0, self.nPress):
             pressCount = self.stepSize * iPr
@@ -810,30 +845,36 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
                     self.Te[numFloat, iPr] = 999.9
                     if(np.abs(self.T[i-1]) < 50. and np.abs(self.T[i]) < 50.):
-                        self.Te[numFloat, iPr] = \
-                            self.T[i-1] + rho * (self.T[i] - self.T[i-1])
+                        self.Te[numFloat, iPr] = (
+                            self.T[i-1] + rho * (self.T[i] - self.T[i-1]))
                     
                     self.Sa[numFloat, iPr] = 999.9
                     if (np.abs(self.S[i-1]) < 50. and np.abs(self.S[i]) < 50.): 
-                        self.Sa[numFloat, iPr] = \
-                            self.S[i-1] + rho * (self.S[i] - self.S[i-1])
+                        self.Sa[numFloat, iPr] = (
+                            self.S[i-1] + rho * (self.S[i] - self.S[i-1]))
                 # Finished interpolation to standard pressures for Float iFloat
             # Finished interpolation to standard pressures for all floats
         return
 
-    def dataForcing(self):
+    def dataForcing(self, numRecs):
+        # See if numRecs -1 overall works, since it's used as an index
         # 4950 ! If the sample is "near-surface" then force it to be surface
-        # 4960 IF P(1)<20. THEN P(1)=0.
-        # 4970 !
+        if self.P[0] < 20:
+            self.P[0] = 0
+
         # 4980 ! If the sample is almost deep enough, force it to be deep enough
-        # 4990 IF P(Nrecs)<Pmax THEN
-        # 5000 Dtdp=(T(Nrecs)-T(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
-        # 5010 Dsdp=(S(Nrecs)-S(Nrecs-1))/(P(Nrecs)-P(Nrecs-1))
-        # 5020 Text=T(Nrecs)+Dtdp*(Pmax-P(Nrecs))
-        # 5030 Sext=S(Nrecs)+Dsdp*(Pmax-P(Nrecs))
-        # 5040 S(Nrecs)=Sext
-        # 5050 T(Nrecs)=Text
-        # 5060 P(Nrecs)=Pmax
+        if self.P[numRecs] < self.maxInterpDepth:
+            dTdP = (self.T[numRecs] - self.T[numRecs - 1] /
+                    self.P[numRecs] - self.P[numRecs - 1])
+            dSdP = (self.S[numRecs] - self.S[numRecs - 1] /
+                    self.P[numRecs] - self.P[numRecs - 1])
+            text = (self.T[numRecs] + dTdP * 
+                   (self.maxInterpDepth - self.P[numRecs]))
+            sext = (self.S[numRecs]  + dSdP *
+                   (self.maxInterpDepth - self.P[numRecs]))            
+            self.S[numRecs] = sext
+            self.T[numRecs] = text
+            self.P[numRecs] = self.maxInterpDepth
         return
 
     def checkSkip(self):

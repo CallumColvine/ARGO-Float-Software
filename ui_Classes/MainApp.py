@@ -3,6 +3,8 @@ MainApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
 
+MainApp is the widget allowing access to TimeSeriesApp and CirculationApp.
+
 Following Pep 8 formatting with the following exceptions:
 - There is no spacing between a docstring and a function
 
@@ -33,7 +35,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         # self.timeSeriesApp.setupUi(self)
         return
 
-
     def setupSignals(self):
         self.timeSeriesButton.clicked.connect(self.timeSeriesButtonClicked)
         self.exitButton.clicked.connect(self.close)
@@ -48,6 +49,13 @@ class MainApp(QMainWindow, Ui_MainApp):
     def circulationButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.experimentSelected()
+        self.circulationApp.argoPath = self.argoPathLineEdit.text()
+        self.circulationApp.path0 = self.argoDataLineEdit.text() + \
+                "argo_mirror\pacific_ocean\\"
+        self.circulationApp.outPath = self.circulationApp.argoPath + \
+                "argo_out_TEST\\Circulation\\"
+        self.circulationApp.readEVals()
+
         return
 
     def backToProgramListButtonClicked(self):
@@ -57,6 +65,9 @@ class MainApp(QMainWindow, Ui_MainApp):
     def timeSeriesButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.timeSeriesPage)
         self.timeSeriesApp.experimentSelected()
+        self.timeSeriesApp.localSoftwarePath = self.argoPathLineEdit.text()
+        self.timeSeriesApp.drive = self.argoDataLineEdit.text()
+        self.timeSeriesApp.driveEdited()
         return
 
 

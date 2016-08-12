@@ -2,11 +2,8 @@
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
 
-Following Pep 8 formatting with the following exceptions:
-- There is no spacing between a docstring and a function
-
-TimeSeries has the functionality from Howard Freeland's TimeSeries written in 
-HT Basic.
+TimeSeries has the functionality from Howard Freeland's TimeSeries which was 
+written in HT Basic.
 
 TimeSeries reads ARGO data and outputs interpolated float data into several 
 TS_*.csv files. 
@@ -15,11 +12,14 @@ Potential upgrades to TimeSeries if there is time in the futre:
 - Eliminate all the individual data arrays, and use a dictionary instead
 - Concurrently handle mutiple tasks to improve runtime
 - Examine loop structure in an attempt to improve runtime
+
+Following Pep 8 formatting with the following exceptions:
+- There is no spacing between a docstring and a function
 '''
 
 # This is to deal with path issues for the sake of project organizaiton
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 
 
 # Utility File imports
@@ -166,6 +166,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
         self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
         self.sigPath = self.drive + "projects\\Sigma_Climate\\"
+        self.localSoftwarePath = ''
         if SAVELOCALLY:
             self.localSoftwarePath = "C:\\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
             self.outPath = self.localSoftwarePath + "argo_out_TEST\\TimeSeries\\"
@@ -240,6 +241,19 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.startDateChanged)
         self.endRangeDateEdit.dateChanged.connect(
             self.endDateChanged)
+        return
+
+    def driveEdited(self):
+        self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
+        self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
+        self.sigPath = self.drive + "projects\\Sigma_Climate\\"
+        if SAVELOCALLY:
+            self.localSoftwarePath = "C:\\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
+            self.outPath = self.localSoftwarePath + "argo_out_TEST\\TimeSeries\\"
+            self.sigPath = self.localSoftwarePath + "projects\\Sigma_Climate\\"
+            lastRun(self.localSoftwarePath, 2)
+        else:
+            lastRun(self.drive, 2)
         return
 
     ''' The following functions are called by button presses.
