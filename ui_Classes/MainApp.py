@@ -14,9 +14,11 @@ Applications.
 
 # This is to deal with path issues for the sake of project organizaiton
 import sys
+import os
 sys.path.append("..")
 # For development, make this your path to the project ui_Classes folder
-sys.path.append('C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software')
+# sys.path.append('C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software')
+sys.path.append(os.path.abspath(os.curdir))
 # ToDo: os.path.join(os.getcwd()) <--- Try this instead
 
 from PySide import QtCore, QtGui
@@ -28,7 +30,7 @@ from PySide.QtGui import QMainWindow
 class MainApp(QMainWindow, Ui_MainApp):
 
     def __init__(self):
-        print "MainApp init called!"
+        # hasInit
         super(MainApp, self).__init__()
         self.setupUi(self)
         self.setupSignals()
@@ -47,6 +49,7 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def circulationButtonClicked(self):
+        # sys.path.append(self.argoPathLineEdit.text())
         self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.experimentSelected()
         self.circulationApp.argoPath = self.argoPathLineEdit.text()
@@ -55,14 +58,11 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.circulationApp.outPath = self.circulationApp.argoPath + \
                 "argo_out_TEST\\Circulation\\"
         self.circulationApp.readEVals()
-
-        return
-
-    def backToProgramListButtonClicked(self):
-        self.listAllPages.setCurrentWidget(self.programListPage)
+        
         return
 
     def timeSeriesButtonClicked(self):
+        # sys.path.append(self.argoPathLineEdit.text())
         self.listAllPages.setCurrentWidget(self.timeSeriesPage)
         self.timeSeriesApp.experimentSelected()
         self.timeSeriesApp.localSoftwarePath = self.argoPathLineEdit.text()
@@ -70,6 +70,9 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.timeSeriesApp.driveEdited()
         return
 
+    def backToProgramListButtonClicked(self):
+        self.listAllPages.setCurrentWidget(self.programListPage)
+        return
 
 def main():
     app = QtGui.QApplication(sys.argv)
