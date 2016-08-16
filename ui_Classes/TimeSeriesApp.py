@@ -1,6 +1,8 @@
-''' TimeSeriesApp.py
+''' 
+TimeSeriesApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
+CallumColvine@gmail.com
 
 TimeSeries has the functionality from Howard Freeland's TimeSeries which was 
 written in HT Basic.

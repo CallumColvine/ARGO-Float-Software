@@ -1,4 +1,5 @@
-''' CirculationApp.py
+''' 
+CirculationApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca (until August 25th)
 CallumColvine@gmail.com
@@ -11,7 +12,7 @@ dynamic height between longitudes: 180-224 and latitudes: 30-60. CirculationApp
 then outputs this data into Dh****_0000.cav files and forms a contour plot with
 the used float locations on it. 
 
-ToDo:
+Potential upgrades to CirculationApp:
 - dhpa, xKMa investigate
 - dList, x, y are part of plotting. Investigate
 - O(n^3) loop in program, would be nice to rework

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\MainApp.ui'
 #
-# Created: Mon Aug 15 10:12:36 2016
+# Created: Mon Aug 15 11:56:51 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -110,6 +110,7 @@ class Ui_MainApp(object):
         self.horizontalLayout_7 = QtGui.QHBoxLayout()
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.argoPathLineEdit = QtGui.QLineEdit(self.programListPage)
+        self.argoPathLineEdit.setEnabled(False)
         self.argoPathLineEdit.setObjectName("argoPathLineEdit")
         self.horizontalLayout_7.addWidget(self.argoPathLineEdit)
         self.label_3 = QtGui.QLabel(self.programListPage)

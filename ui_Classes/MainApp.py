@@ -2,23 +2,23 @@
 MainApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
+CallumColvine@gmail.com
 
 MainApp is the widget allowing access to TimeSeriesApp and CirculationApp.
 
-Following Pep 8 formatting with the following exceptions:
-- There is no spacing between a docstring and a function
-
 MainApp hosts the GUI window surrounding the TimeSeries and Circulation 
 Applications.  
+
+Following Pep 8 formatting with the following exceptions:
+- There is no spacing between a docstring and a function
 '''
 
 # This is to deal with path issues for the sake of project organizaiton
 import sys
 import os
-sys.path.append("..")
-# For development, make this your path to the project ui_Classes folder
-# sys.path.append('C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software')
-sys.path.append(os.path.abspath(os.curdir))
+# sys.path.append("..")
+PROGRAM_PATH = os.path.abspath(os.curdir)
+sys.path.append(PROGRAM_PATH)
 # ToDo: os.path.join(os.getcwd()) <--- Try this instead
 
 from PySide import QtCore, QtGui
@@ -49,23 +49,21 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def circulationButtonClicked(self):
-        # sys.path.append(self.argoPathLineEdit.text())
         self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.experimentSelected()
-        self.circulationApp.argoPath = self.argoPathLineEdit.text()
+        self.circulationApp.argoPath = PROGRAM_PATH
         self.circulationApp.path0 = self.argoDataLineEdit.text() + \
-                "argo_mirror\pacific_ocean\\"
-        self.circulationApp.outPath = self.circulationApp.argoPath + \
-                "argo_out_TEST\\Circulation\\"
+                "\\argo_mirror\pacific_ocean\\"
+        self.circulationApp.outPath = PROGRAM_PATH + \
+                "\\argo_out_TEST\\Circulation\\"
         self.circulationApp.readEVals()
         
         return
 
     def timeSeriesButtonClicked(self):
-        # sys.path.append(self.argoPathLineEdit.text())
         self.listAllPages.setCurrentWidget(self.timeSeriesPage)
         self.timeSeriesApp.experimentSelected()
-        self.timeSeriesApp.localSoftwarePath = self.argoPathLineEdit.text()
+        self.timeSeriesApp.localSoftwarePath = PROGRAM_PATH
         self.timeSeriesApp.drive = self.argoDataLineEdit.text()
         self.timeSeriesApp.driveEdited()
         return

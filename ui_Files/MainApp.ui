@@ -275,6 +275,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QLineEdit" name="argoPathLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\</string>
             </property>

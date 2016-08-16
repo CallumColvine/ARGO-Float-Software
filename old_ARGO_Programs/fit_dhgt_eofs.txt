@@ -838,7 +838,7 @@
 	8380 FOR J=1 TO Ny
 		8390 IF E(I,J,1)<99. THEN
 		8400 FOR M=1 TO Nmodes
-			8410 Dhfit(I,J)=Dhfit(I,J)+Evals(k)*E(I,J,M)
+			8410 Dhfit(I,J)=Dhfit(I,J)+Evals(M)*E(I,J,M)
 			8420 NEXT M
 		8430 ELSE
 		8440 Dhfit(I,J)=99.99
