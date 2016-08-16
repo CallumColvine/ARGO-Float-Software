@@ -63,6 +63,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def experimentSelected(self):
         self.loadOldSettings()
         self.initAllClassVariables()
+        self.lastRunCalls()
         self.setupSignals()
         self.userDefinedSettings()        
         return
@@ -169,8 +170,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
         self.sigPath = self.drive + "projects\\Sigma_Climate\\"
         self.localSoftwarePath = ''
+
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        return
+
+    def lastRunCalls(self):
         if SAVELOCALLY:
-            self.localSoftwarePath = "C:\\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
             self.outPath = self.localSoftwarePath + "argo_out_TEST\\TimeSeries\\"
             self.sigPath = self.localSoftwarePath + "projects\\Sigma_Climate\\"
             lastRun(self.localSoftwarePath, 2)
@@ -180,7 +185,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # if problems: change this maybe
         csvF = open((self.sigPath + "Mp26_i.csv"), 'w')
         csvF.close()
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     ''' Methods called by the user interacting with the GUI '''
@@ -250,7 +254,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
         self.sigPath = self.drive + "projects\\Sigma_Climate\\"
         if SAVELOCALLY:
-            self.localSoftwarePath = "C:\\Users\\ColvineC\\IOS_DFO\\ARGO-Float-Software\\"
             self.outPath = self.localSoftwarePath + "argo_out_TEST\\TimeSeries\\"
             self.sigPath = self.localSoftwarePath + "projects\\Sigma_Climate\\"
             lastRun(self.localSoftwarePath, 2)

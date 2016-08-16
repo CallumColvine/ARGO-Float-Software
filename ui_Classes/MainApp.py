@@ -61,10 +61,10 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def timeSeriesButtonClicked(self):
-        self.listAllPages.setCurrentWidget(self.timeSeriesPage)
-        self.timeSeriesApp.experimentSelected()
         self.timeSeriesApp.localSoftwarePath = PROGRAM_PATH
         self.timeSeriesApp.drive = self.argoDataLineEdit.text()
+        self.listAllPages.setCurrentWidget(self.timeSeriesPage)
+        self.timeSeriesApp.experimentSelected()
         self.timeSeriesApp.driveEdited()
         return
 
