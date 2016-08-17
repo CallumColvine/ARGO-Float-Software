@@ -53,7 +53,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Centre point of plot, (-ve number accepts all defaults) day number of 2001</string>
+            <string>Date of circulation plot</string>
            </property>
           </widget>
          </item>
@@ -100,7 +100,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Range of days used on both sides of current date to interpolate float (Max 30)</string>
+            <string>Range of days used on both sides of target date to interpolate float data (Max 30)</string>
            </property>
           </widget>
          </item>
@@ -147,7 +147,7 @@
             </font>
            </property>
            <property name="text">
-            <string>First Latitude Point</string>
+            <string>Start Latitude Point</string>
            </property>
           </widget>
          </item>
@@ -193,7 +193,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Second Latitude Point</string>
+            <string>End Latitude Point</string>
            </property>
           </widget>
          </item>
@@ -240,7 +240,7 @@
             </font>
            </property>
            <property name="text">
-            <string>First Longitude Point</string>
+            <string>Start Longitude Point</string>
            </property>
           </widget>
          </item>
@@ -286,7 +286,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Second Longitude Point</string>
+            <string>End Longitude Point</string>
            </property>
           </widget>
          </item>

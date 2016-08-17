@@ -3,6 +3,7 @@ MainApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
 CallumColvine@gmail.com
+and Tetjana Ross
 
 MainApp is the widget allowing access to TimeSeriesApp and CirculationApp.
 

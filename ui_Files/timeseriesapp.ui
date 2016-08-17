@@ -52,7 +52,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Day Range (Day/Month/Year)</string>
+          <string>Date Range (Day/Month/Year)</string>
          </property>
         </widget>
        </item>
@@ -173,7 +173,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Current Day:</string>
+            <string>Current Date:</string>
            </property>
           </widget>
          </item>
@@ -219,7 +219,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Latest Recommended Day: </string>
+            <string>Latest Recommended Date: </string>
            </property>
           </widget>
          </item>
@@ -272,7 +272,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Earliest Recommended Day: </string>
+            <string>Earliest Recommended Date: </string>
            </property>
           </widget>
          </item>
@@ -344,7 +344,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Day Step Size</string>
+            <string>Date Step Size</string>
            </property>
           </widget>
          </item>
@@ -391,7 +391,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Range of days used on both sides of current date to interpolate float (Max 30)</string>
+            <string>Range of days used on both sides of target date to interpolate float (Max 30)</string>
            </property>
           </widget>
          </item>
@@ -918,7 +918,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Append to existing files (pick yes)</string>
+              <string>Append to existing files</string>
              </property>
              <property name="checked">
               <bool>true</bool>
