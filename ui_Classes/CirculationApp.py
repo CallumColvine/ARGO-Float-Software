@@ -147,6 +147,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
 
         return
 
+    ''' Called initially, this function reads the necessary values from Howard's 
+    modes file.'''
     def readEVals(self):
         self.E.fill(np.nan)
         modes = open((self.outPath + "hjf_modes.31"), 'r')
