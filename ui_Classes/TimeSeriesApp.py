@@ -65,7 +65,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.initAllClassVariables()
         self.lastRunCalls()
         self.setupSignals()
-        self.userDefinedSettings()        
+        self.userDefinedSettings()
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)        
         return
         
     ''' This method holds references to all class variables. For anyone unclear,
@@ -101,8 +102,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spiciness = self.spicinessCheckBox.isChecked()
         self.dynamicHeight = self.dynamicHeightCheckBox.isChecked()
 
-        self.latitudeDesired = self.latitudeDesiredBox.value()
-        self.longitudeDesired = self.longitudeDesiredBox.value()
+        self.updateDesiredLonLat()
+
         self.append = True
         self.verbose = False
         self.weight = 0
@@ -171,7 +172,16 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.sigPath = self.drive + "projects\\Sigma_Climate\\"
         self.localSoftwarePath = ''
 
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        # self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        return
+
+    def updateDesiredLonLat(self):
+        self.latitudeDesired = \
+            abs((self.secondLatitude + self.firstLatitude) / 2.0)
+        self.latitudeDesiredBox.setValue(self.latitudeDesired)
+        self.longitudeDesired = \
+            abs((self.secondLongitude + self.firstLongitude) / 2.0)
+        self.longitudeDesiredBox.setValue(self.longitudeDesired)
         return
 
     def lastRunCalls(self):
@@ -299,18 +309,22 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     def firstLatitudeBoxEditingFinished(self):
         self.firstLatitude = self.firstLatitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def secondLatitudeBoxEditingFinished(self):
         self.secondLatitude = self.secondLatitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def firstLongitudeBoxEditingFinished(self):
         self.firstLongitude = self.firstLongitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def secondLongitudeBoxEditingFinished(self):
         self.secondLongitude = self.secondLongitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def pressureCutOffBoxEditingFinished(self):
@@ -639,7 +653,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             sTKnt += 1
         if self.P[0] < 20:
             self.P[0] = 0
-        for iPress in range(0, self.nPress):
+        for iPress in xrange(0, self.nPress):
             # Interpolate to pressureCalc
             pressureCalc = self.stepSize * (iPress + 1)
             if (pressureCalc < self.P[0]): 
@@ -647,7 +661,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             if (pressureCalc > self.P[numRecs]):
                 return sTav, sTavSq, sTKnt
             eps = 1.0E-6
-            for k in range(1, numRecs):
+            for k in xrange(1, numRecs):
                 if pressureCalc >= self.P[k - 1] and pressureCalc <= self.P[k]:
                     deltaP = self.P[k] - self.P[k - 1]
                     if deltaP < 100:
@@ -762,7 +776,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
             if(not (qSigmaT < self.sigRefSigT[0]) and 
                 not (qSigmaT > self.sigRefSigT[70])):
-                for iCl in range(0, 69):
+                for iCl in xrange(0, 69):
                     if (qSigmaT >= self.sigRefSigT[iCl] and 
                     qSigmaT <= self.sigRefSigT[iCl + 1]):
                         tep, sap = self.foundPair()
@@ -785,6 +799,18 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 self.dynamicHeightCSV.write(xCoAndpressCount + 
                     str(qDynamicHeight) + '\n')
             iterPressNum += 1
+        # if self.temp:
+        #     self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
+        # if self.salinity:
+        #     self.salinityCSV.write(xCoAndpressCount + str(qSal) + '\n')
+        # if self.sigmaT:
+        #     self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + '\n')
+        # if self.spiciness:
+        #     self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
+        # if self.dynamicHeight:
+        #     self.dynamicHeightCSV.write(xCoAndpressCount + 
+        #         str(qDynamicHeight) + '\n')
+
         return 
 
     ''' When a pair is found, performs calculations on that pair and writes to 
@@ -902,8 +928,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.sigmaTCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSigmaT"))
         self.spicinessCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSpiciness"))
         self.dynamicHeightCheckBox.setChecked(cfg.getboolean("desiredResults", "dispDynamicHeight"))
-        self.latitudeDesiredBox.setValue(cfg.getint("desiredResults", "latitudeDesired"))                
-        self.longitudeDesiredBox.setValue(cfg.getint("desiredResults", "longitudeDesired"))        
+        self.latitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "latitudeDesired"))                
+        self.longitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "longitudeDesired"))        
         return
 
 
@@ -946,14 +972,70 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             cfg.write(cfgFile)
         return
 
+    # Checks to see if IN THE info.txt file, the filename already exists OR
+    # is a subset of a filename that exists (TS_Temp_215_50_1000m_2.csv)
+    # returns the truth value, and the denomination the new file should be given
+    # Ex.) True, 3 or False, 1
+    def fileInInfo(self, name, info):
+        amount = 1
+        isIn = False
+        # Left true if parameters don't match filename OR if there is a new 
+        # parameter based filename
+        writeOut = True
+        for line in info:
+            print line
+            if name in line:
+                splitLine = [x.strip() for x in line.split(',')]
+                # If the input filename does not match
+                if not (int(splitLine[1]) == self.stepSize and 
+                        int(splitLine[2]) == self.sampleWindow):
+                    amount += 1
+                    isIn = True
+                # If the input filename does match, append and don't write
+                else: 
+                    writeOut = False
+        return isIn, writeOut, amount
+
+    def prepName(self, outType, outLon, outLat, outDepth):
+        # Add the ".csv" later. This is so we can check if other names contain
+        # this string as a subset
+        info = open((self.outPath + "TimeSeriesInfo.txt"), 'a+')
+        name = (outType + str(outLon) + '_' + str(outLat) + '_' + 
+                    str(outDepth) + "m")        
+        isIn, writeOut, amount = self.fileInInfo(name, info)
+        if isIn:
+            name += "_" + str(amount)
+        name += ".csv"
+        if writeOut:
+            info.write(name + ', ' + 
+                       str(self.stepSize) + ', ' + 
+                       str(self.sampleWindow) + '\n')
+        info.close()
+        return name
+
     ''' Opens and saves the output destination files in the class scope ''' 
     def prepareOutputFiles(self):
-        tempPath = self.outPath + "TS_Te.csv"
-        salinityPath = self.outPath + "TS_Sa.csv"
-        sigmaTPath = self.outPath + "TS_St.csv"
-        spicinessPath = self.outPath + "TS_Sp.csv"
-        dynamicHeightPath = self.outPath + "TS_Dh.csv"
-        hgtPath = self.outPath + "TS_Shgt.csv"     # Surface Height = Shgt
+
+        outLon = self.longitudeDesired
+        outLat = self.latitudeDesired
+        outDepth = self.maxInterpDepth
+        
+        tempName = self.prepName("TS_Temp_", outLon, outLat, outDepth)
+        salName = self.prepName("TS_Salinity_", outLon, outLat, outDepth)
+        sigTName = self.prepName("TS_SigmaT_", outLon, outLat, outDepth)
+        spiceName = self.prepName("TS_Spiciness_", outLon, outLat, outDepth)
+        dynHName = self.prepName("TS_DynamicHeight_", outLon, outLat, outDepth)
+        surfHeightName = self.prepName("TS_SurfaceHeight_", 
+                outLon, outLat, outDepth)
+
+        tempPath = self.outPath + tempName
+        salinityPath = self.outPath + salName
+        sigmaTPath = self.outPath +  sigTName
+        spicinessPath = self.outPath + spiceName
+        dynamicHeightPath = self.outPath + dynHName
+        hgtPath = self.outPath + surfHeightName         # Surface Height = Shgt
+
+
         cLimPath = self.sigPath + "Sigref.csv"
         stratPath = self.outPath + "Strat.csv"
         self.outputFilesLabel.setText("Output Files:\n" +

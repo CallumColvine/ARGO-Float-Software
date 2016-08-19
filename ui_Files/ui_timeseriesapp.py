@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\timeseriesapp.ui'
+# Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\timeseriesapp.ui'
 #
-# Created: Tue Aug 16 13:41:52 2016
+# Created: Fri Aug 19 10:25:31 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_TimeSeriesApp(object):
     def setupUi(self, TimeSeriesApp):
         TimeSeriesApp.setObjectName("TimeSeriesApp")
-        TimeSeriesApp.resize(803, 595)
+        TimeSeriesApp.resize(818, 595)
         self.horizontalLayout = QtGui.QHBoxLayout(TimeSeriesApp)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.timeSeriesStackedWidget = QtGui.QStackedWidget(TimeSeriesApp)
@@ -356,19 +356,24 @@ class Ui_TimeSeriesApp(object):
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.horizontalLayout_14 = QtGui.QHBoxLayout()
         self.horizontalLayout_14.setObjectName("horizontalLayout_14")
-        self.latitudeDesiredBox = QtGui.QSpinBox(self.settingsPage)
+        self.latitudeDesiredBox = QtGui.QDoubleSpinBox(self.settingsPage)
+        self.latitudeDesiredBox.setEnabled(True)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.latitudeDesiredBox.setFont(font)
-        self.latitudeDesiredBox.setProperty("value", 50)
+        self.latitudeDesiredBox.setReadOnly(True)
+        self.latitudeDesiredBox.setMaximum(180.0)
+        self.latitudeDesiredBox.setProperty("value", 52.5)
         self.latitudeDesiredBox.setObjectName("latitudeDesiredBox")
         self.horizontalLayout_14.addWidget(self.latitudeDesiredBox)
-        self.longitudeDesiredBox = QtGui.QSpinBox(self.settingsPage)
+        self.longitudeDesiredBox = QtGui.QDoubleSpinBox(self.settingsPage)
+        self.longitudeDesiredBox.setEnabled(True)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.longitudeDesiredBox.setFont(font)
-        self.longitudeDesiredBox.setMaximum(300)
-        self.longitudeDesiredBox.setProperty("value", 215)
+        self.longitudeDesiredBox.setReadOnly(True)
+        self.longitudeDesiredBox.setMaximum(360.0)
+        self.longitudeDesiredBox.setProperty("value", 215.0)
         self.longitudeDesiredBox.setObjectName("longitudeDesiredBox")
         self.horizontalLayout_14.addWidget(self.longitudeDesiredBox)
         self.label_14 = QtGui.QLabel(self.settingsPage)
@@ -547,18 +552,18 @@ class Ui_TimeSeriesApp(object):
     def retranslateUi(self, TimeSeriesApp):
         TimeSeriesApp.setWindowTitle(QtGui.QApplication.translate("TimeSeriesApp", "Form", None, QtGui.QApplication.UnicodeUTF8))
         self.defaultSettingsCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Default Settings", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_5.setText(QtGui.QApplication.translate("TimeSeriesApp", "Day Range (Day/Month/Year)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_5.setText(QtGui.QApplication.translate("TimeSeriesApp", "Date Range (Day/Month/Year)", None, QtGui.QApplication.UnicodeUTF8))
         self.startRangeDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
         self.label_15.setText(QtGui.QApplication.translate("TimeSeriesApp", "to", None, QtGui.QApplication.UnicodeUTF8))
         self.endRangeDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
-        self.currentDayLabel.setText(QtGui.QApplication.translate("TimeSeriesApp", "Current Day:", None, QtGui.QApplication.UnicodeUTF8))
+        self.currentDayLabel.setText(QtGui.QApplication.translate("TimeSeriesApp", "Current Date:", None, QtGui.QApplication.UnicodeUTF8))
         self.currentDayDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
-        self.currentDayRangeLabel.setText(QtGui.QApplication.translate("TimeSeriesApp", "Latest Recommended Day: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.currentDayRangeLabel.setText(QtGui.QApplication.translate("TimeSeriesApp", "Latest Recommended Date: ", None, QtGui.QApplication.UnicodeUTF8))
         self.latestDayDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
-        self.currentDayRangeLabel_2.setText(QtGui.QApplication.translate("TimeSeriesApp", "Earliest Recommended Day: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.currentDayRangeLabel_2.setText(QtGui.QApplication.translate("TimeSeriesApp", "Earliest Recommended Date: ", None, QtGui.QApplication.UnicodeUTF8))
         self.earliestDayDateEdit.setDisplayFormat(QtGui.QApplication.translate("TimeSeriesApp", "d/M/yyyy", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_6.setText(QtGui.QApplication.translate("TimeSeriesApp", "Day Step Size", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_7.setText(QtGui.QApplication.translate("TimeSeriesApp", "Range of days used on both sides of current date to interpolate float (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_6.setText(QtGui.QApplication.translate("TimeSeriesApp", "Date Step Size", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_7.setText(QtGui.QApplication.translate("TimeSeriesApp", "Range of days used on both sides of target date to interpolate float (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_8.setText(QtGui.QApplication.translate("TimeSeriesApp", "Start Latitude", None, QtGui.QApplication.UnicodeUTF8))
         self.label_16.setText(QtGui.QApplication.translate("TimeSeriesApp", "End Latitude", None, QtGui.QApplication.UnicodeUTF8))
         self.label_9.setText(QtGui.QApplication.translate("TimeSeriesApp", "Start Longitude", None, QtGui.QApplication.UnicodeUTF8))
@@ -573,7 +578,7 @@ class Ui_TimeSeriesApp(object):
         self.spicinessCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Spiciness", None, QtGui.QApplication.UnicodeUTF8))
         self.dynamicHeightCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Dynamic Height", None, QtGui.QApplication.UnicodeUTF8))
         self.label_14.setText(QtGui.QApplication.translate("TimeSeriesApp", "Latitude and Longtitude of desired station", None, QtGui.QApplication.UnicodeUTF8))
-        self.appendCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Append to existing files (pick yes)", None, QtGui.QApplication.UnicodeUTF8))
+        self.appendCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Append to existing files", None, QtGui.QApplication.UnicodeUTF8))
         self.verboseCheckBox.setText(QtGui.QApplication.translate("TimeSeriesApp", "Verbose", None, QtGui.QApplication.UnicodeUTF8))
         self.progressLabel.setText(QtGui.QApplication.translate("TimeSeriesApp", "Waiting for Settings", None, QtGui.QApplication.UnicodeUTF8))
         self.backButton_2.setText(QtGui.QApplication.translate("TimeSeriesApp", "Back", None, QtGui.QApplication.UnicodeUTF8))

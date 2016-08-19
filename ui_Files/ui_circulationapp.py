@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\ColvineC\IOS_DFO\ARGO-Float-Software\ui_Files\circulationapp.ui'
+# Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\circulationapp.ui'
 #
-# Created: Tue Aug 16 13:41:52 2016
+# Created: Fri Aug 19 10:25:32 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -333,12 +333,12 @@ class Ui_CirculationApp(object):
 
     def retranslateUi(self, CirculationApp):
         CirculationApp.setWindowTitle(QtGui.QApplication.translate("CirculationApp", "Form", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("CirculationApp", "Centre point of plot, (-ve number accepts all defaults) day number of 2001", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_7.setText(QtGui.QApplication.translate("CirculationApp", "Range of days used on both sides of current date to interpolate float (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_8.setText(QtGui.QApplication.translate("CirculationApp", "First Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_16.setText(QtGui.QApplication.translate("CirculationApp", "Second Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_9.setText(QtGui.QApplication.translate("CirculationApp", "First Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_17.setText(QtGui.QApplication.translate("CirculationApp", "Second Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("CirculationApp", "Date of circulation plot", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_7.setText(QtGui.QApplication.translate("CirculationApp", "Range of days used on both sides of target date to interpolate float data (Max 30)", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_8.setText(QtGui.QApplication.translate("CirculationApp", "Start Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_16.setText(QtGui.QApplication.translate("CirculationApp", "End Latitude Point", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_9.setText(QtGui.QApplication.translate("CirculationApp", "Start Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_17.setText(QtGui.QApplication.translate("CirculationApp", "End Longitude Point", None, QtGui.QApplication.UnicodeUTF8))
         self.label_10.setText(QtGui.QApplication.translate("CirculationApp", "Pressure Cut-Off (m)", None, QtGui.QApplication.UnicodeUTF8))
         self.simplifyListCheckBox.setText(QtGui.QApplication.translate("CirculationApp", "Simplify list to reduce multiple reports in the period to one", None, QtGui.QApplication.UnicodeUTF8))
         self.label_11.setText(QtGui.QApplication.translate("CirculationApp", "Interpolate Vertically to P-max  (m)", None, QtGui.QApplication.UnicodeUTF8))

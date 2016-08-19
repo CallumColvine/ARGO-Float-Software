@@ -1,0 +1,6 @@
+TS_Temp_215.0_50.0_1000m.csv, 5, 10
+TS_Salinity_215.0_50.0_1000m.csv, 5, 10
+TS_SigmaT_215.0_50.0_1000m.csv, 5, 10
+TS_Spiciness_215.0_50.0_1000m.csv, 5, 10
+TS_DynamicHeight_215.0_50.0_1000m.csv, 5, 10
+TS_SurfaceHeight_215.0_50.0_1000m.csv, 5, 10

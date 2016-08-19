@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
+    <width>818</width>
     <height>595</height>
    </rect>
   </property>
@@ -857,29 +857,44 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_14">
              <item>
-              <widget class="QSpinBox" name="latitudeDesiredBox">
+              <widget class="QDoubleSpinBox" name="latitudeDesiredBox">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+               <property name="maximum">
+                <double>180.000000000000000</double>
+               </property>
                <property name="value">
-                <number>50</number>
+                <double>52.500000000000000</double>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="longitudeDesiredBox">
+              <widget class="QDoubleSpinBox" name="longitudeDesiredBox">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
                 </font>
                </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
                <property name="maximum">
-                <number>300</number>
+                <double>360.000000000000000</double>
                </property>
                <property name="value">
-                <number>215</number>
+                <double>215.000000000000000</double>
                </property>
               </widget>
              </item>
