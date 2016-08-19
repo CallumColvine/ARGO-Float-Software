@@ -65,7 +65,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.initAllClassVariables()
         self.lastRunCalls()
         self.setupSignals()
-        self.userDefinedSettings()        
+        self.userDefinedSettings()
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)        
         return
         
     ''' This method holds references to all class variables. For anyone unclear,
@@ -101,8 +102,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spiciness = self.spicinessCheckBox.isChecked()
         self.dynamicHeight = self.dynamicHeightCheckBox.isChecked()
 
-        self.latitudeDesired = self.latitudeDesiredBox.value()
-        self.longitudeDesired = self.longitudeDesiredBox.value()
+        self.updateDesiredLonLat()
+
         self.append = True
         self.verbose = False
         self.weight = 0
@@ -171,7 +172,16 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.sigPath = self.drive + "projects\\Sigma_Climate\\"
         self.localSoftwarePath = ''
 
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        # self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        return
+
+    def updateDesiredLonLat(self):
+        self.latitudeDesired = \
+            abs((self.secondLatitude + self.firstLatitude) / 2.0)
+        self.latitudeDesiredBox.setValue(self.latitudeDesired)
+        self.longitudeDesired = \
+            abs((self.secondLongitude + self.firstLongitude) / 2.0)
+        self.longitudeDesiredBox.setValue(self.longitudeDesired)
         return
 
     def lastRunCalls(self):
@@ -299,18 +309,22 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     def firstLatitudeBoxEditingFinished(self):
         self.firstLatitude = self.firstLatitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def secondLatitudeBoxEditingFinished(self):
         self.secondLatitude = self.secondLatitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def firstLongitudeBoxEditingFinished(self):
         self.firstLongitude = self.firstLongitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def secondLongitudeBoxEditingFinished(self):
         self.secondLongitude = self.secondLongitudeBox.value()
+        self.updateDesiredLonLat()
         return
 
     def pressureCutOffBoxEditingFinished(self):
@@ -785,6 +799,18 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 self.dynamicHeightCSV.write(xCoAndpressCount + 
                     str(qDynamicHeight) + '\n')
             iterPressNum += 1
+        # if self.temp:
+        #     self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
+        # if self.salinity:
+        #     self.salinityCSV.write(xCoAndpressCount + str(qSal) + '\n')
+        # if self.sigmaT:
+        #     self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + '\n')
+        # if self.spiciness:
+        #     self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
+        # if self.dynamicHeight:
+        #     self.dynamicHeightCSV.write(xCoAndpressCount + 
+        #         str(qDynamicHeight) + '\n')
+
         return 
 
     ''' When a pair is found, performs calculations on that pair and writes to 
@@ -902,8 +928,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.sigmaTCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSigmaT"))
         self.spicinessCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSpiciness"))
         self.dynamicHeightCheckBox.setChecked(cfg.getboolean("desiredResults", "dispDynamicHeight"))
-        self.latitudeDesiredBox.setValue(cfg.getint("desiredResults", "latitudeDesired"))                
-        self.longitudeDesiredBox.setValue(cfg.getint("desiredResults", "longitudeDesired"))        
+        self.latitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "latitudeDesired"))                
+        self.longitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "longitudeDesired"))        
         return
 
 

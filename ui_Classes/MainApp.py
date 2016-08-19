@@ -50,8 +50,8 @@ class MainApp(QMainWindow, Ui_MainApp):
         return
 
     def circulationButtonClicked(self):
-        self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.experimentSelected()
+        self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.argoPath = PROGRAM_PATH
         self.circulationApp.path0 = self.argoDataLineEdit.text() + \
                 "\\argo_mirror\pacific_ocean\\"

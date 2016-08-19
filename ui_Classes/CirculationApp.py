@@ -50,6 +50,8 @@ import re
 class CirculationApp(QWidget, Ui_CirculationApp):
     def __init__(self, parent):
         super(CirculationApp, self).__init__()
+        self.CLASS_INITTED = False
+        self.signalsSetup = False
         self.setupUi(self)
         return
 
@@ -59,13 +61,18 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     def experimentSelected(self):
         self.initAllClassVariables()
         self.loadDefaultSettings()
-        self.setupSignals()
+        if not self.signalsSetup:
+            self.setupSignals()
+        self.signalsSetup = True
+        self.CLASS_INITTED = True
+        print "Class init true"
         return
 
     ''' This method holds references to all class variables. For anyone unclear,
     Python allows any method inside the class to access these variables. They 
     work similarly to "Global" variables, but in the class scope.'''
     def initAllClassVariables(self):
+        print "Initializing class variables"
         self.verbose = True
         self.firstLatitude = self.firstLatitudeBox.value()
         self.secondLatitude = self.secondLatitudeBox.value()
@@ -87,7 +94,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.Sa = np.empty((800, 800))
         self.Lat = np.zeros((800))
         self.Lon = np.zeros((800))
-        self.floats = []    # 800 long
 
         self.Dh = np.empty((800))
         self.Dhf = np.empty((800))
@@ -144,7 +150,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.stepSize = self.stepSizeBox.value()
         self.nPress = 0
         self.updateNPress()
-
+        self.circulationStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     ''' Called initially, this function reads the necessary values from Howard's 
@@ -308,6 +314,10 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def nextButtonClicked(self):
+
+        if not self.CLASS_INITTED:
+            print "Please wait for class variables to initialize"
+            return
         self.saveChosenSettings()
         self.circulationStackedWidget.setCurrentWidget(self.calculatingPage)
         self.mainLoop()
@@ -325,20 +335,22 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     mainLoop is called at the start of the program and it does everything from
     collecting data, to plotting results.'''
     def mainLoop(self):
+        floats = []    # 800 long
+        # del floats[:]
         doSort = True
         julStart, julEnd = self.getJulianStartAndEnd()
         self.numFloats = 0
         for i in xrange(julStart, julEnd):
-            yearMonthDayPath0 = self.checkFloatsFromIndex(i, self.path0)
+            yearMonthDayPath0 = self.checkFloatsFromIndex(i, self.path0, floats)
         if self.numFloats == 0:
             print ("There are no floats within the provided range. ",
                    "Terminating program")
             return
         if self.verbose:
             print "numFloats is ", self.numFloats
-            print "len of floats is ", len(self.floats)
+            print "len of floats is ", len(floats)
         iFloat = 0
-        for flt in self.floats:
+        for flt in floats:
             numRecs = getProfile(flt, self.P, self.T, self.S)
             despike(self.T, numRecs)
             despike(self.S, numRecs)
@@ -353,7 +365,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.specificVolAndDynH()
         self.meanAndStdDev()
         if doSort:
-            self.removeDuplicates() 
+            self.removeDuplicates(floats) 
         dynHeightBar, dynHeightVar = self.recomputeMeanAndVariation()
         self.subtractMeanFromStored(dynHeightBar)
         self.bestFitMode(dynHeightVar)
@@ -717,7 +729,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     ''' The goal of this functuon is to remove the listings for floats that 
     are very close together. This would help avoid map clutter. This function
     is still in testing due to its non-crucial nature. '''
-    def removeDuplicates(self):
+    def removeDuplicates(self, floats):
         # Now have a list of good float observations, bad ones have Accpt(i)=-1
         if self.verbose:
             print "Checking for duplicates"
@@ -726,7 +738,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         for iFloat in xrange(0, self.numFloats - 1):
             if not self.accept[iFloat]: 
                 continue
-            flt = self.floats[iFloat]
+            flt = floats[iFloat]
             splitName = re.split('[\W_]+', flt)
             # Gets 2nd last element from split string. Last element is "IOS"
             endOfName = splitName[-2]
@@ -734,19 +746,19 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                 if(not self.accept[jFlt]): 
                     continue
                 # duplicate found
-                if(self.floats[jFlt] == endOfName):
-                    self.foundDuplicate(endOfName, iFloat)
+                if(floats[jFlt] == endOfName):
+                    self.foundDuplicate(endOfName, iFloat, floats)
         return
 
     ''' This function is called when very similar floats are being used. '''
-    def foundDuplicate(self, endOfName, dFlt):
+    def foundDuplicate(self, endOfName, dFlt, floats):
         # At least one duplicate is present for float dFlt
         dynHeightBar = 0
         avgLat = 0
         avgLon = 0
         Nav = 0
         for jFlt in xrange(dFlt, self.numFloats):
-            if (self.floats[jFlt] == endOfName): 
+            if (floats[jFlt] == endOfName): 
                 continue
             if (self.Dh[jFlt] < 0 or self.Dh[jFlt] > 5):
                 self.accept[jFlt] = False
@@ -761,7 +773,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.Lat[dFlt] = avgLat / Nav
             self.Lon[dFlt] = avgLon / Nav
         for jFlt in xrange(dFlt+1, self.numFloats):
-            if (self.floats[jFlt] == endOfName): 
+            if (floats[jFlt] == endOfName): 
                 self.accept[jFlt] = False
         return
 
@@ -903,7 +915,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return julStart, julEnd
 
     ''' Not in a utils file due to repeated use of class variables. ''' 
-    def checkFloatsFromIndex(self, cycleJulDate, path0):
+    def checkFloatsFromIndex(self, cycleJulDate, path0, floats):
         day, month, year = julianToDate(cycleJulDate)
         yearMonthDayPath0 = (path0 + 
                              str(year) + '\\' + 
@@ -936,7 +948,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
                        lon < self.secondLongitude and 
                        press > self.pressureCutOff):
                         floatNum = row[0]
-                        self.floats.append(yearMonthDayPath0 + row[0])
+                        floats.append(yearMonthDayPath0 + row[0])
                         self.passedFloat(lat, lon)
                         self.numFloats += 1
         except (OSError, IOError), e:
