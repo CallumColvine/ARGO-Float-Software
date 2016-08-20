@@ -376,6 +376,33 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.contour(xPLL, xPLH, yPLL, yPLH, plotLats, plotLons, plotData)
         return
 
+    def determineOutputFilename(self):
+        # self.outPath
+        outFileName = ("Dh_" + 
+                       str(self.plotCentre) + "_" + 
+                       str(self.sampleWindow) + "_" + 
+                       str(self.totalModes) + "_" +  
+                       str(self.maxInterpDepth))
+        infoFile = open((self.outPath + "CirculationInfo.txt"), 'a+')
+        amount = self.checkForFileName(outFileName, infoFile)
+        if amount > 1:
+            outFileName += "_" + str(amount)
+        outFileName += ".csv"
+        infoFile.write(outFileName + " | " + 
+                       str(self.pressureCutOff) + " | " + 
+                       str(self.stepSize) + " | " + 
+                       str(self.dynHeightsAtP) + " | " + 
+                       str(self.relativeToPref) + " | " + "\n")
+        return self.outPath + outFileName
+
+    def checkForFileName(self, outFileName, infoFile):
+        amount = 1
+        for line in infoFile:
+            print line
+            if outFileName in line:
+                amount += 1
+        return amount    
+
     ''' Writes results to .csv file and creates storage arrays for data to be 
     plotted.'''
     def saveOutput(self, dynHeightBar):
@@ -386,8 +413,9 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         minLon = 360
         maxLon = -180
 
-        outFilePath = self.outPath + "Dh" + str(self.plotCentre) + "_0000.csv" 
-        outFile = open(outFilePath, 'w')
+        outFileName = self.determineOutputFilename()
+        outFile = open(outFileName, 'w')
+
         for i in xrange(0, self.nX):
             lonC = i - 180.
             for j in xrange(0, self.nY):
