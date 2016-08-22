@@ -1,0 +1,6 @@
+Plots dynamic height data near the Alaskan Coast.
+
+FILEDATA
+Format:
+Name_Day Range_Total Modes_Interpolation Depth.csv, Pressure Cutoff, Step Size, Dynamic Heights at max pressure, relative to reference pressure
+
