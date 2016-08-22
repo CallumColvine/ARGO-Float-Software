@@ -74,21 +74,18 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     def initAllClassVariables(self):
         print "Initializing class variables"
         self.verbose = True
-        self.firstLatitude = self.firstLatitudeBox.value()
-        self.secondLatitude = self.secondLatitudeBox.value()
-        self.firstLongitude = self.firstLongitudeBox.value()
-        self.secondLongitude = self.secondLongitudeBox.value()
+        # The first/second lat/lon are fixed due to modes file used
+        self.firstLatitude = 30
+        self.secondLatitude = 60
+        self.firstLongitude = 180
+        self.secondLongitude = 244
         self.sampleWindow = self.sampleWindowBox.value()
         self.pressureCutOff = self.pressureCutOffBox.value()
-        self.simplifyList = self.simplifyListCheckBox.isChecked()
         self.maxInterpDepth = self.maxInterpDepthBox.value()
         self.pressureStepSize = self.stepSizeBox.value()
         self.dynHeightsAtP = self.dynHeightAtPBox.value()
         self.relativeToPref = self.relativeToPrefBox.value()
         self.totalModes = self.totalModesBox.value()
-        self.generateArray = self.generateArrayCheckBox.isChecked()
-        self.pauseOn20 = self.pauseOn20thCheckBox.isChecked()
-        self.entryString = self.entryStringLineEdit.text()
 
         self.Te = np.empty((800, 800))
         self.Sa = np.empty((800, 800))
@@ -207,14 +204,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def setupInputParameterSignals(self):
-        self.firstLatitudeBox.editingFinished.connect(
-            self.firstLatitudeBoxEditingFinished)
-        self.secondLatitudeBox.editingFinished.connect(
-            self.secondLatitudeBoxEditingFinished)
-        self.firstLongitudeBox.editingFinished.connect(
-            self.firstLongitudeBoxEditingFinished)
-        self.secondLongitudeBox.editingFinished.connect(
-            self.secondLongitudeBoxEditingFinished)
         self.sampleWindowBox.editingFinished.connect(
             self.sampleWindowBoxEditingFinished)
         self.pressureCutOffBox.editingFinished.connect(
@@ -223,36 +212,12 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.maxInterpDepthBoxEditingFinished)
         self.stepSizeBox.editingFinished.connect(
             self.stepSizeBoxEditingFinished)
-        self.simplifyListCheckBox.stateChanged.connect(
-            self.simplifyListCheckBoxStateChanged)
         self.dynHeightAtPBox.editingFinished.connect(
             self.dynHeightAtPBoxEditingFinished)
         self.relativeToPrefBox.editingFinished.connect(
             self.relativeToPrefBoxEditingFinished)
         self.totalModesBox.editingFinished.connect(
             self.totalModesBoxEditingFinished)
-        self.generateArrayCheckBox.stateChanged.connect(
-            self.generateArrayCheckBoxStateChanged)
-        self.pauseOn20thCheckBox.stateChanged.connect(
-            self.pauseOn20thCheckBoxStateChanged)
-        self.entryStringLineEdit.editingFinished.connect(
-            self.entryStringLineEditEditingFinished)        
-        return
-
-    def firstLatitudeBoxEditingFinished(self):
-        self.firstLatitude = self.firstLatitudeBox.value()
-        return
-
-    def secondLatitudeBoxEditingFinished(self):
-        self.secondLatitude = self.secondLatitudeBox.value()
-        return
-
-    def firstLongitudeBoxEditingFinished(self):
-        self.firstLongitude = self.firstLongitudeBox.value()
-        return
-
-    def secondLongitudeBoxEditingFinished(self):
-        self.secondLongitude = self.secondLongitudeBox.value()
         return
 
     def sampleWindowBoxEditingFinished(self):
@@ -285,10 +250,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.updateNPress()
         return
 
-    def simplifyListCheckBoxStateChanged(self):
-        self.simplifyList = self.simplifyListCheckBox.isChecked()
-        return
-
     def relativeToPrefBoxEditingFinished(self):
         self.relativeToPref = self.relativeToPrefBox.value()
         return
@@ -297,20 +258,8 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.totalModes = self.totalModesBox.value()
         return
 
-    def generateArrayCheckBoxStateChanged(self):
-        self.generateArray = self.generateArrayCheckBox.isChecked()
-        return
-
-    def pauseOn20thCheckBoxStateChanged(self):
-        self.pauseOn20 = self.pauseOn20thCheckBox.isChecked()
-        return
-
-    def entryStringLineEditEditingFinished(self):
-        self.entryString = self.entryStringLineEdit.text()
-        return
-
     def dynHeightAtPBoxEditingFinished(self):
-        self.dynHeightAtPBox = self.dynHeightAtPBox.value()
+        self.dynHeightAtP = self.dynHeightAtPBox.value()
         return
 
     def nextButtonClicked(self):
