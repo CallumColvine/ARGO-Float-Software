@@ -53,11 +53,11 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.listAllPages.setCurrentWidget(self.circulationPage)
         self.circulationApp.argoPath = PROGRAM_PATH
         self.circulationApp.path0 = self.argoDataLineEdit.text() + \
-                "\\argo_mirror\pacific_ocean\\"
+            "\\argo_mirror\pacific_ocean\\"
         self.circulationApp.outPath = PROGRAM_PATH + \
-                "\\argo_out_TEST\\Circulation\\"
+            "\\argo_out_TEST\\Circulation\\"
         self.circulationApp.readEVals()
-        
+
         return
 
     def timeSeriesButtonClicked(self):
@@ -71,6 +71,7 @@ class MainApp(QMainWindow, Ui_MainApp):
     def backToProgramListButtonClicked(self):
         self.listAllPages.setCurrentWidget(self.programListPage)
         return
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
