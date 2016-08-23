@@ -46,7 +46,6 @@ class MainApp(QMainWindow, Ui_MainApp):
         self.backToProgramListButton2.clicked.connect(
             self.backToProgramListButtonClicked)
         self.circulationButton.clicked.connect(self.circulationButtonClicked)
-
         return
 
     def circulationButtonClicked(self):

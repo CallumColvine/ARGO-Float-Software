@@ -4,3 +4,8 @@ FILEDATA
 Format:
 Name_Day Range_Total Modes_Interpolation Depth.csv, Pressure Cutoff, Step Size, Dynamic Heights at max pressure, relative to reference pressure
 
+Dh_5675_15_20_1000.csv | 950 | 5 | 0 | 1000 | 
+Dh_5675_15_20_1000_2.csv | 950 | 5 | 0 | 1000 | 
+Dh_5675_3_2_1000.csv | 950 | 5 | 0 | 1000 | 
+Dh_5675_3_3_1000.csv | 950 | 5 | 0 | 1000 | 
+Dh_5675_15_20_1000_3.csv | 950 | 5 | 0 | 1000 | 

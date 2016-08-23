@@ -4,4 +4,3 @@ based on the data available from ARGO floats within the selected nearby area.
 FILEDATA
 Format:
 Name_Data Type_Latitude of Data_Longitude of data_Maximum interpolation depth.csv, Pressure Step Size, Day Range 
-

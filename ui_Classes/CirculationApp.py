@@ -263,7 +263,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         return
 
     def nextButtonClicked(self):
-
         if not self.CLASS_INITTED:
             print "Please wait for class variables to initialize"
             return
@@ -299,6 +298,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             print "numFloats is ", self.numFloats
             print "len of floats is ", len(floats)
         iFloat = 0
+        print "Processing data..."
         for flt in floats:
             numRecs = getProfile(flt, self.P, self.T, self.S)
             despike(self.T, numRecs)
@@ -309,6 +309,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.dataForcing(numRecs)
             self.storeData(numRecs, iFloat)
             iFloat += 1
+        print "Performing various calculations..."
         # Specific volume and Dynamic Heights
         # Replaced Deltap with self.stepSize
         self.specificVolAndDynH()
@@ -347,7 +348,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     def checkForFileName(self, outFileName, infoFile):
         amount = 1
         for line in infoFile:
-            print line
             if outFileName in line:
                 amount += 1
         return amount    
@@ -368,8 +368,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         for i in xrange(0, self.nX):
             lonC = i - 180.
             for j in xrange(0, self.nY):
-                if lonC == -116 and j == 0:
-                    print "YEAH I'M AT IT ", self.dHFit[j][i]
                 if not np.isnan(self.dHFit[j][i]):
                     latC = 30. + j / 3.
                     outString = (str(lonC) + "," + str(latC) + "," + 

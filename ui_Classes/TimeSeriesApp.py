@@ -114,7 +114,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV = None
         self.dynamicHeightCSV = None
         self.hgtCSV = None
-        self.cLimCSV = None
+        # self.cLimCSV = None
 
         self.yearMonthDayPath0 = ''
         self.sCY = 111.2  # ! sCY = km/degree of latitude
@@ -394,11 +394,11 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # self.timeSeriesStackedWidget.setCurrentWidget(self.pleaseWaitPage)
         # time.sleep(2)
         print "Next clicked!!"
-        self.progressLabel.setText("Interpolation in progress. Please wait...")
-        print "Label text is set"
+        # self.progressLabel.setText("Interpolation in progress. Please wait...")
+        # print "Label text is set"
         self.saveUsedSettings()
         self.prepareOutputFiles()
-        self.commenceInterpolation()
+        self.mainLoop()
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         return
 
@@ -475,10 +475,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     ''' This is the main loop for the program. Once the user fills out 
     parameters and hits the Next button, we commence interpolation. The rest of 
-    the program is called from commenceInterpolation(). We use *_index.CSV files
+    the program is called from mainLoop(). We use *_index.CSV files
     to determine which floats to use, and then pull the data from each float and
     manipulate it.'''
-    def commenceInterpolation(self):
+    def mainLoop(self):
         julStart, julEnd = self.getJulianStartAndEnd()
         self.initPlotArrays(julStart, julEnd)
         iterDayNum = 0
@@ -490,6 +490,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             julWindowEnd = iDay + self.sampleWindow
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
+                # Get a list of all the names of floats to be used
                 floats, self.yearMonthDayPath0 = \
                     self.checkFloatsFromIndex(floats, cycleJulDate, self.path0)
             sTav = 0
@@ -576,8 +577,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     plotInput: 2D array with data at correct time/depth related positions
     plotTime: 1D array '''
     def plotContour(self, plotInput, plotTime, plotDepth):
-        print "Length of plotInput is ", len(plotInput), "plotInput[0] ", len(plotInput[0])
-        print "Length of plotTime is ", len(plotTime), "plotDepth is ", len(plotDepth)
+        # print "Length of plotInput is ", len(plotInput), "plotInput[0] ", len(plotInput[0])
+        # print "Length of plotTime is ", len(plotTime), "plotDepth is ", len(plotDepth)
         if len(plotTime) < 2:
             print "Error: plotting data. There are too few time entries"
             return
@@ -601,8 +602,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV.close()
         self.dynamicHeightCSV.close()
         self.hgtCSV.close()
-        self.cLimCSV.close()
-        self.stratCSV.close()
+        # self.cLimCSV.close()
+        # self.stratCSV.close()
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
         if SAVELOCALLY:
@@ -611,7 +612,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             lastRun(self.drive, -1)
         return
 
-    ''' Writes to final output files TS_Shgt.csv, Strat.csv, and lstmsge.csv '''
+    ''' Writes to final output file TS_Shgt.csv'''
     def finishUp(self, iPres75):
         if self.dynamicHeight:
             self.hgtCSV.write(str(self.xCoord) + ',' +
@@ -620,9 +621,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         stdDiff = self.St[iPres75 - 1] - self.St[0]
         if stdDiff < -0.002:
             stdDiff = 0.0
-        self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' + 
-                            str(self.St[0]) + ',' + str(self.St[iPres75]) + ',' + 
-                            str(self.weight) + '\n')
+        # self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' + 
+        #                     str(self.St[0]) + ',' + str(self.St[iPres75]) + ',' + 
+        #                     str(self.weight) + '\n')
         stdDiff = 0.001 * int(1000.0 * stdDiff + 0.5)
         if stdDiff < 0.001:
             stdDiff = 0.000
@@ -636,10 +637,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         finalMessage += (" | " + str(self.closestDist) + "  " + 
                          self.closestFloatNum + " |")
         # ToDo: Optimize, open outside of loop
-        lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
+        # lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
         # lstMsge.truncate()
-        lstMsge.write(finalMessage)
-        lstMsge.close()
+        # lstMsge.write(finalMessage)
+        # lstMsge.close()
         return
 
     ''' Calculates some statistical analyses on the data provided'''
@@ -813,8 +814,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         Sap = qSal - Sar
         Tep = 0.001 * int(0.5 + 1000.0 * Tep)
         Sap = 0.001 * int(0.5 + 1000.0 * Sap)
-        self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
-            ',' + Sap)
+        # self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
+        #     ',' + Sap)
         return Tep, Sap
 
     # Used for the "Default Settings" check box option. Was not found useful
@@ -947,46 +948,91 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             cfg.write(cfgFile)
         return
 
-    # Checks to see if IN THE info.txt file, the filename already exists OR
-    # is a subset of a filename that exists (TS_Temp_215_50_1000m_2.csv)
-    # returns the truth value, and the denomination the new file should be given
-    # Ex.) True, 3 or False, 1
-    def fileInInfo(self, name, info):
+    def prepInfoFile(self, outLon, outLat, outDepth):
+        exists = False
+        sameParams = False
         amount = 1
-        isIn = False
-        # Left true if parameters don't match filename OR if there is a new 
-        # parameter based filename
-        writeOut = True
-        for line in info:
-            print line
-            if name in line:
-                splitLine = [x.strip() for x in line.split(',')]
-                # If the input filename does not match
-                if not (int(splitLine[1]) == self.stepSize and 
-                        int(splitLine[2]) == self.sampleWindow):
-                    amount += 1
-                    isIn = True
-                # If the input filename does match, append and don't write
-                else: 
-                    writeOut = False
-        return isIn, writeOut, amount
+        infoName = ("TS_Info_" + str(outLon) + '_' + str(outLat) + '_' + 
+                    str(outDepth) + "m.txt")
+        tempName = ("TS_Temp_" + str(outLon) + '_' + str(outLat) + '_' + 
+                    str(outDepth) + "m")
+        info = open((self.outPath + infoName), 'a+')
+        # Check if the info file is empty
+        if os.stat(self.outPath + infoName).st_size == 0:
+            self.fillEmptyInfoFile(info)
+            exists = False
+        # The info file has contents
+        else: 
+            exists = True
+            for line in info:
+                if tempName in line:
+                    splitLine = [x.strip() for x in line.split('| ')]
+                    print "Split line is ", splitLine
+                    # If the input filename does not match
+                    if not (int(splitLine[1]) == self.stepSize and 
+                            int(splitLine[2]) == self.sampleWindow):
+                        amount += 1
+                        isIn = True
+                        sameParams = False
+                    # There is an exact match in parameters and filename
+                    else:
+                        sameParams = True
+                        # Return immediately because the rest do not matter,
+                        # we found the file we're appending to
+                        return exists, sameParams, info, amount
+        return exists, sameParams, info, amount
 
-    def prepName(self, outType, outLon, outLat, outDepth):
-        # Add the ".csv" later. This is so we can check if other names contain
-        # this string as a subset
-        info = open((self.outPath + "TimeSeriesInfo.txt"), 'a+')
-        name = (outType + str(outLon) + '_' + str(outLat) + '_' + 
-                    str(outDepth) + "m")        
-        isIn, writeOut, amount = self.fileInInfo(name, info)
-        if isIn:
-            name += "_" + str(amount)
-        name += ".csv"
-        if writeOut:
-            info.write(name + ', ' + 
-                       str(self.stepSize) + ', ' + 
-                       str(self.sampleWindow) + '\n')
-        info.close()
-        return name
+    def fillEmptyInfoFile(self, info):
+        info.write("Time Series is a program that interpolates data at a") 
+        info.write("specific location and time, " + '\n')
+        info.write("based on the data available from ARGO floats within")
+        info.write("the selected nearby area." + '\n' + '\n')
+        info.write("FILEDATA" + '\n' + "Format:" + '\n')
+        info.write("Name_Data Type_Latitude of Data_Longitude of data_Maximum ")
+        info.write("interpolation depth.csv, Pressure Step Size, Day Range")
+        info.write('\n')
+        return
+
+    def prepOutFileNames(self, outLon, outLat, outDepth):
+        tempName = ("TS_Temp_" + str(outLon) + '_' + str(outLat) + '_' + 
+                                   str(outDepth) + "m")
+        salName = ("TS_Salinity_" + str(outLon) + '_' + str(outLat) + '_' + 
+                                               str(outDepth) + "m")
+        sigTName = ("TS_SigmaT_" + str(outLon) + '_' + str(outLat) + '_' + 
+                                               str(outDepth) + "m")
+        spiceName = ("TS_Spiciness_" + str(outLon) + '_' + str(outLat) + '_' + 
+                                               str(outDepth) + "m")
+        dynHName = ("TS_DynamicHeight_" + str(outLon) + '_' + str(outLat) + '_' + 
+                                               str(outDepth) + "m")
+        surfHeightName = ("TS_SurfaceHeight_" + str(outLon) + '_' + 
+                            str(outLat) + '_' + str(outDepth) + "m")
+        return tempName, salName, sigTName, spiceName, dynHName, surfHeightName
+
+    def addOffsets(self, tempName, salName, sigTName, spiceName, dynHName, 
+                   surfHeightName, offset):
+        tempName += '_' + str(offset)
+        salName += '_' + str(offset)
+        sigTName += '_' + str(offset)
+        spiceName += '_' + str(offset)
+        dynHName += '_' + str(offset)
+        surfHeightName += '_' + str(offset)
+        return tempName, salName, sigTName, spiceName, dynHName, surfHeightName
+
+    def writeToInfo(self, tempName, salName, sigTName, spiceName, dynHName, 
+                    surfHeightName, infoFile):
+        infoFile.write(tempName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        infoFile.write(salName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        infoFile.write(sigTName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        infoFile.write(spiceName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        infoFile.write(dynHName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        infoFile.write(surfHeightName + " | " + str(self.stepSize) + ' | ' + 
+            str(self.sampleWindow) + '\n')
+        return
 
     ''' Opens and saves the output destination files in the class scope ''' 
     def prepareOutputFiles(self):
@@ -995,13 +1041,35 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         outLat = self.latitudeDesired
         outDepth = self.maxInterpDepth
         
-        tempName = self.prepName("TS_Temp_", outLon, outLat, outDepth)
-        salName = self.prepName("TS_Salinity_", outLon, outLat, outDepth)
-        sigTName = self.prepName("TS_SigmaT_", outLon, outLat, outDepth)
-        spiceName = self.prepName("TS_Spiciness_", outLon, outLat, outDepth)
-        dynHName = self.prepName("TS_DynamicHeight_", outLon, outLat, outDepth)
-        surfHeightName = self.prepName("TS_SurfaceHeight_", 
-                outLon, outLat, outDepth)
+        exists, sameParams, infoFile, offset = \
+                self.prepInfoFile(outLon, outLat, outDepth)
+        doOffset = False
+        appendToInfo = False
+        if not exists:
+            doOffset = False
+            appendToInfo = True
+        elif exists and sameParams:
+            doOffset = False
+            appendToInfo = False
+        if exists and not sameParams:
+            doOffset = True
+            appendToInfo = True
+
+        tempName, salName, sigTName, spiceName, dynHName, surfHeightName = \
+            self.prepOutFileNames(outLon, outLat, outDepth)
+        if doOffset:
+            tempName, salName, sigTName, spiceName, dynHName, surfHeightName = \
+                self.addOffsets(tempName, salName, sigTName, spiceName, 
+                                dynHName, surfHeightName, offset)
+        tempName += ".csv"
+        salName += ".csv"
+        sigTName += ".csv"
+        spiceName += ".csv"
+        dynHName += ".csv"
+        surfHeightName += ".csv"
+        if appendToInfo:
+            self.writeToInfo(tempName, salName, sigTName, spiceName, dynHName, 
+                             surfHeightName, infoFile)
 
         tempPath = self.outPath + tempName
         salinityPath = self.outPath + salName
@@ -1011,18 +1079,19 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         hgtPath = self.outPath + surfHeightName         # Surface Height = Shgt
 
 
-        cLimPath = self.sigPath + "Sigref.csv"
-        stratPath = self.outPath + "Strat.csv"
+        # cLimPath = self.sigPath + "Sigref.csv"
+        # stratPath = self.outPath + "Strat.csv"
         self.outputFilesLabel.setText("Output Files:\n" +
                                       tempPath + '\n' + 
                                       salinityPath + '\n' + 
+                                      sigmaTPath + '\n' + 
                                       spicinessPath + '\n' + 
                                       dynamicHeightPath + '\n' + 
-                                      hgtPath + '\n' + 
-                                      stratPath + '\n' +
-                                      cLimPath)
-        self.outputLocationLabel.setText("Output Location:\n" + 
-                                         self.outPath)
+                                      hgtPath + '\n') 
+                                      # stratPath + '\n' +
+                                      # cLimPath)
+        # self.outputLocationLabel.setText("Output Location:\n" + 
+        #                                  self.outPath)
         writeType = 'a'
         if not self.append:
             writeType = 'w'
@@ -1032,8 +1101,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV = open((spicinessPath), writeType)
         self.dynamicHeightCSV = open((dynamicHeightPath), writeType)
         self.hgtCSV = open((hgtPath), writeType)
-        self.cLimCSV = open((cLimPath), writeType)
-        self.stratCSV = open((stratPath), writeType)
+        # self.cLimCSV = open((cLimPath), writeType)
+        # self.stratCSV = open((stratPath), writeType)
         if SAVELOCALLY:
             self.filesInUse = open((self.outPath + "IOS_Files_In_Use.txt"), 'w+')
         return
