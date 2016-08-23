@@ -174,7 +174,7 @@ def getProfile(floatPath, P, T, S):
     numRecs = extractDataFromFloatFile(floatPath, order, P, T, S)
     if not checkIfReturn(numRecs, fileTempQc, filePSalQc):
         print "Returning profile prematurely due to bad values"
-        return
+        return numRecs
     return numRecs
 
 ''' Quits dataset of float if it does not have all the required components '''

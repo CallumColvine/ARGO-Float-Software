@@ -212,59 +212,6 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="currentDayRangeLabel">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Latest Recommended Date: </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDateEdit" name="latestDayDateEdit">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="displayFormat">
-            <string>d/M/yyyy</string>
-           </property>
-           <property name="date">
-            <date>
-             <year>2020</year>
-             <month>1</month>
-             <day>1</day>
-            </date>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_21">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QLabel" name="currentDayRangeLabel_2">
            <property name="font">
             <font>

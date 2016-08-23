@@ -66,7 +66,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.lastRunCalls()
         self.setupSignals()
         self.userDefinedSettings()
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)        
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)   
+        self.progressLabel.setText("Waiting for Settings")     
         return
         
     ''' This method holds references to all class variables. For anyone unclear,
@@ -74,7 +75,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     work similarly to "Global" variables, but in the class scope.'''
     def initAllClassVariables(self):
         # Declare input parameter variables
-        self.defaultSettings = False
         self.xCoord = 0
         self.startDate = self.startRangeDateEdit.date().getDate()
         self.endDate = self.endRangeDateEdit.date().getDate()
@@ -213,8 +213,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         return
 
     def setupInputParameterSignals(self):
-        self.defaultSettingsCheckBox.stateChanged.connect(
-            self.defaultSettingsCheckBoxStateChanged)
         self.dayStepSizeBox.editingFinished.connect(
             self.dayStepSizeBoxEditingFinished)
         self.sampleWindowBox.editingFinished.connect(
@@ -288,12 +286,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                                              self.endDate[2])
         return
 
-    def defaultSettingsCheckBoxStateChanged(self, boxInput):
-        if boxInput == 2:
-            self.defaultOptions()
-        else:
-            self.userDefinedSettings()
-        return
+    # def defaultSettingsCheckBoxStateChanged(self, boxInput):
+    #     if boxInput == 2:
+    #         self.defaultOptions()
+    #     else:
+    #         self.userDefinedSettings()
+    #     return
 
     def dayRangeBoxEditingFinished(self):
         # self.dayRange = self.dayRangeBox.value()
@@ -387,6 +385,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         return
 
     def backToSettingsButtonClicked(self):
+        self.progressLabel.setText("Waiting for Settings")     
         self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
@@ -483,12 +482,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         julStart, julEnd = self.getJulianStartAndEnd()
         self.initPlotArrays(julStart, julEnd)
         iterDayNum = 0
-        for Dc in xrange(julStart, julEnd, self.dayStepSize):
+        for iDay in xrange(julStart, julEnd, self.dayStepSize):
             self.updateProgress(iterDayNum, julStart, julEnd)
             self.numFloats = 0
-            self.xCoord = Dc
-            julWindowStart = Dc - self.sampleWindow
-            julWindowEnd = Dc + self.sampleWindow
+            self.xCoord = iDay
+            julWindowStart = iDay - self.sampleWindow
+            julWindowEnd = iDay + self.sampleWindow
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
                 floats, self.yearMonthDayPath0 = \
@@ -509,7 +508,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                     break
             iPres75 = self.formatResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
-            self.computeDHgt(iterDayNum)
+            self.computeDynHeight(iterDayNum)
             self.finishUp(iPres75)
             iterDayNum += 1
         self.cleanUp()
@@ -726,12 +725,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 qTemp = tempWeightSumT / weightSumT
             else:
                 qTemp = tempWeightSumT
-                # print "float not usable to calculate qTemp"
             if weightSumS > 0:
                 qSal = salWeightSumT / weightSumS
             else:
                 pass
-                # print "float not usable to calculate qSal"
             self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
             qSigmaT = getSigmaT(qSal, qTemp)
             qSpice = getSpiciness(qTemp, qSal)
@@ -755,7 +752,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         return
 
     ''' Writes the values from P, T, S, St, and Sp to their respective files '''
-    def computeDHgt(self, iterDayNum):
+    def computeDynHeight(self, iterDayNum):
         # Now compute DHgt relative to Pmax
         self.dynH[self.nPress - 1] = 0
         q = 5.6E-6  # q=0.5f/g at station Papa
@@ -799,18 +796,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 self.dynamicHeightCSV.write(xCoAndpressCount + 
                     str(qDynamicHeight) + '\n')
             iterPressNum += 1
-        # if self.temp:
-        #     self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
-        # if self.salinity:
-        #     self.salinityCSV.write(xCoAndpressCount + str(qSal) + '\n')
-        # if self.sigmaT:
-        #     self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + '\n')
-        # if self.spiciness:
-        #     self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
-        # if self.dynamicHeight:
-        #     self.dynamicHeightCSV.write(xCoAndpressCount + 
-        #         str(qDynamicHeight) + '\n')
-
         return 
 
     ''' When a pair is found, performs calculations on that pair and writes to 
@@ -832,11 +817,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             ',' + Sap)
         return Tep, Sap
 
-    def defaultOptions(self):
-        self.setEnabledParameters(False)
-        return
+    # Used for the "Default Settings" check box option. Was not found useful
+    # def defaultOptions(self):
+    #     self.setEnabledParameters(False)
+    #     return
 
-
+    ''' Determines potential validity of data ''' 
     def sanityCheck(self, numRecs):
         numRecs = self.checkOutOfRange(numRecs)
         numRecs = checkPressureMonotonic(numRecs, self.P, self.T, self.S)
@@ -853,13 +839,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 self.S[i] > 39):
                 numRecs = removeIndexFromPTS(i, numRecs, self.P, self.T, self.S)
         return numRecs
-
-    ''' TODO 
-    Pulls settings from an already existing file. INCOMPLETE'''
-    def setSettings():
-        # Now using a .cfg file to load settings
-        # settingsF = open((self.drive + "argo_programs\\TSlast.txt"), 'r+')
-        return
 
     def setEnabledParameters(self, isEnabled):
         self.dayStepSizeBox.setEnabled(isEnabled)
@@ -892,10 +871,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # If the user has NOT selected default settings
         # self.writeDefinedSettings()
         return
-
-    # def writeDefinedSettings(self):
-    #     # Save settings to .cfg file
-    #     return
 
 
     ''' Reads in the settings from the last run of TimeSeries from 
