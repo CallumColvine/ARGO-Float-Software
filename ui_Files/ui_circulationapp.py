@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\circulationapp.ui'
 #
-# Created: Fri Aug 19 15:09:05 2016
+# Created: Mon Aug 22 09:42:59 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -67,6 +67,7 @@ class Ui_CirculationApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.firstLatitudeBox.setFont(font)
+        self.firstLatitudeBox.setReadOnly(True)
         self.firstLatitudeBox.setMinimum(-9999)
         self.firstLatitudeBox.setMaximum(9999)
         self.firstLatitudeBox.setProperty("value", 30)
@@ -84,6 +85,7 @@ class Ui_CirculationApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.secondLatitudeBox.setFont(font)
+        self.secondLatitudeBox.setReadOnly(True)
         self.secondLatitudeBox.setMinimum(-9999)
         self.secondLatitudeBox.setMaximum(9999)
         self.secondLatitudeBox.setProperty("value", 60)
@@ -104,6 +106,7 @@ class Ui_CirculationApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.firstLongitudeBox.setFont(font)
+        self.firstLongitudeBox.setReadOnly(True)
         self.firstLongitudeBox.setMinimum(-9999)
         self.firstLongitudeBox.setMaximum(9999)
         self.firstLongitudeBox.setProperty("value", 180)
@@ -121,6 +124,7 @@ class Ui_CirculationApp(object):
         font = QtGui.QFont()
         font.setPointSize(10)
         self.secondLongitudeBox.setFont(font)
+        self.secondLongitudeBox.setReadOnly(True)
         self.secondLongitudeBox.setMinimum(-9999)
         self.secondLongitudeBox.setMaximum(9999)
         self.secondLongitudeBox.setProperty("value", 244)

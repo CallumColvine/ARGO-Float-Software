@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\timeseriesapp.ui'
 #
-# Created: Fri Aug 19 15:09:04 2016
+# Created: Mon Aug 22 09:42:59 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
