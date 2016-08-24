@@ -845,6 +845,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
             self.P[numRecs] = self.maxInterpDepth
         return
 
+    ''' Should not be necessary, these checks are already made '''
     def checkSkip(self):
         # 4830 IF Rflag<-.1 THEN GOTO 5330
         # 4840 Ifirst=0
@@ -864,7 +865,6 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         self.plotCentre = julDate
         julStart = julDate - self.sampleWindow
         julEnd = julDate + self.sampleWindow
-        print "julStart: ", julStart, " julEnd: ", julEnd
         return julStart, julEnd
 
     ''' Not in a utils file due to repeated use of class variables. '''
