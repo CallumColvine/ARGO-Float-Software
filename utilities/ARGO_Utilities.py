@@ -142,8 +142,6 @@ def getSvanom(S, T, P0):
     Sigma = Dr350 + Dr35p - Dvan
     return Sigma, Svan
 
-
-
 ''' Returns the spiciness of the water. '''
 def getSpiciness(temp, salt):
     # Hardcoded by Howard
@@ -300,7 +298,6 @@ def appendInfo(line, order, i, P, T, S):
     return
 
 
-
 # ToDo: could be moved to the Utils file
 ''' Checks if the pressure array is monotonic'''
 def checkPressureMonotonic(numRecs, P, T, S):
@@ -339,7 +336,7 @@ def convertLatLonToNegative(latIn, lonIn):
         # lonIn = -(lonIn)
     return latIn, lonIn
 
-# Maybe not necessary?
+# Not necessary?
 def fillgaps(T, Nrecs1):
     # 31630 Nrecs=Nrecs1
     # 31640 !

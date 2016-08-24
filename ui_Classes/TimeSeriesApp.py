@@ -66,10 +66,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.lastRunCalls()
         self.setupSignals()
         self.userDefinedSettings()
-        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)   
-        self.progressLabel.setText("Waiting for Settings")     
+        self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
+        self.progressLabel.setText("Waiting for Settings")
         return
-        
+
     ''' This method holds references to all class variables. For anyone unclear,
     Python allows any method inside the class to access these variables. They 
     work similarly to "Global" variables, but in the class scope.'''
@@ -114,7 +114,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV = None
         self.dynamicHeightCSV = None
         self.hgtCSV = None
-        self.cLimCSV = None
+        # self.cLimCSV = None
 
         self.yearMonthDayPath0 = ''
         self.sCY = 111.2  # ! sCY = km/degree of latitude
@@ -133,7 +133,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         else:
             self.curDay, self.curMonth, self.curYear = todayInDate()
         self.currentDayDateEdit.setDate(QDate(self.curYear,
-                                              self.curMonth, 
+                                              self.curMonth,
                                               self.curDay))
         self.numFloats = 0
 
@@ -165,7 +165,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
         # Max is 100, indicating completed
         self.progress = 0
-            
+
         self.drive = "P:\\"
         self.path0 = self.drive + "argo_mirror\\pacific_ocean\\"
         self.outPath = self.drive + "argo_out_TEST\\TimeSeries\\"
@@ -209,7 +209,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.plotTemperatureButton.clicked.connect(self.plotTempButtonClicked)
         self.plotSalinityButton.clicked.connect(self.plotSalinityButtonClicked)
         self.plotSigmaTButton.clicked.connect(self.plotSigmaTButtonClicked)
-        self.plotSpicinessButton.clicked.connect(self.plotSpicinessButtonClicked)
+        self.plotSpicinessButton.clicked.connect(
+            self.plotSpicinessButtonClicked)
         return
 
     def setupInputParameterSignals(self):
@@ -385,20 +386,16 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         return
 
     def backToSettingsButtonClicked(self):
-        self.progressLabel.setText("Waiting for Settings")     
+        self.progressLabel.setText("Waiting for Settings")
         self.timeSeriesStackedWidget.setCurrentWidget(self.settingsPage)
         return
 
     def nextButtonClicked(self):
         # Check to make sure all params have been filled
-        # self.timeSeriesStackedWidget.setCurrentWidget(self.pleaseWaitPage)
-        # time.sleep(2)
-        print "Next clicked!!"
-        self.progressLabel.setText("Interpolation in progress. Please wait...")
-        print "Label text is set"
+        print "Next clicked!"
         self.saveUsedSettings()
         self.prepareOutputFiles()
-        self.commenceInterpolation()
+        self.mainLoop()
         self.timeSeriesStackedWidget.setCurrentWidget(self.calculationsPage)
         return
 
@@ -417,7 +414,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def plotSpicinessButtonClicked(self):
         self.plotContour(self.plotSpiciness, self.plotTime, self.plotDepth)
         return
-
 
     def updateNPress(self):
         self.nPress = 1 + int(self.maxInterpDepth / self.stepSize)
@@ -446,39 +442,41 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     def updateProgress(self, iterDayNum, julStart, julEnd):
         if iterDayNum != 0:
-            self.progress = (iterDayNum / 
-                float(ceil((julEnd - julStart) / float(self.dayStepSize))))
+            self.progress = (iterDayNum /
+                             float(ceil(
+                                 (julEnd - julStart) / float(self.dayStepSize))))
             self.calculationProgressBar.setValue(self.progress)
         return
 
     def initPlotArrays(self, julStart, julEnd):
-        # print "ceiling days is ", ceil((julEnd - julStart) / float(self.dayStepSize))
-        self.plotTemp = np.empty((ceil((julEnd - julStart) / 
-                                    float(self.dayStepSize)), 
-                                ceil(self.maxInterpDepth / 
-                                    float(self.stepSize)) + 1))
-        self.plotSalinity = np.empty((ceil((julEnd - julStart) / 
-                                        float(self.dayStepSize)), 
-                                    ceil(self.maxInterpDepth / 
-                                        float(self.stepSize)) + 1))
-        self.plotSigmaT = np.empty((ceil((julEnd - julStart) / 
-                                        float(self.dayStepSize)), 
-                                    ceil(self.maxInterpDepth / 
-                                        float(self.stepSize)) + 1))
-        self.plotSpiciness = np.empty((ceil((julEnd - julStart) / 
-                                        float(self.dayStepSize)), 
-                                    ceil(self.maxInterpDepth / 
-                                        float(self.stepSize)) + 1))
+        # print "ceiling days is ", ceil((julEnd - julStart) /
+        # float(self.dayStepSize))
+        self.plotTemp = np.empty((ceil((julEnd - julStart) /
+                                       float(self.dayStepSize)),
+                                  ceil(self.maxInterpDepth /
+                                       float(self.stepSize)) + 1))
+        self.plotSalinity = np.empty((ceil((julEnd - julStart) /
+                                           float(self.dayStepSize)),
+                                      ceil(self.maxInterpDepth /
+                                           float(self.stepSize)) + 1))
+        self.plotSigmaT = np.empty((ceil((julEnd - julStart) /
+                                         float(self.dayStepSize)),
+                                    ceil(self.maxInterpDepth /
+                                         float(self.stepSize)) + 1))
+        self.plotSpiciness = np.empty((ceil((julEnd - julStart) /
+                                            float(self.dayStepSize)),
+                                       ceil(self.maxInterpDepth /
+                                            float(self.stepSize)) + 1))
         self.plotTime = np.arange(julStart, julEnd, self.dayStepSize)
         self.plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
         return
 
     ''' This is the main loop for the program. Once the user fills out 
     parameters and hits the Next button, we commence interpolation. The rest of 
-    the program is called from commenceInterpolation(). We use *_index.CSV files
+    the program is called from mainLoop(). We use *_index.CSV files
     to determine which floats to use, and then pull the data from each float and
     manipulate it.'''
-    def commenceInterpolation(self):
+    def mainLoop(self):
         julStart, julEnd = self.getJulianStartAndEnd()
         self.initPlotArrays(julStart, julEnd)
         iterDayNum = 0
@@ -490,6 +488,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             julWindowEnd = iDay + self.sampleWindow
             floats = []
             for cycleJulDate in xrange(julWindowStart, julWindowEnd):
+                # Get a list of all the names of floats to be used
                 floats, self.yearMonthDayPath0 = \
                     self.checkFloatsFromIndex(floats, cycleJulDate, self.path0)
             sTav = 0
@@ -514,19 +513,19 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.cleanUp()
         return
 
-    ''' Not in a utils file due to repeated use of class variables. ''' 
+    ''' Not in a utils file due to repeated use of class variables. '''
     def checkFloatsFromIndex(self, floats, cycleJulDate, path0):
         day, month, year = julianToDate(cycleJulDate)
         if self.verbose:
             print "Day, month, year are ", day, month, year
-        yearMonthDayPath0 = (path0 + 
-                             str(year) + '\\' + 
-                             str(month).zfill(2) + '\\' + 
+        yearMonthDayPath0 = (path0 +
+                             str(year) + '\\' +
+                             str(month).zfill(2) + '\\' +
                              str(day).zfill(2) + '\\')
-        inFileName = (yearMonthDayPath0 + 
-                      str(year) + 
-                      str(month).zfill(2) + 
-                      str(day).zfill(2) + 
+        inFileName = (yearMonthDayPath0 +
+                      str(year) +
+                      str(month).zfill(2) +
+                      str(day).zfill(2) +
                       '_index.csv')
         print "inFileName is ", inFileName
         try:
@@ -538,7 +537,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 # Skip the first entry since it's a header
                 reader.next()
                 for row in reader:
-                    # Filer out the ******* lines that are in some index files 
+                    # Filer out the ******* lines that are in some index files
                     if row[3] == "*******":
                         continue
                     lat = float(row[1])
@@ -546,10 +545,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                     if lon < 0:
                         lon += 360
                     press = float(row[3])
-                    if(lat > self.firstLatitude and 
-                       lat < self.secondLatitude and 
-                       lon > self.firstLongitude and 
-                       lon < self.secondLongitude and 
+                    if(lat > self.firstLatitude and
+                       lat < self.secondLatitude and
+                       lon > self.firstLongitude and
+                       lon < self.secondLongitude and
                        press > self.pressureCutOff):
                         # print "So it passed, press is ", press
                         floatNum = row[0]
@@ -576,17 +575,15 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     plotInput: 2D array with data at correct time/depth related positions
     plotTime: 1D array '''
     def plotContour(self, plotInput, plotTime, plotDepth):
-        print "Length of plotInput is ", len(plotInput), "plotInput[0] ", len(plotInput[0])
-        print "Length of plotTime is ", len(plotTime), "plotDepth is ", len(plotDepth)
         if len(plotTime) < 2:
             print "Error: plotting data. There are too few time entries"
             return
         origin = 'lower'
-        CS = plt.contourf(plotTime, 
-            plotDepth, 
-            plotInput.T, 
-            linewidths=(3,),
-            cmap=plt.cm.bone)
+        CS = plt.contourf(plotTime,
+                          plotDepth,
+                          plotInput.T,
+                          linewidths=(3,),
+                          cmap=plt.cm.bone)
         plt.clabel(CS, fmt='%2.1f', colors='w', fontsize=14)
         plt.gca().invert_yaxis()
 
@@ -601,8 +598,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV.close()
         self.dynamicHeightCSV.close()
         self.hgtCSV.close()
-        self.cLimCSV.close()
-        self.stratCSV.close()
+        # self.cLimCSV.close()
+        # self.stratCSV.close()
         print "----------------------------------------------------------------"
         print "Interpolations are completed and stored."
         if SAVELOCALLY:
@@ -611,7 +608,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             lastRun(self.drive, -1)
         return
 
-    ''' Writes to final output files TS_Shgt.csv, Strat.csv, and lstmsge.csv '''
+    ''' Writes to final output file TS_Shgt.csv'''
     def finishUp(self, iPres75):
         if self.dynamicHeight:
             self.hgtCSV.write(str(self.xCoord) + ',' +
@@ -620,26 +617,27 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         stdDiff = self.St[iPres75 - 1] - self.St[0]
         if stdDiff < -0.002:
             stdDiff = 0.0
-        self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' + 
-                            str(self.St[0]) + ',' + str(self.St[iPres75]) + ',' + 
-                            str(self.weight) + '\n')
+        # self.stratCSV.write(str(self.xCoord) + ',' + str(stdDiff) + ',' +
+        #                     str(self.St[0]) + ',' + str(self.St[iPres75]) +
+        #                      ',' +
+        #                     str(self.weight) + '\n')
         stdDiff = 0.001 * int(1000.0 * stdDiff + 0.5)
         if stdDiff < 0.001:
             stdDiff = 0.000
         St1 = 0.001 * int(0.5 + 1000.0 * self.St[0])
         dayOut, monthOut, yearOut = julianToDate(self.xCoord)
-        finalMessage = ("| " + str(self.xCoord) + " " + str(dayOut) + "/" + 
-                        str(monthOut) +  "/" + str(yearOut) + " | " + 
-                        str(self.weight) + "  " + str(stdDiff) + "    " + 
+        finalMessage = ("| " + str(self.xCoord) + " " + str(dayOut) + "/" +
+                        str(monthOut) + "/" + str(yearOut) + " | " +
+                        str(self.weight) + "  " + str(stdDiff) + "    " +
                         str(St1))
         self.closestDist = 0.1 * int(10.0 * self.closestDist + 0.5)
-        finalMessage += (" | " + str(self.closestDist) + "  " + 
+        finalMessage += (" | " + str(self.closestDist) + "  " +
                          self.closestFloatNum + " |")
         # ToDo: Optimize, open outside of loop
-        lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
+        # lstMsge = open((self.outPath + "lstmsge.csv"), 'w')
         # lstMsge.truncate()
-        lstMsge.write(finalMessage)
-        lstMsge.close()
+        # lstMsge.write(finalMessage)
+        # lstMsge.close()
         return
 
     ''' Calculates some statistical analyses on the data provided'''
@@ -655,7 +653,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         for iPress in xrange(0, self.nPress):
             # Interpolate to pressureCalc
             pressureCalc = self.stepSize * (iPress + 1)
-            if (pressureCalc < self.P[0]): 
+            if (pressureCalc < self.P[0]):
                 continue
             if (pressureCalc > self.P[numRecs]):
                 return sTav, sTavSq, sTKnt
@@ -690,7 +688,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         iPres75 = int(1.1 + 75 / self.stepSize)
         weightSumTMax = 0
         for iterPress in xrange(0, self.nPress):
-            pressureCal = self.stepSize * (iterPress - 1)  
+            pressureCal = self.stepSize * (iterPress - 1)
             weightSumS = 0
             weightSumT = 0
             salWeightSumT = 0
@@ -713,7 +711,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                         tempWeightSumT = tempWeightSumT + \
                             self.weight * self.Te[iterFloat, iterPress]
 
-                    if (self.Sa[iterFloat, iterPress] > 20 and 
+                    if (self.Sa[iterFloat, iterPress] > 20 and
                             self.Sa[iterFloat, iterPress] < 40):
                         weightSumS = weightSumS + self.weight
                         salWeightSumT = salWeightSumT + \
@@ -742,7 +740,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.arSva[kDel] = svan
         return iPres75
 
-    ''' Remove entries in P, T, S, St, and Sp that are unusable ''' 
+    ''' Remove entries in P, T, S, St, and Sp that are unusable '''
     def removeEmpties(self):
         if self.St[0] > self.St[1] and np.abs(self.St[0] - self.St[1]) > .05:
             self.St[0] = self.St[1]
@@ -758,8 +756,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         q = 5.6E-6  # q=0.5f/g at station Papa
         for k in xrange(1, self.nPress):
             iPress = self.nPress - k - 1
-            self.dynH[iPress] = ((self.dynH[iPress + 1]) + q * 
-                (self.arSva[iPress + 1] + self.arSva[iPress]) * self.stepSize)
+            self.dynH[iPress] = ((self.dynH[iPress + 1]) + q *
+                                 (self.arSva[iPress + 1] + self.arSva[iPress]) *
+                                 self.stepSize)
 
         iterPressNum = 0
         for iPress in xrange(0, self.nPress):
@@ -771,15 +770,15 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
             pressCount = self.stepSize * (iPress)
 
-            if(not (qSigmaT < self.sigRefSigT[0]) and 
-                not (qSigmaT > self.sigRefSigT[70])):
+            if(not (qSigmaT < self.sigRefSigT[0]) and
+                    not (qSigmaT > self.sigRefSigT[70])):
                 for iCl in xrange(0, 69):
-                    if (qSigmaT >= self.sigRefSigT[iCl] and 
-                    qSigmaT <= self.sigRefSigT[iCl + 1]):
+                    if (qSigmaT >= self.sigRefSigT[iCl] and
+                            qSigmaT <= self.sigRefSigT[iCl + 1]):
                         tep, sap = self.foundPair()
                         break
-                            
-            xCoAndpressCount = str(self.xCoord) + ',' + str(-pressCount) + ',' 
+
+            xCoAndpressCount = str(self.xCoord) + ',' + str(-pressCount) + ','
             if self.temp:
                 self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
                 self.plotTemp[iterDayNum][iterPressNum] = qTemp
@@ -793,14 +792,14 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
                 self.plotSpiciness[iterDayNum][iterPressNum] = qSpice
             if self.dynamicHeight:
-                self.dynamicHeightCSV.write(xCoAndpressCount + 
-                    str(qDynamicHeight) + '\n')
+                self.dynamicHeightCSV.write(xCoAndpressCount +
+                                            str(qDynamicHeight) + '\n')
             iterPressNum += 1
-        return 
+        return
 
     ''' When a pair is found, performs calculations on that pair and writes to 
     Sigref.csv'''
-    # Variable names conflict with standard due to direct port of code of 
+    # Variable names conflict with standard due to direct port of code of
     # Howard's HT Basic.
     def foundPair(self, qSigmaT, iCl):
         Ra = (qSigmaT - self.sigRefSigT[iCl]) / \
@@ -813,8 +812,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         Sap = qSal - Sar
         Tep = 0.001 * int(0.5 + 1000.0 * Tep)
         Sap = 0.001 * int(0.5 + 1000.0 * Sap)
-        self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal + 
-            ',' + Sap)
+        # self.cLimCSV.write(qSigmaT + ',' + qTemp + ',' + Tep + ',' + qSal +
+        #     ',' + Sap)
         return Tep, Sap
 
     # Used for the "Default Settings" check box option. Was not found useful
@@ -822,7 +821,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     #     self.setEnabledParameters(False)
     #     return
 
-    ''' Determines potential validity of data ''' 
+    ''' Determines potential validity of data '''
     def sanityCheck(self, numRecs):
         numRecs = self.checkOutOfRange(numRecs)
         numRecs = checkPressureMonotonic(numRecs, self.P, self.T, self.S)
@@ -832,11 +831,11 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # Loop, if out of range, remove and adjust all values to cover up
         for i in xrange(0, numRecs):
             if (self.P[i] < -0.5 or
-                self.P[i] > 2200 or
-                self.T[i] < -2.5 or
-                self.T[i] > 30 or
-                self.S[i] < 30 or
-                self.S[i] > 39):
+                    self.P[i] > 2200 or
+                    self.T[i] < -2.5 or
+                    self.T[i] > 30 or
+                    self.S[i] < 30 or
+                    self.S[i] > 39):
                 numRecs = removeIndexFromPTS(i, numRecs, self.P, self.T, self.S)
         return numRecs
 
@@ -872,7 +871,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # self.writeDefinedSettings()
         return
 
-
     ''' Reads in the settings from the last run of TimeSeries from 
     TimeSeriesSettings.cfg '''
     def loadOldSettings(self):
@@ -880,36 +878,48 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         cfg.read('TimeSeriesSettings.cfg')
         startDateRaw = cfg.get("inputParams", "dayRangeStart")
         startDateList = [x.strip() for x in startDateRaw.split(',')]
-        self.startRangeDateEdit.setDate(QDate(int(startDateList[0]), 
-                                              int(startDateList[1]), 
+        self.startRangeDateEdit.setDate(QDate(int(startDateList[0]),
+                                              int(startDateList[1]),
                                               int(startDateList[2])))
         endDateRaw = cfg.get("inputParams", "dayRangeEnd")
         endDateList = [x.strip() for x in endDateRaw.split(',')]
-        self.endRangeDateEdit.setDate(QDate(int(endDateList[0]), 
-                                            int(endDateList[1]), 
+        self.endRangeDateEdit.setDate(QDate(int(endDateList[0]),
+                                            int(endDateList[1]),
                                             int(endDateList[2])))
         self.dayStepSizeBox.setValue(cfg.getint("inputParams", "dayStepSize"))
         self.sampleWindowBox.setValue(cfg.getint("inputParams", "timeWindow"))
-        self.firstLatitudeBox.setValue(cfg.getint("inputParams", "firstLatitude"))
-        self.secondLatitudeBox.setValue(cfg.getint("inputParams", "secondLatitude"))
-        self.firstLongitudeBox.setValue(cfg.getint("inputParams", "firstLongitude"))
-        self.secondLongitudeBox.setValue(cfg.getint("inputParams", "secondLongitude"))
-        self.pressureCutOffBox.setValue(cfg.getint("inputParams", "pressureCutoff"))
-        self.maxInterpDepthBox.setValue(cfg.getint("inputParams", "maxPressure"))
+        self.firstLatitudeBox.setValue(
+            cfg.getint("inputParams", "firstLatitude"))
+        self.secondLatitudeBox.setValue(
+            cfg.getint("inputParams", "secondLatitude"))
+        self.firstLongitudeBox.setValue(
+            cfg.getint("inputParams", "firstLongitude"))
+        self.secondLongitudeBox.setValue(
+            cfg.getint("inputParams", "secondLongitude"))
+        self.pressureCutOffBox.setValue(
+            cfg.getint("inputParams", "pressureCutoff"))
+        self.maxInterpDepthBox.setValue(
+            cfg.getint("inputParams", "maxPressure"))
         self.stepSizeBox.setValue(cfg.getint("inputParams", "changeInPressure"))
 
-        self.tempCheckBox.setChecked(cfg.getboolean("desiredResults", "dispTemp"))
-        self.salinityCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSalinity"))
-        self.sigmaTCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSigmaT"))
-        self.spicinessCheckBox.setChecked(cfg.getboolean("desiredResults", "dispSpiciness"))
-        self.dynamicHeightCheckBox.setChecked(cfg.getboolean("desiredResults", "dispDynamicHeight"))
-        self.latitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "latitudeDesired"))                
-        self.longitudeDesiredBox.setValue(cfg.getfloat("desiredResults", "longitudeDesired"))        
+        self.tempCheckBox.setChecked(
+            cfg.getboolean("desiredResults", "dispTemp"))
+        self.salinityCheckBox.setChecked(
+            cfg.getboolean("desiredResults", "dispSalinity"))
+        self.sigmaTCheckBox.setChecked(
+            cfg.getboolean("desiredResults", "dispSigmaT"))
+        self.spicinessCheckBox.setChecked(
+            cfg.getboolean("desiredResults", "dispSpiciness"))
+        self.dynamicHeightCheckBox.setChecked(
+            cfg.getboolean("desiredResults", "dispDynamicHeight"))
+        self.latitudeDesiredBox.setValue(
+            cfg.getfloat("desiredResults", "latitudeDesired"))
+        self.longitudeDesiredBox.setValue(
+            cfg.getfloat("desiredResults", "longitudeDesired"))
         return
 
-
     ''' Writes the settings from this run to TimeSeriesSettings.cfg '''
-    # From my understanding and research, writing to a *.cfg file needs to 
+    # From my understanding and research, writing to a *.cfg file needs to
     # completely overwrite file. Because of this, every option will always
     # be written. This isn't TOO inefficient since the file is very short
     def saveUsedSettings(self):
@@ -917,112 +927,193 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         cfg = configparser.SafeConfigParser()
         date = self.startRangeDateEdit.date().getDate()
         cfg.add_section("inputParams")
-        cfg.set("inputParams", "dayRangeStart", str(date[0]) + ',' + 
-                                                str(date[1]) + ',' + 
-                                                str(date[2]))
+        cfg.set("inputParams", "dayRangeStart", str(date[0]) + ',' +
+                str(date[1]) + ',' +
+                str(date[2]))
         date = self.endRangeDateEdit.date().getDate()
-        cfg.set("inputParams", "dayRangeEnd", str(date[0]) + ',' + 
-                                              str(date[1]) + ',' + 
-                                              str(date[2]))
+        cfg.set("inputParams", "dayRangeEnd", str(date[0]) + ',' +
+                str(date[1]) + ',' +
+                str(date[2]))
         cfg.set("inputParams", "dayStepSize", str(self.dayStepSizeBox.value()))
         cfg.set("inputParams", "timeWindow", str(self.sampleWindowBox.value()))
-        cfg.set("inputParams", "firstLatitude", str(self.firstLatitudeBox.value()))
-        cfg.set("inputParams", "secondLatitude", str(self.secondLatitudeBox.value()))
-        cfg.set("inputParams", "firstLongitude", str(self.firstLongitudeBox.value()))
-        cfg.set("inputParams", "secondLongitude", str(self.secondLongitudeBox.value()))
-        cfg.set("inputParams", "pressureCutoff", str(self.pressureCutOffBox.value()))
-        cfg.set("inputParams", "maxPressure", str(self.maxInterpDepthBox.value()))
-        cfg.set("inputParams", "changeInPressure", str(self.stepSizeBox.value()))
-        
+        cfg.set("inputParams", "firstLatitude",
+                str(self.firstLatitudeBox.value()))
+        cfg.set("inputParams", "secondLatitude",
+                str(self.secondLatitudeBox.value()))
+        cfg.set("inputParams", "firstLongitude",
+                str(self.firstLongitudeBox.value()))
+        cfg.set("inputParams", "secondLongitude",
+                str(self.secondLongitudeBox.value()))
+        cfg.set("inputParams", "pressureCutoff",
+                str(self.pressureCutOffBox.value()))
+        cfg.set("inputParams", "maxPressure", str(
+            self.maxInterpDepthBox.value()))
+        cfg.set("inputParams", "changeInPressure",
+                str(self.stepSizeBox.value()))
+
         cfg.add_section("desiredResults")
-        cfg.set("desiredResults", "dispTemp", str(self.tempCheckBox.isChecked()))
-        cfg.set("desiredResults", "dispSalinity", str(self.salinityCheckBox.isChecked()))
-        cfg.set("desiredResults", "dispSigmaT", str(self.sigmaTCheckBox.isChecked()))
-        cfg.set("desiredResults", "dispSpiciness", str(self.spicinessCheckBox.isChecked()))
-        cfg.set("desiredResults", "dispDynamicHeight", str(self.dynamicHeightCheckBox.isChecked()))
-        cfg.set("desiredResults", "latitudeDesired", str(self.latitudeDesiredBox.value()))
-        cfg.set("desiredResults", "longitudeDesired", str(self.longitudeDesiredBox.value()))
+        cfg.set("desiredResults", "dispTemp",
+                str(self.tempCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSalinity",
+                str(self.salinityCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSigmaT",
+                str(self.sigmaTCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispSpiciness",
+                str(self.spicinessCheckBox.isChecked()))
+        cfg.set("desiredResults", "dispDynamicHeight",
+                str(self.dynamicHeightCheckBox.isChecked()))
+        cfg.set("desiredResults", "latitudeDesired",
+                str(self.latitudeDesiredBox.value()))
+        cfg.set("desiredResults", "longitudeDesired",
+                str(self.longitudeDesiredBox.value()))
 
         with open('TimeSeriesSettings.cfg', 'wb') as cfgFile:
             cfg.write(cfgFile)
         return
 
-    # Checks to see if IN THE info.txt file, the filename already exists OR
-    # is a subset of a filename that exists (TS_Temp_215_50_1000m_2.csv)
-    # returns the truth value, and the denomination the new file should be given
-    # Ex.) True, 3 or False, 1
-    def fileInInfo(self, name, info):
+    def prepInfoFile(self, outLon, outLat, outDepth):
+        exists = False
+        sameParams = False
         amount = 1
-        isIn = False
-        # Left true if parameters don't match filename OR if there is a new 
-        # parameter based filename
-        writeOut = True
-        for line in info:
-            print line
-            if name in line:
-                splitLine = [x.strip() for x in line.split(',')]
-                # If the input filename does not match
-                if not (int(splitLine[1]) == self.stepSize and 
-                        int(splitLine[2]) == self.sampleWindow):
-                    amount += 1
-                    isIn = True
-                # If the input filename does match, append and don't write
-                else: 
-                    writeOut = False
-        return isIn, writeOut, amount
+        infoName = ("TS_Info_" + str(outLon) + '_' + str(outLat) + '_' +
+                    str(outDepth) + "m.txt")
+        tempName = ("TS_Temp_" + str(outLon) + '_' + str(outLat) + '_' +
+                    str(outDepth) + "m")
+        info = open((self.outPath + infoName), 'a+')
+        # Check if the info file is empty
+        if os.stat(self.outPath + infoName).st_size == 0:
+            self.fillEmptyInfoFile(info)
+            exists = False
+        # The info file has contents
+        else:
+            exists = True
+            for line in info:
+                if tempName in line:
+                    splitLine = [x.strip() for x in line.split('| ')]
+                    print "Split line is ", splitLine
+                    # If the input filename does not match
+                    if not (int(splitLine[1]) == self.stepSize and
+                            int(splitLine[2]) == self.sampleWindow):
+                        amount += 1
+                        isIn = True
+                        sameParams = False
+                    # There is an exact match in parameters and filename
+                    else:
+                        sameParams = True
+                        # Return immediately because the rest do not matter,
+                        # we found the file we're appending to
+                        return exists, sameParams, info, amount
+        return exists, sameParams, info, amount
 
-    def prepName(self, outType, outLon, outLat, outDepth):
-        # Add the ".csv" later. This is so we can check if other names contain
-        # this string as a subset
-        info = open((self.outPath + "TimeSeriesInfo.txt"), 'a+')
-        name = (outType + str(outLon) + '_' + str(outLat) + '_' + 
-                    str(outDepth) + "m")        
-        isIn, writeOut, amount = self.fileInInfo(name, info)
-        if isIn:
-            name += "_" + str(amount)
-        name += ".csv"
-        if writeOut:
-            info.write(name + ', ' + 
-                       str(self.stepSize) + ', ' + 
+    def fillEmptyInfoFile(self, info):
+        info.write("Time Series is a program that interpolates data at a")
+        info.write("specific location and time, " + '\n')
+        info.write("based on the data available from ARGO floats within")
+        info.write("the selected nearby area." + '\n' + '\n')
+        info.write("FILEDATA" + '\n' + "Format:" + '\n')
+        info.write("Name_Data Type_Latitude of Data_Longitude of data_Maximum ")
+        info.write("interpolation depth.csv, Pressure Step Size, Day Range")
+        info.write('\n')
+        return
+
+    def prepOutFileNames(self, outLon, outLat, outDepth):
+        tempName = ("TS_Temp_" + str(outLon) + '_' + str(outLat) + '_' +
+                    str(outDepth) + "m")
+        salName = ("TS_Salinity_" + str(outLon) + '_' + str(outLat) + '_' +
+                   str(outDepth) + "m")
+        sigTName = ("TS_SigmaT_" + str(outLon) + '_' + str(outLat) + '_' +
+                    str(outDepth) + "m")
+        spiceName = ("TS_Spiciness_" + str(outLon) + '_' + str(outLat) + '_' +
+                     str(outDepth) + "m")
+        dynHName = ("TS_DynamicHeight_" + str(outLon) + '_' + str(outLat) + '_' +
+                    str(outDepth) + "m")
+        surfHeightName = ("TS_SurfaceHeight_" + str(outLon) + '_' +
+                          str(outLat) + '_' + str(outDepth) + "m")
+        return tempName, salName, sigTName, spiceName, dynHName, surfHeightName
+
+    def addOffsets(self, tempName, salName, sigTName, spiceName, dynHName,
+                   surfHeightName, offset):
+        tempName += '_' + str(offset)
+        salName += '_' + str(offset)
+        sigTName += '_' + str(offset)
+        spiceName += '_' + str(offset)
+        dynHName += '_' + str(offset)
+        surfHeightName += '_' + str(offset)
+        return tempName, salName, sigTName, spiceName, dynHName, surfHeightName
+
+    def writeToInfo(self, tempName, salName, sigTName, spiceName, dynHName,
+                    surfHeightName, infoFile):
+        infoFile.write(tempName + " | " + str(self.stepSize) + ' | ' +
                        str(self.sampleWindow) + '\n')
-        info.close()
-        return name
+        infoFile.write(salName + " | " + str(self.stepSize) + ' | ' +
+                       str(self.sampleWindow) + '\n')
+        infoFile.write(sigTName + " | " + str(self.stepSize) + ' | ' +
+                       str(self.sampleWindow) + '\n')
+        infoFile.write(spiceName + " | " + str(self.stepSize) + ' | ' +
+                       str(self.sampleWindow) + '\n')
+        infoFile.write(dynHName + " | " + str(self.stepSize) + ' | ' +
+                       str(self.sampleWindow) + '\n')
+        infoFile.write(surfHeightName + " | " + str(self.stepSize) + ' | ' +
+                       str(self.sampleWindow) + '\n')
+        return
 
-    ''' Opens and saves the output destination files in the class scope ''' 
+    ''' Opens and saves the output destination files in the class scope '''
     def prepareOutputFiles(self):
 
         outLon = self.longitudeDesired
         outLat = self.latitudeDesired
         outDepth = self.maxInterpDepth
-        
-        tempName = self.prepName("TS_Temp_", outLon, outLat, outDepth)
-        salName = self.prepName("TS_Salinity_", outLon, outLat, outDepth)
-        sigTName = self.prepName("TS_SigmaT_", outLon, outLat, outDepth)
-        spiceName = self.prepName("TS_Spiciness_", outLon, outLat, outDepth)
-        dynHName = self.prepName("TS_DynamicHeight_", outLon, outLat, outDepth)
-        surfHeightName = self.prepName("TS_SurfaceHeight_", 
-                outLon, outLat, outDepth)
+
+        exists, sameParams, infoFile, offset = \
+            self.prepInfoFile(outLon, outLat, outDepth)
+        doOffset = False
+        appendToInfo = False
+        if not exists:
+            doOffset = False
+            appendToInfo = True
+        elif exists and sameParams:
+            doOffset = False
+            appendToInfo = False
+        if exists and not sameParams:
+            doOffset = True
+            appendToInfo = True
+
+        tempName, salName, sigTName, spiceName, dynHName, surfHeightName = \
+            self.prepOutFileNames(outLon, outLat, outDepth)
+        if doOffset:
+            tempName, salName, sigTName, spiceName, dynHName, surfHeightName = \
+                self.addOffsets(tempName, salName, sigTName, spiceName,
+                                dynHName, surfHeightName, offset)
+        tempName += ".csv"
+        salName += ".csv"
+        sigTName += ".csv"
+        spiceName += ".csv"
+        dynHName += ".csv"
+        surfHeightName += ".csv"
+        if appendToInfo:
+            self.writeToInfo(tempName, salName, sigTName, spiceName, dynHName,
+                             surfHeightName, infoFile)
 
         tempPath = self.outPath + tempName
         salinityPath = self.outPath + salName
-        sigmaTPath = self.outPath +  sigTName
+        sigmaTPath = self.outPath + sigTName
         spicinessPath = self.outPath + spiceName
         dynamicHeightPath = self.outPath + dynHName
         hgtPath = self.outPath + surfHeightName         # Surface Height = Shgt
 
-
-        cLimPath = self.sigPath + "Sigref.csv"
-        stratPath = self.outPath + "Strat.csv"
+        # cLimPath = self.sigPath + "Sigref.csv"
+        # stratPath = self.outPath + "Strat.csv"
         self.outputFilesLabel.setText("Output Files:\n" +
-                                      tempPath + '\n' + 
-                                      salinityPath + '\n' + 
-                                      spicinessPath + '\n' + 
-                                      dynamicHeightPath + '\n' + 
-                                      hgtPath + '\n' + 
-                                      stratPath + '\n' +
-                                      cLimPath)
-        self.outputLocationLabel.setText("Output Location:\n" + 
-                                         self.outPath)
+                                      tempPath + '\n' +
+                                      salinityPath + '\n' +
+                                      sigmaTPath + '\n' +
+                                      spicinessPath + '\n' +
+                                      dynamicHeightPath + '\n' +
+                                      hgtPath + '\n')
+        # stratPath + '\n' +
+        # cLimPath)
+        # self.outputLocationLabel.setText("Output Location:\n" +
+        #                                  self.outPath)
         writeType = 'a'
         if not self.append:
             writeType = 'w'
@@ -1032,8 +1123,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.spicinessCSV = open((spicinessPath), writeType)
         self.dynamicHeightCSV = open((dynamicHeightPath), writeType)
         self.hgtCSV = open((hgtPath), writeType)
-        self.cLimCSV = open((cLimPath), writeType)
-        self.stratCSV = open((stratPath), writeType)
+        # self.cLimCSV = open((cLimPath), writeType)
+        # self.stratCSV = open((stratPath), writeType)
         if SAVELOCALLY:
-            self.filesInUse = open((self.outPath + "IOS_Files_In_Use.txt"), 'w+')
+            self.filesInUse = open(
+                (self.outPath + "IOS_Files_In_Use.txt"), 'w+')
         return
