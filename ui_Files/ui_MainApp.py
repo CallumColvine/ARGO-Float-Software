@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\MainApp.ui'
 #
-# Created: Mon Aug 22 09:42:59 2016
+# Created: Tue Aug 23 08:39:03 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
