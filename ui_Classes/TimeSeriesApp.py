@@ -901,7 +901,6 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.maxInterpDepthBox.setValue(
             cfg.getint("inputParams", "maxPressure"))
         self.stepSizeBox.setValue(cfg.getint("inputParams", "changeInPressure"))
-
         self.tempCheckBox.setChecked(
             cfg.getboolean("desiredResults", "dispTemp"))
         self.salinityCheckBox.setChecked(
@@ -931,7 +930,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 str(date[1]) + ',' +
                 str(date[2]))
         date = self.endRangeDateEdit.date().getDate()
-        cfg.set("inputParams", "dayRangeEnd", str(date[0]) + ',' +
+        cfg.set("inputParams", "dayRangeEnd", 
+                str(date[0]) + ',' +
                 str(date[1]) + ',' +
                 str(date[2]))
         cfg.set("inputParams", "dayStepSize", str(self.dayStepSizeBox.value()))

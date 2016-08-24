@@ -30,6 +30,7 @@ This might (hopefully) make the code more readable
 # UI Imports
 from PySide import QtCore, QtGui
 from PySide.QtGui import QWidget
+from PySide.QtCore import QDate
 from ui_Files.ui_circulationapp import Ui_CirculationApp
 # Plotting Imports
 from mpl_toolkits.basemap import Basemap
@@ -45,6 +46,9 @@ from utilities.ARGO_Utilities import formatToDateTime, dateToJulian, \
     convertLatLonToNegative
 # Formatting Imports
 import re
+# Settings Imports
+import configparser
+
 
 
 class CirculationApp(QWidget, Ui_CirculationApp):
@@ -61,7 +65,7 @@ class CirculationApp(QWidget, Ui_CirculationApp):
     chooses this experiment. '''
     def experimentSelected(self):
         self.initAllClassVariables()
-        self.loadDefaultSettings()
+        self.loadPreviousSettings()
         if not self.signalsSetup:
             self.setupSignals()
         self.signalsSetup = True
@@ -246,17 +250,52 @@ class CirculationApp(QWidget, Ui_CirculationApp):
         if not self.CLASS_INITTED:
             print "Please wait for class variables to initialize"
             return
-        self.saveChosenSettings()
+        self.saveUsedSettings()
         self.circulationStackedWidget.setCurrentWidget(self.calculatingPage)
         self.mainLoop()
         return
 
-    def saveChosenSettings(self):
-        # Saves the user picked settings to a *.cfg file
+    def saveUsedSettings(self):
+        cfg = configparser.SafeConfigParser()
+        date = self.centreOfPlotDateEdit.date().getDate()
+        cfg.add_section("floatParams")
+        cfg.set("floatParams", "plotCentreDate", 
+                str(date[0]) + ',' + 
+                str(date[1]) + ',' + 
+                str(date[2]))
+        cfg.set("floatParams", "dayRange", str(self.sampleWindowBox.value()))
+        cfg.set("floatParams", "pressureCutoff", str(self.pressureCutOffBox.value()))
+        cfg.set("floatParams", "maxPressure", str(self.maxInterpDepthBox.value()))
+        cfg.set("floatParams", "stepSize", str(self.stepSizeBox.value()))
+        cfg.set("floatParams", "dynamicHeightAtSurface", str(self.dynHeightAtPBox.value()))
+        cfg.set("floatParams", "relativeToNoMotion", str(self.relativeToPrefBox.value()))        
+        cfg.set("floatParams", "totalModes", str(self.totalModesBox.value()))
+
+        with open('CirculationSettings.cfg', 'wb') as cfgFile:
+            cfg.write(cfgFile)
         return
 
-    def loadDefaultSettings(self):
+    def loadPreviousSettings(self):
         # Read default/previous from a *.cfg file
+        cfg = configparser.SafeConfigParser()
+        cfg.read('CirculationSettings.cfg')
+        dateRaw = cfg.get("floatParams", "plotCentreDate")
+        dateList = [x.strip() for x in dateRaw.split(',')]
+        self.centreOfPlotDateEdit.setDate(QDate(int(dateList[0]),
+                                                int(dateList[1]),
+                                                int(dateList[2])))
+        self.sampleWindowBox.setValue(cfg.getint("floatParams", 
+                                                 "dayRange"))
+        self.pressureCutOffBox.setValue(cfg.getint("floatParams", 
+                                                   "pressureCutoff"))
+        self.maxInterpDepthBox.setValue(cfg.getint("floatParams", 
+                                                   "maxPressure"))
+        self.stepSizeBox.setValue(cfg.getint("floatParams", "stepSize"))
+        self.dynHeightAtPBox.setValue(cfg.getint("floatParams", 
+                                                 "dynamicHeightAtSurface"))
+        self.relativeToPrefBox.setValue(cfg.getint("floatParams",
+                                                   "relativeToNoMotion"))
+        self.totalModesBox.setValue(cfg.getint("floatParams", "totalModes"))
         return
 
     ''' Every function call for the normal working of the program is made here.
