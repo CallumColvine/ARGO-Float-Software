@@ -1,0 +1,12 @@
+Time Series is a program that interpolates data at a specific location and time, 
+based on the data available from ARGO floats within the selected nearby area (defined by the min/max Lat/Lon).
+
+FILEDATA
+Format:
+Name_DataType_MeanLatitude_MeanLongitude_MaximumDepth.csv, Min Latitude, Max Latitude, Min Longitude, Max Longitude, Pressure Step Size, Day Range
+TS_Temp_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10
+TS_Salinity_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10
+TS_SigmaT_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10
+TS_Spiciness_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10
+TS_DynamicHeight_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10
+TS_SurfaceHeight_215.0_50.0_1000m.csv | 48.0 | 52.0 | 212.0 | 218.0 | 5 | 10

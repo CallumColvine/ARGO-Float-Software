@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\MainApp.ui'
 #
-# Created: Tue Aug 23 08:39:03 2016
+# Created: Fri Aug 26 11:04:41 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,6 +68,7 @@ class Ui_MainApp(object):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.timeSeriesButton = QtGui.QPushButton(self.programListPage)
+        self.timeSeriesButton.setEnabled(True)
         self.timeSeriesButton.setMinimumSize(QtCore.QSize(0, 0))
         self.timeSeriesButton.setMaximumSize(QtCore.QSize(99, 16777215))
         font = QtGui.QFont()
@@ -110,6 +111,7 @@ class Ui_MainApp(object):
         self.horizontalLayout_6 = QtGui.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.argoDataLineEdit = QtGui.QLineEdit(self.programListPage)
+        self.argoDataLineEdit.setMaximumSize(QtCore.QSize(80, 16777215))
         font = QtGui.QFont()
         font.setPointSize(11)
         self.argoDataLineEdit.setFont(font)

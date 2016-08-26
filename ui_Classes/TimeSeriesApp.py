@@ -3,6 +3,7 @@ TimeSeriesApp.py
 Callum Colvine - Research Assistant
 Callum.Colvine@dfo-mpo.gc.ca
 CallumColvine@gmail.com
+and Tetjana Ross (tetjana.ross@dfo-mpo.gc.ca)
 
 TimeSeries has the functionality from Howard Freeland's TimeSeries which was 
 written in HT Basic.
@@ -10,9 +11,9 @@ written in HT Basic.
 TimeSeries reads ARGO data and outputs interpolated float data into several 
 TS_*.csv files. 
 
-Potential upgrades to TimeSeries if there is time in the futre:
+Potential upgrades to TimeSeries if there is time in the future:
 - Eliminate all the individual data arrays, and use a dictionary instead
-- Concurrently handle mutiple tasks to improve runtime
+- Concurrently handle multiple tasks to improve runtime
 - Examine loop structure in an attempt to improve runtime
 
 Following Pep 8 formatting with the following exceptions:
@@ -155,7 +156,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         # 110! Dimensions of data to be read from files
         self.P = np.empty((2000))
         self.T = np.empty((2000))
+        self.nT = np.empty((2000))
         self.S = np.empty((2000))
+        self.nS = np.empty((2000))
         self.St = np.empty((2000))
         self.Sp = np.empty((2000))
         # 140 ! ALPHA PEN 1
@@ -451,22 +454,22 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def initPlotArrays(self, julStart, julEnd):
         # print "ceiling days is ", ceil((julEnd - julStart) /
         # float(self.dayStepSize))
-        self.plotTemp = np.empty((ceil((julEnd - julStart) /
-                                       float(self.dayStepSize)),
-                                  ceil(self.maxInterpDepth /
-                                       float(self.stepSize)) + 1))
-        self.plotSalinity = np.empty((ceil((julEnd - julStart) /
-                                           float(self.dayStepSize)),
-                                      ceil(self.maxInterpDepth /
-                                           float(self.stepSize)) + 1))
-        self.plotSigmaT = np.empty((ceil((julEnd - julStart) /
-                                         float(self.dayStepSize)),
-                                    ceil(self.maxInterpDepth /
-                                         float(self.stepSize)) + 1))
-        self.plotSpiciness = np.empty((ceil((julEnd - julStart) /
-                                            float(self.dayStepSize)),
-                                       ceil(self.maxInterpDepth /
-                                            float(self.stepSize)) + 1))
+        self.plotTemp = np.empty((int(ceil((julEnd - julStart) /
+                                       float(self.dayStepSize))),
+                                  int(ceil(self.maxInterpDepth /
+                                       self.stepSize)) + 1))
+        self.plotSalinity = np.empty((int(ceil((julEnd - julStart) /
+                                           float(self.dayStepSize))),
+                                      int(ceil(self.maxInterpDepth /
+                                           self.stepSize)) + 1))
+        self.plotSigmaT = np.empty((int(ceil((julEnd - julStart) /
+                                         float(self.dayStepSize))),
+                                    int(ceil(self.maxInterpDepth /
+                                         self.stepSize)) + 1))
+        self.plotSpiciness = np.empty((int(ceil((julEnd - julStart) /
+                                            float(self.dayStepSize))),
+                                       int(ceil(self.maxInterpDepth /
+                                            self.stepSize)) + 1))
         self.plotTime = np.arange(julStart, julEnd, self.dayStepSize)
         self.plotDepth = np.arange(0, self.maxInterpDepth + 1, self.stepSize)
         return
@@ -505,9 +508,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 j += 1
                 if TESTING:
                     break
-            iPres75 = self.formatResults(sTav, sTavSq, sTKnt)
+            iPres75 = self.interpResults(sTav, sTavSq, sTKnt)
             self.removeEmpties()
-            self.computeDynHeight(iterDayNum)
+            self.computeDynHeight()
+            self.writeArgoFiles(iterDayNum)
             self.finishUp(iPres75)
             iterDayNum += 1
         self.cleanUp()
@@ -537,7 +541,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                 # Skip the first entry since it's a header
                 reader.next()
                 for row in reader:
-                    # Filer out the ******* lines that are in some index files
+                    # Filter out the ******* lines that are in some index files
                     if row[3] == "*******":
                         continue
                     lat = float(row[1])
@@ -669,13 +673,12 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                         self.Sa[iFloat, iPress] = self.S[k - 1] + \
                             rho * (self.S[k] - self.S[k - 1] + eps)
                     break
-            # Finished interpolation to standard pressures for Float iFloat
-        # Finished interpolation to standard pressures for all floats
+            # Finished interpolation to standard pressures for iPress
+        # Finished interpolation to standard pressures for all pressures
         return sTav, sTavSq, sTKnt
 
-    ''' Calculates values and adds them to P, T, S, St, and Sp 
-    Line 814 '''
-    def formatResults(self, sTav, sTavSq, sTKnt):
+    ''' Calculates values and adds them to P, T, S, St, and Sp  '''
+    def interpResults(self, sTav, sTavSq, sTKnt):
         if sTKnt != 0:
             sTav = sTav / sTKnt
             sTavSq = sTavSq / sTKnt
@@ -691,8 +694,10 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             pressureCal = self.stepSize * (iterPress - 1)
             weightSumS = 0
             weightSumT = 0
-            salWeightSumT = 0
+            tempWeightSumS = 0
             tempWeightSumT = 0
+            nFloatsT = 0
+            nFloatsS = 0
             for iterFloat in xrange(0, self.numFloats):
                 if self.floatUsable[iterFloat] == False:
                     continue
@@ -708,13 +713,15 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
                     if (self.Te[iterFloat, iterPress] > -1.5 and
                             self.Te[iterFloat, iterPress] < 40):
                         weightSumT = weightSumT + self.weight
+                        nFloatsT += 1
                         tempWeightSumT = tempWeightSumT + \
                             self.weight * self.Te[iterFloat, iterPress]
 
                     if (self.Sa[iterFloat, iterPress] > 20 and
                             self.Sa[iterFloat, iterPress] < 40):
                         weightSumS = weightSumS + self.weight
-                        salWeightSumT = salWeightSumT + \
+                        nFloatsS += 1
+                        tempWeightSumS = tempWeightSumS + \
                             self.weight * self.Sa[iterFloat, iterPress]
 
             if weightSumT > weightSumTMax:
@@ -724,7 +731,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             else:
                 qTemp = tempWeightSumT
             if weightSumS > 0:
-                qSal = salWeightSumT / weightSumS
+                qSal = tempWeightSumS / weightSumS
             else:
                 pass
             self.weight = (int((weightSumTMax * 1000) + 0.5)) / 1000.0
@@ -733,7 +740,9 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             sigma, svan = getSvanom(qSal, qTemp, 0)
             self.P[iterPress] = self.stepSize * (iterPress - 1)
             self.T[iterPress] = qTemp
+            self.nT[iterPress] = nFloatsT
             self.S[iterPress] = qSal
+            self.nS[iterPress] = nFloatsS
             self.St[iterPress] = qSigmaT
             self.Sp[iterPress] = qSpice
             kDel += 1
@@ -749,8 +758,8 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.Sp[0] = self.Sp[1]
         return
 
-    ''' Writes the values from P, T, S, St, and Sp to their respective files '''
-    def computeDynHeight(self, iterDayNum):
+    ''' Calculates Dynamic Height '''
+    def computeDynHeight(self):
         # Now compute DHgt relative to Pmax
         self.dynH[self.nPress - 1] = 0
         q = 5.6E-6  # q=0.5f/g at station Papa
@@ -759,11 +768,16 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
             self.dynH[iPress] = ((self.dynH[iPress + 1]) + q *
                                  (self.arSva[iPress + 1] + self.arSva[iPress]) *
                                  self.stepSize)
-
+        return
+        
+    ''' Writes the values from P, T, S, St, and Sp to their respective files '''
+    def writeArgoFiles(self, iterDayNum):
         iterPressNum = 0
         for iPress in xrange(0, self.nPress):
             qTemp = 0.001 * int(0.5 + 1000 * self.T[iPress])
+            qNTemp = int(self.nT[iPress])
             qSal = 0.001 * int(0.5 + 1000 * self.S[iPress])
+            qNSal = int(self.nS[iPress])
             qSigmaT = 0.001 * int(0.5 + 1000 * self.St[iPress])
             qSpice = 0.001 * int(0.5 + 1000 * self.Sp[iPress])
             qDynamicHeight = 0.001 * int(0.5 + 1000 * self.dynH[iPress])
@@ -780,20 +794,25 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
             xCoAndpressCount = str(self.xCoord) + ',' + str(-pressCount) + ','
             if self.temp:
-                self.tempCSV.write(xCoAndpressCount + str(qTemp) + '\n')
+                self.tempCSV.write(xCoAndpressCount + str(qTemp) + ',' \
+                        + str(qNTemp) + '\n')
                 self.plotTemp[iterDayNum][iterPressNum] = qTemp
             if self.salinity:
-                self.salinityCSV.write(xCoAndpressCount + str(qSal) + '\n')
+                self.salinityCSV.write(xCoAndpressCount + str(qSal) + ',' \
+                        + str(qNSal) + '\n')
                 self.plotSalinity[iterDayNum][iterPressNum] = qSal
             if self.sigmaT:
-                self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + '\n')
+                self.sigmaTCSV.write(xCoAndpressCount + str(qSigmaT) + ',' \
+                        + str(min([qNTemp, qNSal])) + '\n')
                 self.plotSigmaT[iterDayNum][iterPressNum] = qSigmaT
             if self.spiciness:
-                self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + '\n')
+                self.spicinessCSV.write(xCoAndpressCount + str(qSpice) + ',' \
+                        + str(min([qNTemp, qNSal])) + '\n')
                 self.plotSpiciness[iterDayNum][iterPressNum] = qSpice
             if self.dynamicHeight:
                 self.dynamicHeightCSV.write(xCoAndpressCount +
-                                            str(qDynamicHeight) + '\n')
+                                            str(qDynamicHeight) + ',' \
+                        + str(min([qNTemp, qNSal])) + '\n')
             iterPressNum += 1
         return
 
@@ -889,13 +908,13 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         self.dayStepSizeBox.setValue(cfg.getint("inputParams", "dayStepSize"))
         self.sampleWindowBox.setValue(cfg.getint("inputParams", "timeWindow"))
         self.firstLatitudeBox.setValue(
-            cfg.getint("inputParams", "firstLatitude"))
+            cfg.getfloat("inputParams", "firstLatitude"))
         self.secondLatitudeBox.setValue(
-            cfg.getint("inputParams", "secondLatitude"))
+            cfg.getfloat("inputParams", "secondLatitude"))
         self.firstLongitudeBox.setValue(
-            cfg.getint("inputParams", "firstLongitude"))
+            cfg.getfloat("inputParams", "firstLongitude"))
         self.secondLongitudeBox.setValue(
-            cfg.getint("inputParams", "secondLongitude"))
+            cfg.getfloat("inputParams", "secondLongitude"))
         self.pressureCutOffBox.setValue(
             cfg.getint("inputParams", "pressureCutoff"))
         self.maxInterpDepthBox.setValue(
@@ -974,45 +993,67 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
     def prepInfoFile(self, outLon, outLat, outDepth):
         exists = False
         sameParams = False
-        amount = 1
+        amount = 0
+        offset = []
+        fileSuffix = ""
         infoName = ("TS_Info_" + str(outLon) + '_' + str(outLat) + '_' +
                     str(outDepth) + "m.txt")
         tempName = ("TS_Temp_" + str(outLon) + '_' + str(outLat) + '_' +
                     str(outDepth) + "m")
-        info = open((self.outPath + infoName), 'a+')
-        # Check if the info file is empty
-        if os.stat(self.outPath + infoName).st_size == 0:
+
+        # Check if the info file exists
+        filenames = os.listdir(self.outPath)
+        for files in filenames:
+            if infoName[:-4] in files:
+                exists = True
+                if files[files.find(infoName[-5:-4])+2:-4] == "":
+                    offset.append(0)
+                else:
+                    offset.append(int(files[files.find(infoName[-5:-4])+2:-4]))
+                    amount += 1
+        # If it doesn't exist, create it
+        if not exists: 
+            info = open((self.outPath + infoName), 'a+')
             self.fillEmptyInfoFile(info)
-            exists = False
-        # The info file has contents
-        else:
-            exists = True
-            for line in info:
-                if tempName in line:
-                    splitLine = [x.strip() for x in line.split('| ')]
-                    print "Split line is ", splitLine
-                    # If the input filename does not match
-                    if not (int(splitLine[1]) == self.stepSize and
-                            int(splitLine[2]) == self.sampleWindow):
-                        amount += 1
-                        isIn = True
-                        sameParams = False
-                    # There is an exact match in parameters and filename
-                    else:
-                        sameParams = True
-                        # Return immediately because the rest do not matter,
-                        # we found the file we're appending to
-                        return exists, sameParams, info, amount
+        # If it exists, see if the parameter sets are the same, if so append, otherwise create a new one
+        else:  
+            for iFile in xrange(0, amount+1):
+                if offset[iFile] == 0:
+                    fileSuffix = ""
+                else:
+                    fileSuffix = ("_" + str(offset[iFile]))         
+                info = open((self.outPath + infoName[:-4] + fileSuffix + infoName[-4:]), 'a+')
+                for line in info:
+                    if tempName in line:
+                        splitLine = [x.strip() for x in line.split('| ')]
+                        print "Split line is ", splitLine
+                        # If the input filename does not match
+                        if not (float(splitLine[1]) == self.firstLatitude and
+                                float(splitLine[2]) == self.secondLatitude and
+                                float(splitLine[3]) == self.firstLongitude and
+                                float(splitLine[4]) == self.secondLongitude and
+                                int(splitLine[5]) == self.stepSize and
+                                int(splitLine[6]) == self.sampleWindow):
+                            sameParams = False
+                        # There is an exact match in parameters and filename
+                        else:
+                            sameParams = True
+                            break
+            if not sameParams:
+                amount += 1
+                fileSuffix = ("_" + str(amount))
+                info = open((self.outPath + infoName[:-4] + fileSuffix + infoName[-4:]), 'a+')
+                self.fillEmptyInfoFile(info)
         return exists, sameParams, info, amount
 
     def fillEmptyInfoFile(self, info):
-        info.write("Time Series is a program that interpolates data at a")
+        info.write("Time Series is a program that interpolates data at a ")
         info.write("specific location and time, " + '\n')
-        info.write("based on the data available from ARGO floats within")
-        info.write("the selected nearby area." + '\n' + '\n')
+        info.write("based on the data available from ARGO floats within ")
+        info.write("the selected nearby area (defined by the min/max Lat/Lon)." + '\n' + '\n')
         info.write("FILEDATA" + '\n' + "Format:" + '\n')
-        info.write("Name_Data Type_Latitude of Data_Longitude of data_Maximum ")
-        info.write("interpolation depth.csv, Pressure Step Size, Day Range")
+        info.write("Name_DataType_MeanLatitude_MeanLongitude_Maximum")
+        info.write("Depth.csv, Min Latitude, Max Latitude, Min Longitude, Max Longitude, Pressure Step Size, Day Range")
         info.write('\n')
         return
 
@@ -1043,18 +1084,30 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
 
     def writeToInfo(self, tempName, salName, sigTName, spiceName, dynHName,
                     surfHeightName, infoFile):
-        infoFile.write(tempName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
-        infoFile.write(salName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
-        infoFile.write(sigTName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
-        infoFile.write(spiceName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
-        infoFile.write(dynHName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
-        infoFile.write(surfHeightName + " | " + str(self.stepSize) + ' | ' +
-                       str(self.sampleWindow) + '\n')
+        infoFile.write(tempName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
+        infoFile.write(salName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
+        infoFile.write(sigTName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
+        infoFile.write(spiceName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
+        infoFile.write(dynHName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
+        infoFile.write(surfHeightName + " | " + str(self.firstLatitude) + ' | ' + 
+                    str(self.secondLatitude) + ' | ' + str(self.firstLongitude) 
+                    + ' | ' + str(self.secondLongitude) + ' | ' + 
+                    str(self.stepSize) + ' | ' + str(self.sampleWindow) + '\n')
         return
 
     ''' Opens and saves the output destination files in the class scope '''
@@ -1065,7 +1118,7 @@ class TimeSeriesApp(QWidget, Ui_TimeSeriesApp):
         outDepth = self.maxInterpDepth
 
         exists, sameParams, infoFile, offset = \
-            self.prepInfoFile(outLon, outLat, outDepth)
+            self.prepInfoFile(outLon, outLat,  outDepth)
         doOffset = False
         appendToInfo = False
         if not exists:

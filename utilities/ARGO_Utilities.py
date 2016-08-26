@@ -10,21 +10,8 @@ def formatToDateTime(year, month, day):
     return dateTuple
 
 def julianToDate(julDate):
-    yearAmounts = 0
-    curYear = 0
-    daysIn = 0
-    # 7306 is the Julian Date for 2020
-    # 14612 is the Howard Julian date for 2040
-    for i in xrange(0, 14612, (365 + int(yearAmounts))):
-        if (i <= julDate) and ((i + 365 + int(yearAmounts)) > julDate):
-            daysIn = julDate - i
-            break
-        curYear += 1
-        yearAmounts += 0.25
-        if yearAmounts > 1:
-            yearAmounts -= 1
-    year = curYear + 2001
-    result = datetime.datetime(year, 1, 1) + datetime.timedelta(daysIn)
+    result = datetime.datetime(2001, 1, 1) + datetime.timedelta(julDate-1)
+    year = result.year
     month = result.month
     day = result.day
     return day, month, year

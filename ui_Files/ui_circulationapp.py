@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:\Users\rosst\Documents\Argo\Software\ui_Files\circulationapp.ui'
 #
-# Created: Tue Aug 23 08:39:04 2016
+# Created: Fri Aug 26 11:04:42 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -40,7 +40,7 @@ class Ui_CirculationApp(object):
         self.label_8.setFont(font)
         self.label_8.setObjectName("label_8")
         self.horizontalLayout_10.addWidget(self.label_8)
-        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Minimum)
+        spacerItem1 = QtGui.QSpacerItem(47, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_10.addItem(spacerItem1)
         self.label_16 = QtGui.QLabel(self.settingsPage)
         font = QtGui.QFont()

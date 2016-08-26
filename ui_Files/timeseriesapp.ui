@@ -20,7 +20,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="settingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -343,20 +343,26 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>
-          <widget class="QSpinBox" name="firstLatitudeBox">
+          <widget class="QDoubleSpinBox" name="firstLatitudeBox">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
            <property name="minimum">
-            <number>-9999</number>
+            <double>-90.000000000000000</double>
            </property>
            <property name="maximum">
-            <number>9999</number>
+            <double>90.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>40</number>
+            <double>40.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -389,20 +395,26 @@
           </spacer>
          </item>
          <item>
-          <widget class="QSpinBox" name="secondLatitudeBox">
+          <widget class="QDoubleSpinBox" name="secondLatitudeBox">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
            <property name="minimum">
-            <number>-9999</number>
+            <double>-90.000000000000000</double>
            </property>
            <property name="maximum">
-            <number>9999</number>
+            <double>90.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>65</number>
+            <double>60.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -436,20 +448,26 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_11">
          <item>
-          <widget class="QSpinBox" name="firstLongitudeBox">
+          <widget class="QDoubleSpinBox" name="firstLongitudeBox">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
            <property name="minimum">
-            <number>-9999</number>
+            <double>0.000000000000000</double>
            </property>
            <property name="maximum">
-            <number>9999</number>
+            <double>360.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>200</number>
+            <double>200.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -482,20 +500,23 @@
           </spacer>
          </item>
          <item>
-          <widget class="QSpinBox" name="secondLongitudeBox">
+          <widget class="QDoubleSpinBox" name="secondLongitudeBox">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
             </font>
            </property>
-           <property name="minimum">
-            <number>-9999</number>
+           <property name="decimals">
+            <number>1</number>
            </property>
            <property name="maximum">
-            <number>9999</number>
+            <double>360.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <number>230</number>
+            <double>230.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -799,6 +820,9 @@
                <property name="readOnly">
                 <bool>true</bool>
                </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
                <property name="maximum">
                 <double>180.000000000000000</double>
                </property>
@@ -819,6 +843,9 @@
                </property>
                <property name="readOnly">
                 <bool>true</bool>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
                </property>
                <property name="maximum">
                 <double>360.000000000000000</double>
