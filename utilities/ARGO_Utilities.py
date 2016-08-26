@@ -2,6 +2,7 @@ import datetime
 import numpy as np
 import time
 
+''' Converts a Gregorian Date to a datetime object '''
 def formatToDateTime(year, month, day):
     stringVersion = str(day) + '.' + str(month) + '.' + str(year)
     stringFormat = '%d.%m.%Y'
@@ -9,6 +10,7 @@ def formatToDateTime(year, month, day):
                                            stringFormat)
     return dateTuple
 
+''' Converts a Howard Julian Date input to Gregorian day/month/year'''
 def julianToDate(julDate):
     result = datetime.datetime(2001, 1, 1) + datetime.timedelta(julDate-1)
     year = result.year
@@ -39,6 +41,7 @@ def lastRun(curDrive, status):
     lastRunF.close()
     return
 
+''' Returns the current date in Howard's Julian'''
 def todayInJulian():
     day = int(time.strftime("%d"))
     month = int(time.strftime("%m"))
@@ -47,7 +50,7 @@ def todayInJulian():
     todayInJul = dateToJulian(day, month, year, dayOfYear)
     return todayInJul
 
-
+''' Returns the current Gregorian date in day/month/year format'''
 def todayInDate():
     curDay = int(time.strftime("%d"))
     curMonth = int(time.strftime("%m"))
@@ -187,7 +190,6 @@ def checkIfReturn(numRecords, fileTempQc, filePSalQc):
 
 ''' Used by getProfile() to determine validity of float data '''
 def extractDataFromFloatFile(path, order, P, T, S):
-    # print "Opening path ", path
     floatFile = open(path, 'r')
     passedEndOfHeader = False
     pFound = False
@@ -199,8 +201,6 @@ def extractDataFromFloatFile(path, order, P, T, S):
         if not passedEndOfHeader:
             if line.find("NUMBER OF RECORDS") != -1:
                 numRecs = getNumRecs(line)
-                # if numRecs > 500:
-                #     print "Num recs > 500 in file: ", path
             order, pFound, tFound, sFound = \
                 findOrder(line, order, pFound, tFound, sFound)
             if not (verifyUsability(line)):
@@ -214,7 +214,6 @@ def extractDataFromFloatFile(path, order, P, T, S):
 
 def getNumRecs(line):
     split = line.split()
-    # print "numRecs is ", int(split[4])
     return int(split[4])
 
 
@@ -224,7 +223,6 @@ def findOrder(line, order, pFound, tFound, sFound):
     resP = -1
     resT = -1
     resS = -1
-    # print line
     if not pFound:
         resP = line.find("PRES_ADJUSTED ")
     if not tFound:
@@ -257,11 +255,9 @@ def verifyUsability(line):
 ''' Adds data pulled form individual float files to the P, T, S arrays '''
 def appendInfo(line, order, i, P, T, S):
     split = line.split()
-    # print "Split is ", split
     offset = 5
     position = 0
-    # if order != ['P', 'T', 'S']:
-    #     print "----- Order is different -----"
+
     for data in order:
         twoPos = float(split[2 + (position * 5)])
         zeroPos = float(split[0 + (position * 5)])
